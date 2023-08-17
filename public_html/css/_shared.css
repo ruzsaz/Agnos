@@ -176,7 +176,7 @@ body {
   overflow-x: hidden;
   overflow-y: hidden;
   background: black;
-  color: #ffffff;
+  color: white;
 }
 svg {
   overflow: hidden;
@@ -1633,7 +1633,7 @@ svg.switchButtonHelp {
 }
 #dialogPanel {
   left: 50vw;
-  top: 50vh;
+  top: 35vh;
   overflow: hidden;
   position: relative;
   -ms-transform: translateX(-50%) translateY(-50%);
@@ -1641,7 +1641,6 @@ svg.switchButtonHelp {
   transform: translateX(-50%) translateY(-50%);
   padding: 20px 20px 20px;
   width: 310px;
-  min-height: 208px;
   border-radius: 10px;
   background: #343434;
   border: 0px solid white;
@@ -1665,7 +1664,6 @@ svg.switchButtonHelp {
 }
 #dialogMessage {
   margin: 5px;
-  min-height: 102px;
 }
 #dialogPanel button {
   width: 137px;

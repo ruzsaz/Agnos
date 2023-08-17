@@ -89,17 +89,11 @@ function Container() {
                 var startObject = JSON.parse(LZString.decompressFromEncodedURIComponent(startString));
                 that.navigateTo(startObject);
             } catch (e) {
-                console.log(e)
                 if (global.preferredUsername === undefined) {
-                    alert("Log in to see the report");
-                    //keycloak.login();
+                    global.showNotAuthenticated();             
                 } else {
-                    alert("Megszoptad");
-                    //keycloak.logout();
-                }
-                
-                
-                //window.location.replace(location.href.split("#")[0]);
+                    global.showNotAuthorized(global.preferredUsername);
+                }                             
             }
         } else {
             that.resizeContainers(0, 1, global.panelNumberOnScreen);

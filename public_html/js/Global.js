@@ -52,7 +52,7 @@ var global = function () {
         setCookie("css", cssFile, 730);
         clearTimeout(global.cssChangeTimer);
         global.changeCSSInProgress = true;
-        
+
 
         d3.select('body').style("opacity", 0);
 
@@ -104,7 +104,9 @@ var global = function () {
 
             d3.select('body').transition(savedDuration).delay(0).style("opacity", 1)
                     .on("end", function () {
-                        global.cssChangeTimer = setTimeout(function() {global.changeCSSInProgress = false;}, 2000);
+                        global.cssChangeTimer = setTimeout(function () {
+                            global.changeCSSInProgress = false;
+                        }, 2000);
                         global.selfDuration = savedDuration;
                     });
         }
@@ -457,7 +459,7 @@ var global = function () {
                 // Tényleges URL-be írás. Ha nem kell, kikommentelendő.
                 if (global.saveToBookmarkRequired) {
                     const newUrl = location.origin + location.pathname + "?q=" + LZString.compressToEncodedURIComponent(JSON.stringify(startObject));
-                    window.history.replaceState({ id: "100" }, "Page 3", newUrl);
+                    window.history.replaceState({id: "100"}, "Page 3", newUrl);
                     //location.hash = LZString.compressToEncodedURIComponent(JSON.stringify(startObject));
                 }
             }
@@ -468,125 +470,89 @@ var global = function () {
         global.mediators[1].publish("getConfig", receiveConfig);
     };
 
+
     /**
-     * Belépés.
+     * Logs the current user out from the identity provider
      * 
-     * @param {String} username Felhasználónév.
-     * @param {String} password Jelszó.
-     * @param {String} callback Sikeres autentikáció után meghívandó függvény.	 
      * @returns {undefined}
      */
-//    var login = function (username, password, callback) {
-//        var progressDiv = d3.select("#progressDiv");
-//        var progressCounter = setTimeout(function () {
-//            progressDiv.style("z-index", 1000);
-//        }, 50);
-//
-//        $.ajax({
-//            url: global.url.auth,
-//            timeout: 5000,
-//            beforeSend: function (xhr) {
-//                xhr.setRequestHeader('Authorization', 'Basic ' + btoa(username + ':' + password));
-//            },
-//            success: function (result) { // Sikeres autentikáció esetén.
-//                global.secretUsername = username;
-//                global.secretToken = result;
-//                setDialog(); // Esetleges hibaüzenet levétele.                
-//                callback();
-//            },
-//            error: function (jqXHR, textStatus, errorThrown) { // Hálózati, vagy autentikációs hiba esetén.
-//                throw new Error("Something went badly wrong!");
-//                $(':focus').blur();
-//                if (jqXHR.status === 401) { // Ha a szerver 'nem vagy autentikálva' választ ad, újra megpróbáljuk.
-//                    setDialog(
-//                            "Wrong username or password.",
-//                            "<div class='errorStaticText'>Username:</div><div><input id='loginName' type='text' name='username'></div>" +
-//                            "<div class='errorStaticText'>Password:</div><div><input id='loginPassword' type='password' name='password'></div>",
-//                            "Login",
-//                            function () {
-//                                login($('#loginName').val(),
-//                                        $('#loginPassword').val(),
-//                                        callback);
-//                            },
-//                            "Quit",
-//                            function () {
-//                                location.reload();
-//                            },
-//                            1,
-//                            (global.demoEntry) ? "Anonymous login" : undefined,
-//                            function () {
-//                                login('agnos.demo',
-//                                        'zolikaokos',
-//                                        callback);
-//                            }
-//                    );
-//                } else if (jqXHR.status === 403) { // Ha az autentikáció jó, de nincs olvasási jog az adathoz
-//                    setDialog(
-//                            "Access denied",
-//                            "<div class='errorStaticText'>You have no access to this report. Error code:</div>" +
-//                            "<div class='errorVariableText'><em>" + "Error " + jqXHR.status + ": " + errorThrown + "</em></div>" +
-//                            "<div class='errorStaticText'>Ask permission from the system administrator.</div>",
-//                            undefined,
-//                            undefined,
-//                            "Quit",
-//                            function () {
-//                                location.reload();
-//                            },
-//                            2,
-//                            (global.demoEntry) ? "Anonymous login" : undefined,
-//                            function () {
-//                                login('agnos.demo',
-//                                        'zolikaokos',
-//                                        callback);
-//                            }
-//                    );
-//                } else { // Más hiba esetén...                    
-//                    setDialog(
-//                            "Network error",
-//                            "<div class='errorStaticText'>Connection to the database is lost. Error code:</div>" +
-//                            "<div class='errorVariableText'><em>" + "Error " + jqXHR.status + ": " + errorThrown + "</em></div>" +
-//                            "<div class='errorStaticText'>Try to log in again!</div>",
-//                            "Again",
-//                            function () {
-//                                login(username, password, callback);
-//                            },
-//                            "Logout",
-//                            function () {
-//                                location.reload();
-//                            },
-//                            1,
-//                            (global.demoEntry) ? "Anonymous login" : undefined,
-//                            function () {
-//                                login('agnos.demo',
-//                                        'zolikaokos',
-//                                        callback);
-//                            }
-//                    );
-//                }
-//            },
-//            complete: function () {
-//                // Esetleges homokóra letörlése.
-//                clearTimeout(progressCounter);
-//                progressDiv.style("z-index", -1);
-//            }
-//
-//        });
-//    };
-
-    var logout = function() {
+    var logout = function () {
         keycloak.logout();
     };
-    
-    var login = function() {
-        keycloak.login();
+
+    /**
+     * Starts the login method of the identity provider.
+     * 
+     * @returns {undefined}
+     */
+    var login = function () {
+        keycloak.login({"prompt": true, "locale": "hu"});
     };
 
-    var loginOrLogout = function() {
+    /**
+     * Logs out the current user, and starts the login method of the identity provider.
+     * 
+     * @returns {undefined}
+     */
+    var reLogin = function () {
+        keycloak.logout({"redirectUri": keycloak.createLoginUrl({"redirectUri": location.href})});
+    };
+
+    /**
+     * If an user is logged in, logs it out, else starts the login process
+     * 
+     * @returns {undefined}
+     */
+    var loginOrLogout = function () {
         if (keycloak !== undefined && keycloak.userInfo !== undefined) {
             login();
         } else {
             logout();
         }
+    };
+
+    /**
+     * Shows the not authenticated dialog when a not logged in user tries to
+     * access protected content.
+     * 
+     * @returns {undefined}
+     */
+    var showNotAuthenticated = function () {
+        setDialog(
+                "Bejelentkezés szükséges",
+                "<div class='errorStaticText loc' style='text-align:center'>A kért tartalom hozzáférése korlátozott.</div>" +
+                "<div class='errorStaticText loc' style='text-align:center; margin-top:1em'>A továblépéshez jelentkezz be!</div>",
+                "Belépés",
+                global.login,
+                "Mégse",
+                function () {
+                    location.replace(location.origin + location.pathname);
+                },
+                1
+                );
+    };
+
+    /**
+     * Shows the not authorized dialog when an user tries to access
+     * content not available for him.
+     * 
+     * @param {type} username Name of the user (for the warning message only)
+     * @returns {undefined}
+     */
+    var showNotAuthorized = function (username) {
+        setDialog(
+                "Hozzáférés megtagadva",
+                "<div class='errorStaticText'><span class='loc'>Sajnálom&nbsp;</span><span style='font-style: italic'>" + username +
+                "</span><span class='loc'>, a kért jelentés számodra nem elérhető.</span></div>" +
+                "<div class='errorStaticText loc' style='margin-top:1em'>Kérj hozzáférést az adminisztrátortól, vagy lépj be más identitással!</div>",
+                "Belépés",
+                global.reLogin,
+                "Mégse",
+                function () {
+                    location.replace(location.origin + location.pathname);
+                },
+                2
+                );
     };
 
     /**
@@ -608,13 +574,10 @@ var global = function () {
             url: url,
             data: data,
             timeout: 5000,
-            beforeSend: function (xhr) {                
-
-                //xhr.setRequestHeader('Authorization', 'Basic ' + btoa(global.secretUsername + ':' + global.secretToken)); 
+            beforeSend: function (xhr) {
                 if (keycloak.token !== undefined) {
                     xhr.setRequestHeader('authorization', `Bearer ${keycloak.token}`);
                 }
-                
             },
             success: function (result, status) { // Sikeres letöltés esetén.
                 // Esetleges hibaüzenet levétele.
@@ -629,78 +592,12 @@ var global = function () {
                 clearTimeout(progressCounter);
                 progressDiv.style("z-index", -1);
                 if (jqXHR.status === 401) { // Ha a szerver 'nem vagy autentikálva' választ ad, autentikáljuk.
-                    console.log("401")
-                    /*setDialog(
-                            "Restricted. Log in first!",
-                            "<div class='errorStaticText'>Username:</div><div><input id='loginName' type='text' name='username'></div>" +
-                            "<div class='errorStaticText'>Password:</div><div><input id='loginPassword' type='password' name='password'></div>",
-                            "Login",
-                            function () {
-                                login($('#loginName').val(),
-                                        $('#loginPassword').val(),
-                                        function () {
-                                            get(url, data, callback, isDeleteDialogRequired);
-                                        });
-                            },
-                            "Quit",
-                            function () {
-                                location.reload();
-                            },
-                            1,
-                            (global.demoEntry) ? "Anonymous login" : undefined,
-                            function () {
-                                login('agnos.demo',
-                                        'zolikaokos',
-                                        function () {
-                                            get(url, data, callback, isDeleteDialogRequired);
-                                        });
-                            }
-                    );*/
-//                    keycloak.login();
-                    
+                    showNotAuthenticated();
                 } else if (jqXHR.status === 403) { // Ha az autentikáció jó, de nincs olvasási jog az adathoz
-                    setDialog(
-                            "Access denied",
-                            "<div class='errorStaticText'>You have no access to this report. Error code:</div>" +
-                            "<div class='errorVariableText'><em>" + "Error " + jqXHR.status + ": " + errorThrown + "</em></div>" +
-                            "<div class='errorStaticText'>Ask permission from the system administrator.</div>",
-                            undefined,
-                            undefined,
-                            "Logout",
-                            function () {
-                                location.reload();
-                            },
-                            2,
-                            (global.demoEntry) ? "Anonymous login" : undefined,
-                            function () {
-                                login('agnos.demo',
-                                        'zolikaokos',
-                                        function () {
-                                            get(url, data, callback, isDeleteDialogRequired);
-                                        });
-                            }
-                    );
+                    showNotAuthorized();
                 } else { // Más hiba esetén...    
-                    if (errorThrown === "") {
-                        errorThrown = "Server unreachable";
-                    }
-                    setDialog(
-                            "Network error",
-                            "<div class='errorStaticText'>Connection to the database is lost. Error code:</div>" +
-                            "<div class='errorVariableText'><em>" + "Error " + jqXHR.status + ": " + errorThrown + "</em></div>" +
-                            "<div class='errorStaticText'>Try to reload...</div>",
-                            "Try again",
-                            function () {
-                                get(url, data, callback);
-                            },
-                            "Logout",
-                            function () {
-                                location.reload();
-                            },
-                            1
-                            );
+                    alert('egyéb hiba')
                 }
-
             },
             complete: function () {
                 // Esetleges homokóra letörlése.
@@ -1427,6 +1324,7 @@ var global = function () {
             }
         } else { // Különben megjelenítjük.
             dialogMask.select("h1")
+                    .attr("class", "loc")
                     .html(title);
             dialogMask.select("#dialogMessage")
                     .html(body);
@@ -1434,7 +1332,7 @@ var global = function () {
                 leftButton.classed("hidden", true);
                 leftButton.nodes()[0].onclick = undefined;
             } else {
-                leftButton.html(leftButtonLabel);
+                leftButton.attr("class", "loc").html(leftButtonLabel);
                 leftButton.nodes()[0].onclick = leftButtonFunction;
                 leftButton.classed("hidden", false);
             }
@@ -1442,7 +1340,7 @@ var global = function () {
                 rightButton.classed("hidden", true);
                 rightButton.nodes()[0].onclick = undefined;
             } else {
-                rightButton.html(rightButtonLabel);
+                rightButton.attr("class", "loc").html(rightButtonLabel);
                 rightButton.nodes()[0].onclick = rightButtonFunction;
                 rightButton.classed("hidden", false);
             }
@@ -1450,7 +1348,7 @@ var global = function () {
                 extraButton.classed("hidden", true);
                 extraButton.nodes()[0].onclick = undefined;
             } else {
-                extraButton.html(extraButtonLabel);
+                extraButton.attr("class", "loc").html(extraButtonLabel);
                 extraButton.nodes()[0].onclick = extraButtonFunction;
                 extraButton.classed("hidden", false);
             }
@@ -1591,15 +1489,14 @@ var global = function () {
         scaleRatio: undefined, // A képernyő svg elemeire vonatkozó nagyítás szorzója.
         dragDropManager: dragDropManager, // Húzd-és-ejtsd működését vezérlő ojektum.
         tooltip: undefined, // Épp aktuális tooltip törzse, html.
-        secretToken: 'zzz', // Autentikáció után kapott token.
-        secretUsername: undefined, // Sikeres autentikáció user-neve.
         maxEntriesIn1D: 350,
         maxEntriesIn2D: 10000,
         preferredUsername: preferredUsername,
         // Globálisan elérendő függvények.
-        logout: logout,
-        login: login,
-        loginOrLogout: loginOrLogout,
+        logout: logout, // Logs the current user out from the identity provider
+        login: login, // Starts the login method of the identity provider
+        reLogin: reLogin, // Logs out the current user, and starts the login method of the identity provider
+        loginOrLogout: loginOrLogout, // If an user is logged in, logs it out, else starts the login process
         changeCSSInProgress: changeCSSInProgress,
         changeCSS: changeCSS, // Css-t vált
         tagForLocalization: tagForLocalization, // Nyelvváltoztatás előtt a szövegeket az 'origText' attrib-ba írja.
@@ -1648,15 +1545,11 @@ var global = function () {
         colorValue: colorValue, // Megadja egy érték kijelzésének színét.
         color: color, // Megadja egy dimenzióelem kijelzésének színét.
         randomString: randomString, // Adott hosszúságú véletlen stringet generál.
-        initValuesFromCss: initValuesFromCss
+        initValuesFromCss: initValuesFromCss,
+        showNotAuthenticated: showNotAuthenticated,
+        showNotAuthorized: showNotAuthorized
     };
 
 }();
 
 global.initValuesFromCss();
-global.secretToken = global.getCookie("token");
-
-global.secretUsername = global.getCookie("user");
-
-
-
