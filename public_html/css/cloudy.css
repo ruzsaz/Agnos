@@ -570,6 +570,10 @@ mask path {
   display: table-row;
 }
 /* HeadPanel */
+.HeadPanel_Browser .row * {
+  cursor: pointer;
+}
+/* HeadPanel */
 .cell {
   display: table-cell;
   font-size: 16px;
@@ -578,6 +582,36 @@ mask path {
   line-height: 20px;
   z-index: 2;
   position: relative;
+}
+/* HeadPanel, greeting badge */
+.HeadPanel_Browser #greetingBadge {
+  padding: 16px;
+  display: flex;
+  justify-content: space-between;
+}
+.HeadPanel_Browser #greetingBadge input {
+  margin: 0px !important;
+}
+.HeadPanel_Browser #greetingBadge .greeting {
+  font-size: 20px;
+  margin: auto;
+}
+.HeadPanel_Browser #greetingBadge .greeting .username {
+  font-style: italic;
+}
+.HeadPanel_Browser #greetingBadge #logoutLink {
+  margin: auto 0px auto 240px;
+  text-align: end;
+  color: #000;
+  cursor: pointer;
+  transition: color 0.1s linear;
+  -webkit-transition: color 0.1s linear;
+  -moz-transition: color 0.1s linear;
+  -ms-transition: color 0.1s linear;
+  -o-transition: color 0.1s linear;
+}
+.HeadPanel_Browser #greetingBadge #logoutLink:hover {
+  color: #ffffff;
 }
 .dimTable .cell:nth-child(1),
 .dimTable .cell:nth-child(2) {
@@ -667,29 +701,6 @@ mask path {
 .alterColored[parity="hidden"] {
   display: none;
 }
-/* A legújabb próbálkozás szerint ez nem kell
-.reportsTable .cell:nth-child(1) {
-        overflow-wrap: break-word;
-        max-width: 10%;
-        width: 10%;
-}
-
-.reportsTable .cell:nth-child(2) {
-        overflow-wrap: break-word;
-        max-width: 30%;
-}
-
-.reportsTable .cell:nth-child(3) {
-        overflow-wrap: break-word;
-        max-width: 5%;
-        width: 5%;
-}
-
-.reportsTable .cell:nth-child(4) {
-        overflow-wrap: break-word;
-        max-width: 5%;
-        width: 5%;
-} */
 .reportsTable .cell:nth-child(5) {
   overflow-wrap: break-word;
   max-width: 50%;

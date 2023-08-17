@@ -89,8 +89,17 @@ function Container() {
                 var startObject = JSON.parse(LZString.decompressFromEncodedURIComponent(startString));
                 that.navigateTo(startObject);
             } catch (e) {
-                alert("A bookmarkba kódolt hivatkozás sérült.");
-                window.location.replace(location.href.split("#")[0]);
+                console.log(e)
+                if (global.preferredUsername === undefined) {
+                    alert("Log in to see the report");
+                    //keycloak.login();
+                } else {
+                    alert("Megszoptad");
+                    //keycloak.logout();
+                }
+                
+                
+                //window.location.replace(location.href.split("#")[0]);
             }
         } else {
             that.resizeContainers(0, 1, global.panelNumberOnScreen);

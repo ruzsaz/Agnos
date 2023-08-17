@@ -6,6 +6,18 @@ console.log("Az épp aktuális panelkonfiguráció kiíratása: global.getConfig
 console.log("A fordítás segítéséhez: global.getUntranslated('lang');");
 // A bookmark-lehetőség kiiktatásához a "location.hash"-t tartalmazó sort kell kikommentelni.
 
+
+
+//const loginPromise = keycloak.init({onLoad: 'login-required'});
+
+//try {
+//    const authenticated = keycloak.init({onLoad: 'login-required'});
+//    console.log(`User is ${authenticated ? 'authenticated' : 'not authenticated'}`);
+//} catch (error) {
+//    console.error('Failed to initialize adapter:', error);
+//}
+
+
 /**
  * Kiterjeszti a d3.selectiont egy .moveToFront() függvénnyel, ami az adott
  * elemeket a vele egy szinten levő elemek elé mozgatja.
@@ -444,7 +456,9 @@ var global = function () {
 
                 // Tényleges URL-be írás. Ha nem kell, kikommentelendő.
                 if (global.saveToBookmarkRequired) {
-                    location.hash = LZString.compressToEncodedURIComponent(JSON.stringify(startObject));
+                    const newUrl = location.origin + location.pathname + "?q=" + LZString.compressToEncodedURIComponent(JSON.stringify(startObject));
+                    window.history.replaceState({ id: "100" }, "Page 3", newUrl);
+                    //location.hash = LZString.compressToEncodedURIComponent(JSON.stringify(startObject));
                 }
             }
         };
@@ -462,100 +476,117 @@ var global = function () {
      * @param {String} callback Sikeres autentikáció után meghívandó függvény.	 
      * @returns {undefined}
      */
-    var login = function (username, password, callback) {
-        var progressDiv = d3.select("#progressDiv");
-        var progressCounter = setTimeout(function () {
-            progressDiv.style("z-index", 1000);
-        }, 50);
+//    var login = function (username, password, callback) {
+//        var progressDiv = d3.select("#progressDiv");
+//        var progressCounter = setTimeout(function () {
+//            progressDiv.style("z-index", 1000);
+//        }, 50);
+//
+//        $.ajax({
+//            url: global.url.auth,
+//            timeout: 5000,
+//            beforeSend: function (xhr) {
+//                xhr.setRequestHeader('Authorization', 'Basic ' + btoa(username + ':' + password));
+//            },
+//            success: function (result) { // Sikeres autentikáció esetén.
+//                global.secretUsername = username;
+//                global.secretToken = result;
+//                setDialog(); // Esetleges hibaüzenet levétele.                
+//                callback();
+//            },
+//            error: function (jqXHR, textStatus, errorThrown) { // Hálózati, vagy autentikációs hiba esetén.
+//                throw new Error("Something went badly wrong!");
+//                $(':focus').blur();
+//                if (jqXHR.status === 401) { // Ha a szerver 'nem vagy autentikálva' választ ad, újra megpróbáljuk.
+//                    setDialog(
+//                            "Wrong username or password.",
+//                            "<div class='errorStaticText'>Username:</div><div><input id='loginName' type='text' name='username'></div>" +
+//                            "<div class='errorStaticText'>Password:</div><div><input id='loginPassword' type='password' name='password'></div>",
+//                            "Login",
+//                            function () {
+//                                login($('#loginName').val(),
+//                                        $('#loginPassword').val(),
+//                                        callback);
+//                            },
+//                            "Quit",
+//                            function () {
+//                                location.reload();
+//                            },
+//                            1,
+//                            (global.demoEntry) ? "Anonymous login" : undefined,
+//                            function () {
+//                                login('agnos.demo',
+//                                        'zolikaokos',
+//                                        callback);
+//                            }
+//                    );
+//                } else if (jqXHR.status === 403) { // Ha az autentikáció jó, de nincs olvasási jog az adathoz
+//                    setDialog(
+//                            "Access denied",
+//                            "<div class='errorStaticText'>You have no access to this report. Error code:</div>" +
+//                            "<div class='errorVariableText'><em>" + "Error " + jqXHR.status + ": " + errorThrown + "</em></div>" +
+//                            "<div class='errorStaticText'>Ask permission from the system administrator.</div>",
+//                            undefined,
+//                            undefined,
+//                            "Quit",
+//                            function () {
+//                                location.reload();
+//                            },
+//                            2,
+//                            (global.demoEntry) ? "Anonymous login" : undefined,
+//                            function () {
+//                                login('agnos.demo',
+//                                        'zolikaokos',
+//                                        callback);
+//                            }
+//                    );
+//                } else { // Más hiba esetén...                    
+//                    setDialog(
+//                            "Network error",
+//                            "<div class='errorStaticText'>Connection to the database is lost. Error code:</div>" +
+//                            "<div class='errorVariableText'><em>" + "Error " + jqXHR.status + ": " + errorThrown + "</em></div>" +
+//                            "<div class='errorStaticText'>Try to log in again!</div>",
+//                            "Again",
+//                            function () {
+//                                login(username, password, callback);
+//                            },
+//                            "Logout",
+//                            function () {
+//                                location.reload();
+//                            },
+//                            1,
+//                            (global.demoEntry) ? "Anonymous login" : undefined,
+//                            function () {
+//                                login('agnos.demo',
+//                                        'zolikaokos',
+//                                        callback);
+//                            }
+//                    );
+//                }
+//            },
+//            complete: function () {
+//                // Esetleges homokóra letörlése.
+//                clearTimeout(progressCounter);
+//                progressDiv.style("z-index", -1);
+//            }
+//
+//        });
+//    };
 
-        $.ajax({
-            url: global.url.auth,
-            timeout: 5000,
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('Authorization', 'Basic ' + btoa(username + ':' + password));
-            },
-            success: function (result) { // Sikeres autentikáció esetén.
-                global.secretUsername = username;
-                global.secretToken = result;
-                setDialog(); // Esetleges hibaüzenet levétele.                
-                callback();
-            },
-            error: function (jqXHR, textStatus, errorThrown) { // Hálózati, vagy autentikációs hiba esetén.
-                $(':focus').blur();
-                if (jqXHR.status === 401) { // Ha a szerver 'nem vagy autentikálva' választ ad, újra megpróbáljuk.
-                    setDialog(
-                            "Wrong username or password.",
-                            "<div class='errorStaticText'>Username:</div><div><input id='loginName' type='text' name='username'></div>" +
-                            "<div class='errorStaticText'>Password:</div><div><input id='loginPassword' type='password' name='password'></div>",
-                            "Login",
-                            function () {
-                                login($('#loginName').val(),
-                                        $('#loginPassword').val(),
-                                        callback);
-                            },
-                            "Quit",
-                            function () {
-                                location.reload();
-                            },
-                            1,
-                            (global.demoEntry) ? "Anonymous login" : undefined,
-                            function () {
-                                login('agnos.demo',
-                                        'zolikaokos',
-                                        callback);
-                            }
-                    );
-                } else if (jqXHR.status === 403) { // Ha az autentikáció jó, de nincs olvasási jog az adathoz
-                    setDialog(
-                            "Access denied",
-                            "<div class='errorStaticText'>You have no access to this report. Error code:</div>" +
-                            "<div class='errorVariableText'><em>" + "Error " + jqXHR.status + ": " + errorThrown + "</em></div>" +
-                            "<div class='errorStaticText'>Ask permission from the system administrator.</div>",
-                            undefined,
-                            undefined,
-                            "Quit",
-                            function () {
-                                location.reload();
-                            },
-                            2,
-                            (global.demoEntry) ? "Anonymous login" : undefined,
-                            function () {
-                                login('agnos.demo',
-                                        'zolikaokos',
-                                        callback);
-                            }
-                    );
-                } else { // Más hiba esetén...                    
-                    setDialog(
-                            "Network error",
-                            "<div class='errorStaticText'>Connection to the database is lost. Error code:</div>" +
-                            "<div class='errorVariableText'><em>" + "Error " + jqXHR.status + ": " + errorThrown + "</em></div>" +
-                            "<div class='errorStaticText'>Try to log in again!</div>",
-                            "Again",
-                            function () {
-                                login(username, password, callback);
-                            },
-                            "Logout",
-                            function () {
-                                location.reload();
-                            },
-                            1,
-                            (global.demoEntry) ? "Anonymous login" : undefined,
-                            function () {
-                                login('agnos.demo',
-                                        'zolikaokos',
-                                        callback);
-                            }
-                    );
-                }
-            },
-            complete: function () {
-                // Esetleges homokóra letörlése.
-                clearTimeout(progressCounter);
-                progressDiv.style("z-index", -1);
-            }
+    var logout = function() {
+        keycloak.logout();
+    };
+    
+    var login = function() {
+        keycloak.login();
+    };
 
-        });
+    var loginOrLogout = function() {
+        if (keycloak !== undefined && keycloak.userInfo !== undefined) {
+            login();
+        } else {
+            logout();
+        }
     };
 
     /**
@@ -577,8 +608,13 @@ var global = function () {
             url: url,
             data: data,
             timeout: 5000,
-            beforeSend: function (xhr) {
-                xhr.setRequestHeader('Authorization', 'Basic ' + btoa(global.secretUsername + ':' + global.secretToken));
+            beforeSend: function (xhr) {                
+
+                //xhr.setRequestHeader('Authorization', 'Basic ' + btoa(global.secretUsername + ':' + global.secretToken)); 
+                if (keycloak.token !== undefined) {
+                    xhr.setRequestHeader('authorization', `Bearer ${keycloak.token}`);
+                }
+                
             },
             success: function (result, status) { // Sikeres letöltés esetén.
                 // Esetleges hibaüzenet levétele.
@@ -593,7 +629,8 @@ var global = function () {
                 clearTimeout(progressCounter);
                 progressDiv.style("z-index", -1);
                 if (jqXHR.status === 401) { // Ha a szerver 'nem vagy autentikálva' választ ad, autentikáljuk.
-                    setDialog(
+                    console.log("401")
+                    /*setDialog(
                             "Restricted. Log in first!",
                             "<div class='errorStaticText'>Username:</div><div><input id='loginName' type='text' name='username'></div>" +
                             "<div class='errorStaticText'>Password:</div><div><input id='loginPassword' type='password' name='password'></div>",
@@ -618,7 +655,9 @@ var global = function () {
                                             get(url, data, callback, isDeleteDialogRequired);
                                         });
                             }
-                    );
+                    );*/
+//                    keycloak.login();
+                    
                 } else if (jqXHR.status === 403) { // Ha az autentikáció jó, de nincs olvasási jog az adathoz
                     setDialog(
                             "Access denied",
@@ -641,7 +680,7 @@ var global = function () {
                                         });
                             }
                     );
-                } else { // Más hiba esetén...                    
+                } else { // Más hiba esetén...    
                     if (errorThrown === "") {
                         errorThrown = "Server unreachable";
                     }
@@ -1442,6 +1481,10 @@ var global = function () {
 //////////////////////////////////////////////////
 
     var changeCSSInProgress = false;
+    var preferredUsername = undefined;
+    if (keycloak !== undefined && keycloak.userInfo !== undefined) {
+        preferredUsername = keycloak.userInfo.preferred_username;
+    }
 
     {
         // Az értékek megjelenését színező színpaletta.
@@ -1552,7 +1595,11 @@ var global = function () {
         secretUsername: undefined, // Sikeres autentikáció user-neve.
         maxEntriesIn1D: 350,
         maxEntriesIn2D: 10000,
+        preferredUsername: preferredUsername,
         // Globálisan elérendő függvények.
+        logout: logout,
+        login: login,
+        loginOrLogout: loginOrLogout,
         changeCSSInProgress: changeCSSInProgress,
         changeCSS: changeCSS, // Css-t vált
         tagForLocalization: tagForLocalization, // Nyelvváltoztatás előtt a szövegeket az 'origText' attrib-ba írja.
@@ -1610,4 +1657,6 @@ global.initValuesFromCss();
 global.secretToken = global.getCookie("token");
 
 global.secretUsername = global.getCookie("user");
+
+
 

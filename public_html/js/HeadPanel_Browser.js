@@ -17,13 +17,35 @@ function HeadPanel_Browser(init, superMeta, startScale, duration) {
     this.superMeta = superMeta;
 
     HeadPanel.call(this, init, global.mediators[init.group], "HeadPanel_Browser", startScale, duration);
+    
+    // Felhasználó köszöntése rész
+    this.top = that.divTableBase.append("html:div")
+            .attr("id", "greetingBadge");    
 
     // A keresés mező.
-    that.divTableBase.append("html:input")
+    this.top.append("html:input")
             .attr("type", "text")
             .attr("id", "searchP" + that.panelSide)
             .attr("placeholder", "???")
             .on("keyup", that.searchFilter);
+    
+    this.greeting = this.top.append("html:div")
+            .attr("class", "greeting");
+    
+    this.greeting.append("html.span")
+            .attr("class", "loc")
+            .text((global.preferredUsername) ? "Felhasználó:" : "Nincs belépve. Csak a publikus jelentések láthatóak.");
+    
+    this.greeting.append("html.span")
+            .attr("class", "username")
+            .text((global.preferredUsername) ? " " + global.preferredUsername : "");
+        
+    // Logout link.
+    this.top.append("html:span")
+            .attr("id", "logoutLink")
+            .attr("class", "loc")
+            .text((global.preferredUsername) ? "Kilépés" : "Belépés")
+            .on("click", (global.preferredUsername) ? global.logout : global.login);            
 
     // Táblázat létrehozása.
     this.table = that.divTableBase.append("html:div")

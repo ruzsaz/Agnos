@@ -88,6 +88,10 @@
     "Rövid név": "Report name",
     "Leírás": "Description",
     "Forrás": "Data source",
-    "Frissítve": "Updated"
+    "Frissítve": "Updated",
+    "Kilépés": "Logout",
+    "Belépés": "Log in",
+    "Felhasználó:": "Logged in as",
+    "Nincs belépve. Csak a publikus jelentések láthatóak.": "Not logged in. Only the public reports available."
     
 }
