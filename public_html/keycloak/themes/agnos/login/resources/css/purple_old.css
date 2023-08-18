@@ -1,0 +1,154 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Nov 7, 2017, 3:16:49 PM
+    Author     : ruzsaz
+*/
+/* 
+    Document   : frame
+    Created on : 2014.01.29., 16:03:26
+    Author     : ruzsaz
+    Description:
+        Purpose of the stylesheet follows.
+*/
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/style.less to edit this template
+*/
+/*
+    Created on : Aug 18, 2023, 1:51:35 PM
+    Author     : ruzsaz
+*/
+/* A toolbar magassága */
+/* A háttérszín */
+/* A panel, és az arra írás színe */
+/* Keretek */
+/* Kerekítettség */
+/* Árnyékok */
+/* A dimenziók színei */
+/* Értékek színei */
+/* A dimenzióelemek jelölésére szolgáló színpaletta */
+/* Input mezők színezése */
+/* Fejléc színei */
+/* Elemek körüli határ */
+/* A panelváltó és becsukógomb szélessége */
+/* Scrollbar színe */
+/* A css-es animáció ideje */
+/* Ennyi bejegyzés lehet a legend-ben. */
+/* Panel nagyító fül */
+.login-pf body {
+  background: yellow;
+  background-image: none;
+  background-size: cover;
+}
+h1#kc-page-title {
+  margin: -25px -25px 5px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 16px;
+  color: darkred;
+  fill: #e7e7e7;
+  stroke-width: 0px;
+  text-align: center;
+  background: #5f5;
+  border-radius: 0px 0px 0 0;
+  font-weight: 700 !important;
+  /* rz */
+}
+#kc-header-wrapper {
+  -webkit-mask-image: url(../img/agnos.svg);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position-x: center;
+  -webkit-mask-position-y: center;
+  mask-image: url(../img/agnos.svg);
+  mask-repeat: no-repeat;
+  mask-position-x: center;
+  mask-position-y: center;
+  background: darkred;
+  font-size: 0px;
+  height: 20vh;
+  opacity: 1;
+  position: relative;
+}
+.card-pf {
+  background: white;
+  border-radius: 0px;
+  border: 2px solid darkgreen !important;
+  padding: 25px !important;
+}
+.pf-c-button.pf-m-primary {
+  color: darkred;
+  background: #5f5;
+  border-radius: 0px;
+  border: 2px solid darkgreen;
+  font-size: 16px;
+  height: 29px;
+  padding: 0 18px;
+}
+.pf-c-form__label-text {
+  color: darkred;
+}
+.pf-c-form-control {
+  color: white;
+  background: #e7e7e7;
+  background-repeat: no-repeat;
+  border: 2px solid darkgreen !important;
+  border-radius: 0px;
+  -moz-outline-radius: 3px;
+}
+.pf-c-form-control:focus {
+  outline: none;
+  box-shadow: 0 0 10px darkred;
+  -webkit-box-shadow: 0 0 10px darkred;
+  -moz-box-shadow: 0 0 10px darkred;
+}
+a {
+  color: darkred;
+  text-decoration: none;
+}
+a:hover,
+a:focus {
+  color: darkblue !important;
+}
+.form-group.login-pf-settings {
+  margin-top: -12px;
+  /* rz */
+  margin-bottom: 30px;
+  /* rz */
+}
+#kc-locale {
+  display: none;
+}
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Nov 7, 2017, 3:16:49 PM
+    Author     : ruzsaz
+*/
+/* 
+    Document   : frame
+    Created on : 2014.01.29., 16:03:26
+    Author     : ruzsaz
+    Description:
+        Purpose of the stylesheet follows.
+*/
+/* A toolbar magassága */
+/* A háttérszín */
+/* A panel, és az arra írás színe */
+/* A dimenziók színei */
+/* Értékek színei */
+/* A dimenzióelemek jelölésére szolgáló színpaletta */
+/* Input mezők színezése */
+/* Fejléc színei */
+/* Elemek körüli határ */
+/* A panelváltó és becsukógomb szélessége */
+/* A css-es animáció ideje */
+/* Ennyi bejegyzés lehet a legend-ben. */
+/* Panel nagyító fül */
+/*# sourceMappingURL=purple_old.css.map */

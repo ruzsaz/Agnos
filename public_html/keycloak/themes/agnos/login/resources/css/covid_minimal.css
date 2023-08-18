@@ -1,0 +1,160 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Nov 7, 2017, 3:16:49 PM
+    Author     : ruzsaz
+*/
+/* 
+    Document   : frame
+    Created on : 2014.01.29., 16:03:26
+    Author     : ruzsaz
+    Description:
+        Purpose of the stylesheet follows.
+*/
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/style.less to edit this template
+*/
+/*
+    Created on : Aug 18, 2023, 1:51:35 PM
+    Author     : ruzsaz
+*/
+/* A toolbar magassága */
+/* A háttérszín */
+/* A panel, és az arra írás színe */
+/* Keretek */
+/* Kerekítettség */
+/* Árnyékok */
+/* A dimenziók színei */
+/* Értékek színei */
+/* A dimenzióelemek jelölésére szolgáló színpaletta */
+/* Input mezők színezése */
+/* Fejléc színei */
+/* Elemek körüli határ */
+/* A panelváltó és becsukógomb szélessége */
+/* Scrollbar színe */
+/* A css-es animáció ideje */
+/* Ennyi bejegyzés lehet a legend-ben. */
+/* Panel nagyító fül */
+@import url('../data/fonts/covid.css');
+.login-pf body {
+  background: #eee;
+  background-image: url('../data/pictures/eee_2.png');
+  background-size: cover;
+}
+h1#kc-page-title {
+  margin: -25px -25px 5px;
+  height: 40px;
+  line-height: 40px;
+  font-size: 18px;
+  color: #000;
+  fill: #eee;
+  stroke-width: 0px;
+  text-align: center;
+  background: #d36f77;
+  border-radius: 7px 7px 0 0;
+  font-weight: 700 !important;
+  /* rz */
+}
+#kc-header-wrapper {
+  -webkit-mask-image: url(../img/agnos.svg);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position-x: center;
+  -webkit-mask-position-y: center;
+  mask-image: url(../img/agnos.svg);
+  mask-repeat: no-repeat;
+  mask-position-x: center;
+  mask-position-y: center;
+  background: #000;
+  font-size: 0px;
+  height: 20vh;
+  opacity: 1;
+  position: relative;
+}
+.card-pf {
+  background: #fff;
+  border-radius: 7px;
+  border: 2px solid #2d3132 !important;
+  padding: 25px !important;
+}
+.pf-c-button.pf-m-primary {
+  color: #000;
+  background: #d36f77;
+  border-radius: 7px;
+  border: 2px solid #c92d3a;
+  font-size: 16px;
+  height: 29px;
+  padding: 0 18px;
+}
+.pf-c-form__label-text {
+  color: #000;
+}
+.pf-c-form-control {
+  color: #000;
+  background: #eee;
+  background-repeat: no-repeat;
+  border: 2px solid #d34d58 !important;
+  border-radius: 7px;
+  -moz-outline-radius: 3px;
+}
+.pf-c-form-control:focus {
+  outline: none;
+  box-shadow: 0 0 10px #ffe;
+  -webkit-box-shadow: 0 0 10px #ffe;
+  -moz-box-shadow: 0 0 10px #ffe;
+}
+a {
+  color: #000;
+  text-decoration: none;
+}
+a:hover,
+a:focus {
+  color: #c92d3a !important;
+}
+.form-group.login-pf-settings {
+  margin-top: -12px;
+  /* rz */
+  margin-bottom: 30px;
+  /* rz */
+}
+#kc-locale {
+  display: none;
+}
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Nov 7, 2017, 3:16:49 PM
+    Author     : ruzsaz
+*/
+/* 
+    Document   : frame
+    Created on : 2014.01.29., 16:03:26
+    Author     : ruzsaz
+    Description:
+        Purpose of the stylesheet follows.
+*/
+* {
+  font-family: Helvetica, sans-serif;
+  font-weight: bold;
+}
+/* A háttérszín */
+/* Párbeszédablakok háttere */
+/* A panel, és az arra írás színe */
+/* Keretek */
+/* Kerekítettség */
+/* Árnyékok */
+/* A dimenziók válatakozó színei */
+/* Az értékek jelölésére szolgáló színpaletta */
+/* Elemek körüli határ */
+/* Input mezők színezése */
+/* Fejléc színei, árnyékolása */
+/* Scrollbar */
+/* Help színezése */
+/* Tooltip */
+/*# sourceMappingURL=covid_minimal.css.map */

@@ -1,0 +1,224 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/style.less to edit this template
+*/
+/*
+    Created on : Aug 18, 2023, 1:51:35 PM
+    Author     : ruzsaz
+*/
+
+////////////////////////////////////////////////////////////////////////////
+// Default értékek megadása ////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+
+/* A toolbar magassága */
+@mainToolbarHeight: 32px;
+@helpControlHeight: @mainToolbarHeight;
+
+/* A háttérszín */
+@baseBackgroundColor: black;
+@baseBackgroundImage: none;
+@dialogMaskColor: rgba(0,0,0,0.9);
+@dialogBorder: @panelBorder;
+
+/* A panel, és az arra írás színe */
+@panelWidth: 600px;
+@panelHeight: 400px;
+@panelMargin: 6px;
+@panelBackgroundColor: #343434;
+@panelWriteColor: white;
+@panelWriteValueColor: #c2b211;
+@panelInputColor: rgb(231, 231, 231);
+
+/* Keretek */
+@borderSize: 0px; // Az elemek körül
+@dimValBorder: @borderSize solid white; // A dimenzió és érték elemek körül
+@panelBorderSize: @borderSize;  // A panelek körül (valójában az árnyékok között van megvalósítva)
+@panelBorderColor: white;  // A panelek körül (valójában az árnyékok között van megvalósítva)
+@panelBorder: @borderSize solid @panelBorderColor; // A panelek körül
+
+/* Kerekítettség */
+@rounding: 10px;
+
+/* Árnyékok */
+@dimValShadow: 3px 3px 9px rgba(0,0,0,0.75); // A dimenziók, értékek körül a felső panelen
+@panelShadow: 0px 0px 0px @borderSize @panelBorderColor; // A panelek körül
+
+/* A dimenziók színei */
+@oddColor: #555;
+@evenColor: #666;
+@avgColor: #606060;
+@writeOnDimColor: @panelWriteColor;
+
+/* Értékek színei */
+@valWriteColor: black;
+@valWriteColor2: @writeOnDimColor; // Más szín, ha az előző nem lenne olvasható
+
+@highlightColor: @panelWriteColor;
+@dimHighlightColor: black;
+
+@neutralGrey: #aaaaaa;
+@multiValuesColor: @neutralGrey;
+
+/* A dimenzióelemek jelölésére szolgáló színpaletta */
+@valColors: #40bddf,#bad642,#8c8014,#22ada6,#85c222,#faeb4c,#00a6d3,#9eb060,#43b57c,#d4cc4c,#3db8a3,#80d4e9,#9ccf61,#bfe8f6,#f7e306,#b8bf5a,#badb8e,#c2b211,#7d9c53,#0885a4,#fcf288,#7dc772;
+@valColorNA: grey;
+
+/* Input mezők színezése */
+@inputTextColor: @panelBackgroundColor;
+@inputBackgroundColor: @panelWriteColor;
+@inputPlaceholderColor: @oddColor;
+@inputTextBorder: @panelBorder;
+
+/* Fejléc színei */
+@middleGrey0: #a0a0a0;
+@middleGrey: #888888;
+@middleGrey1: #6d6d6d;
+@mainToolbarBackgroundColor: @middleGrey;
+@switchColor: #40bddf; // Panelváltó gomb színe
+@closeColor: #bad642; // Riportbecsokó gomb színe
+@helpBackgroundColor: @middleGrey;
+@mainToolbarShadow: inset 0px -24px 24px -12px rgba(0, 0, 0, 0.2), 3px 3px 9px rgba(0,0,0,0.75);
+@helpControlBackgroundGradient: top, @middleGrey0 0%, @middleGrey 30px, @middleGrey1 100%;
+@topTenColor: #444;
+
+@mainToolbarActiveColor: #000000;
+@mainToolbarInactiveColor: #888888;
+@mainToolbarHoverColor: #ffffff;
+
+@firstChildGradient: top, @middleGrey0 0%, @middleGrey 50%;
+@lastChildGradient: top, @middleGrey 50%, @middleGrey1 100%;
+@dropDownBackgroundColor: @middleGrey;
+
+/* Elemek körüli határ */
+@elementBorderSize: 0px;
+@elementBorderColor: black;
+
+/* A panelváltó és becsukógomb szélessége */
+@stripeWidth: 8px;
+
+
+/* Scrollbar színe */
+@scrollbarColor: @switchColor;
+
+@scrollbarRounding: 5px;
+@scrollbarWidth: 12px;
+
+@axisTextOpacity: 1;
+
+@fontSizeHuge: 20px;
+@fontSizeBig: 16px;
+@fontSizeNormal: 16px;
+@fontSizeSmall: 12px;
+
+@lineSymbolStroke: black;
+
+/* A css-es animáció ideje */
+@animDurationText: 0.1s;
+@animDurationHover: 0.0s;
+@appearDuration: 0.2s;
+
+/* Ennyi bejegyzés lehet a legend-ben. */
+@maximalLegendElement: 150;
+
+@tooltipTextColor: white;
+@tooltipValueColor: @panelWriteValueColor;
+@tooltipBackgroundColor: black;
+@tooltipBorder: @panelBorder;
+
+/* Panel nagyító fül */
+@magnifyPanelButtonColor: @mainToolbarActiveColor;
+@magnifyPanelButtonHoverColor: @mainToolbarHoverColor;
+
+.login-pf body {
+    background: @baseBackgroundColor;
+    background-image: @baseBackgroundImage;
+    background-size: cover;
+}
+
+h1#kc-page-title {
+    margin: -25px -25px 5px;
+    height: 40px;
+    line-height: 40px;
+    font-size: @fontSizeBig;
+    color: @panelWriteColor;
+    fill: @panelInputColor;
+    stroke-width: 0px;
+    text-align: center;
+    background: @oddColor;
+    border-radius: @rounding @rounding 0 0;
+    font-weight: 700 !important; /* rz */
+}
+
+#kc-header-wrapper {
+    -webkit-mask-image: url(../img/agnos.svg);
+    -webkit-mask-repeat: no-repeat;    
+    -webkit-mask-position-x: center;
+    -webkit-mask-position-y: center;
+    mask-image: url(../img/agnos.svg);    
+    mask-repeat: no-repeat;    
+    mask-position-x: center;
+    mask-position-y: center;
+    background: @panelWriteColor;
+    font-size: 0px;
+    height: 20vh;
+    opacity: 1;
+    position: relative;
+    
+}
+
+
+.card-pf {
+    background: @panelBackgroundColor;
+    border-radius: @rounding;
+    border: @dialogBorder !important;
+    padding: 25px !important;
+}
+
+.pf-c-button.pf-m-primary {
+    color: @writeOnDimColor;
+    background: @oddColor;
+    border-radius: @rounding;
+    border: @panelBorder;
+    font-size: @fontSizeNormal;
+    height: 29px;
+    padding: 0 18px;
+}
+
+.pf-c-form__label-text {
+    color: @panelWriteColor;
+}
+
+.pf-c-form-control {
+    color: @inputTextColor;
+    background: @panelInputColor;
+    background-repeat: no-repeat;
+    border: @inputTextBorder !important;
+    border-radius: @rounding;
+    -moz-outline-radius: 3px;
+
+    &:focus {
+	outline: none;
+	box-shadow: 0 0 10px @highlightColor;
+        -webkit-box-shadow: 0 0 10px @highlightColor;
+        -moz-box-shadow: 0 0 10px @highlightColor;
+    }
+}
+
+a {
+    color: @panelWriteColor;
+    text-decoration: none;
+
+    &:hover, &:focus {
+	color: @panelWriteValueColor !important;
+    }
+}
+
+.form-group.login-pf-settings {
+    margin-top: -12px; /* rz */
+    margin-bottom: 30px; /* rz */
+}
+
+#kc-locale {
+    display: none;
+}

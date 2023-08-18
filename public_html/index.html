@@ -277,8 +277,7 @@
                 loadResourcesAsync([
                     "js/HeadPanel." + min + "js",
                     "js/Panel." + min + "js",
-                    "js/TitleBox." + min + "js",
-                    "localSettings." + min + "js"
+                    "js/TitleBox." + min + "js",                    
                 ], loadLevel4);
             }
 
@@ -385,16 +384,13 @@
 
             async function loadKeycloak() {
                 loadResourcesAsync([
+                    "localSettings." + min + "js",
                     "js/libs/keycloak-22.0.1/keycloak.js"
                 ], initKeycloak);    
             }
 
             async function initKeycloak() {
-                keycloak = new Keycloak({
-                    url: 'http://localhost:8080/',
-                    realm: 'AgnosRealm',
-                    clientId: 'agnos'
-                });
+                keycloak = new Keycloak(agnosConfig.keycloakSettings);
 //                const k = await keycloak.init({onLoad: 'login-required'});
                 const k = await keycloak.init({onLoad: 'check-sso'});
                 //                const k = await keycloak.init({onLoad: 'check-sso', silentCheckSsoRedirectUri: `${location.href}/silent-check-sso.html`});

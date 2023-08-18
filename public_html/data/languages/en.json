@@ -96,11 +96,11 @@
     "Nincs belépve. Csak a publikus jelentések láthatóak.": "Not logged in. Only the public reports available.",
     "Bejelentkezés szükséges": "Login required",
     "A kért tartalom hozzáférése korlátozott.": "Access to the requested content is restricted.",
-    "A továblépéshez jelentkezz be!": "Please log in to continue.",
+    "A továblépéshez jelentkezzen be!": "Please log in to continue.",
     "Hozzáférés megtagadva": "Forbidden",
     "Sajnálom&nbsp;": "Sorry&nbsp;",
-    ", a kért jelentés számodra nem elérhető.": ", the report you requested is not available for you.",
-    "Kérj hozzáférést az adminisztrátortól, vagy lépj be más identitással!": "Ask permission from the administrator, or log in with a different identity."
+    ", a kért jelentés megtekintésére nem jogosult.": ", the report you requested is not available for you.",
+    "Kérjen hozzáférést az adminisztrátortól, vagy lépjen be más identitással!": "Ask permission from the administrator, or log in with a different identity."
     
     
 }

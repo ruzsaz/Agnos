@@ -679,14 +679,10 @@ mask path {
         text-align: end;
         color: @panelWriteColor;
         cursor: pointer;
-        transition: color @animDurationText linear;
-        -webkit-transition: color @animDurationText linear;
-        -moz-transition: color @animDurationText linear;
-        -ms-transition: color @animDurationText linear;
-        -o-transition: color @animDurationText linear;
             
         &:hover {
-            color: @baseBackgroundColor;            
+            color: @panelWriteValueColor;
+            text-decoration: underline;
         }
     }    
 }

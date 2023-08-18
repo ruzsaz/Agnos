@@ -604,14 +604,10 @@ mask path {
   text-align: end;
   color: white;
   cursor: pointer;
-  transition: color 0.1s linear;
-  -webkit-transition: color 0.1s linear;
-  -moz-transition: color 0.1s linear;
-  -ms-transition: color 0.1s linear;
-  -o-transition: color 0.1s linear;
 }
 .HeadPanel_Browser #greetingBadge #logoutLink:hover {
-  color: black;
+  color: #c2b211;
+  text-decoration: underline;
 }
 .dimTable .cell:nth-child(1),
 .dimTable .cell:nth-child(2) {
@@ -1957,6 +1953,22 @@ svg.switchButtonHelp {
 #loginReadyPercentage {
   font-size: 40px;
 }
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : Nov 7, 2017, 3:16:49 PM
+    Author     : ruzsaz
+*/
+/* 
+    Document   : frame
+    Created on : 2014.01.29., 16:03:26
+    Author     : ruzsaz
+    Description:
+        Purpose of the stylesheet follows.
+*/
 /* A háttérszín */
 /* Párbeszédablakok háttere */
 /* A panel, és az arra írás színe */

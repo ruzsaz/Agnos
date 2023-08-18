@@ -1,4 +1,4 @@
-/* global d3, LZString, parseFloat */
+/* global d3, LZString, parseFloat, agnosConfig */
 
 'use strict'; // TODO: nyelv
 
@@ -485,8 +485,8 @@ var global = function () {
      * 
      * @returns {undefined}
      */
-    var login = function () {
-        keycloak.login({"prompt": true, "locale": "hu"});
+    var login = function () {        
+        keycloak.login({"prompt": true, "locale": getCookie("language"), "loginHint": getCookie("css")});
     };
 
     /**
@@ -521,7 +521,7 @@ var global = function () {
         setDialog(
                 "Bejelentkezés szükséges",
                 "<div class='errorStaticText loc' style='text-align:center'>A kért tartalom hozzáférése korlátozott.</div>" +
-                "<div class='errorStaticText loc' style='text-align:center; margin-top:1em'>A továblépéshez jelentkezz be!</div>",
+                "<div class='errorStaticText loc' style='text-align:center; margin-top:1em'>A továblépéshez jelentkezzen be!</div>",
                 "Belépés",
                 global.login,
                 "Mégse",
@@ -543,8 +543,8 @@ var global = function () {
         setDialog(
                 "Hozzáférés megtagadva",
                 "<div class='errorStaticText'><span class='loc'>Sajnálom&nbsp;</span><span style='font-style: italic'>" + username +
-                "</span><span class='loc'>, a kért jelentés számodra nem elérhető.</span></div>" +
-                "<div class='errorStaticText loc' style='margin-top:1em'>Kérj hozzáférést az adminisztrátortól, vagy lépj be más identitással!</div>",
+                "</span><span class='loc'>, a kért jelentés megtekintésére nem jogosult.</span></div>" +
+                "<div class='errorStaticText loc' style='margin-top:1em'>Kérjen hozzáférést az adminisztrátortól, vagy lépjen be más identitással!</div>",
                 "Belépés",
                 global.reLogin,
                 "Mégse",
@@ -1473,6 +1473,9 @@ var global = function () {
 
     return {
         // Globálisan elérendő változók.        
+        url: agnosConfig.url,
+        i18nRequired: agnosConfig.i18nRequired,
+        saveToBookmarkRequired: agnosConfig.saveToBookmarkRequired,        
         facts: [], // Az adatokat tartalmazó 2 elemű tömb.
         maxPanelCount: 6, // Egy oldalon levő panelek maximális száma.		
         panelNumberOnScreen: undefined, // Megjelenítendő panelszám soronként.
