@@ -12,10 +12,11 @@
 //var baseUrl = "http://agnos:9091/ars";
 //var baseUrl = "http://127.0.0.1:9091/ars";
 const baseUrl = "http://localhost:9091/ars";
+//const baseUrl = "http://localhost:7979/ars";
 
 var agnosConfig = {};
-
-agnosConfig.keycloakSettings = {url: 'http://localhost:8080/', realm: 'AgnosRealm', clientId: 'agnos'};
+//agnosConfig.keycloakSettings = {url: 'http://localhost:8080', realm: 'AgnosRealm', clientId: 'agnos'};
+agnosConfig.keycloakSettings = {url: 'http://localhost:8082/auth', realm: 'AgnosRealm', clientId: 'agnos'};
 agnosConfig.url = {
     auth: baseUrl + "/auth/login",
     superMeta: baseUrl + "/meta/cubes",
