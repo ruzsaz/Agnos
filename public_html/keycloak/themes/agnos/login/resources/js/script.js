@@ -32,7 +32,7 @@ function getCookie(name) {
 function getBasePath() {
     var scripts = document.getElementsByTagName("script");
     var path = scripts[scripts.length - 1].src;
-    return /\/resources.*agnos\//g.exec(path)[0];
+    return /.*agnos\//g.exec(path)[0];
 }
 
 const basePath = getBasePath();
@@ -40,7 +40,7 @@ const basePath = getBasePath();
 window.onload = function() {    
     const cssToUse = getCssFile();
     if (cssToUse !== undefined) {
-        changeCSS("/resources/atk2l/login/agnos/" + cssToUse);
+        changeCSS(basePath + cssToUse);
     }
     document.body.setAttribute("style", "opacity: 1");
 };
