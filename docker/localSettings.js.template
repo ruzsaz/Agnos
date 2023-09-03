@@ -1,0 +1,17 @@
+/* Lokális értékek beállítása */
+
+'use strict';
+
+// Az adatok beszerzési url-je
+var baseUrl = "${REPORTSERVER_PUBLIC_IP}:${REPORTSERVER_PUBLIC_PORT}/ars";
+
+var agnosConfig = {};
+agnosConfig.keycloakSettings = {url: "${KEYCLOAK_PUBLIC_IP}:${KEYCLOAK_PUBLIC_PORT}/auth", realm: 'AgnosRealm', clientId: 'agnos'};
+agnosConfig.url = {
+    auth: baseUrl + "/auth/login",
+    superMeta: baseUrl + "/meta/cubes",
+    meta: baseUrl + "/meta/cube",
+    fact: baseUrl + "/cube"};
+
+agnosConfig.i18nRequired = true;
+agnosConfig.saveToBookmarkRequired = true;
