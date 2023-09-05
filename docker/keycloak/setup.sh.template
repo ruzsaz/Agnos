@@ -16,5 +16,5 @@ CL_ID=$(./kcadm.sh get clients -r "${KEYCLOAK_REALM}" --fields id,clientId | gre
 
 # Set redirect uris
 ./kcadm.sh update clients/336a3620-c5b4-4914-8692-1fbc3fe1cc77 -r "${KEYCLOAK_REALM}" \
-    -s "redirectUris=[\"${AGNOS_PUBLIC_IP}:${AGNOS_PUBLIC_PORT}/*\"]" \
-    -s "rootUrl=\"${AGNOS_PUBLIC_IP}:${AGNOS_PUBLIC_PORT}\""
+    -s "redirectUris=[\"${AGNOS_PUBLIC_IP}/*\"]" \
+    -s "rootUrl=\"${AGNOS_PUBLIC_IP}\""
