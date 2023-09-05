@@ -1,3 +1,20 @@
 #!/bin/bash
 
-echo "HELLO ${KEYCLOAK_ADMIN}"
+cd /opt/keycloak/bin
+
+# Log in into keycloak, and repeat until successful (= KC initialized and running)
+while ! ./kcadm.sh config credentials --server "http://agnos-keycloak:8080${KC_HTTP_RELATIVE_PATH}" \
+	--realm master \
+	--user "${KEYCLOAK_ADMIN}" \
+	--password "${KEYCLOAK_ADMIN_PASSWORD}"
+do
+    sleep 2
+done
+
+# Extract the agnos client's id
+CL_ID=$(./kcadm.sh get clients -r "${KEYCLOAK_REALM}" --fields id,clientId | grep -B 1 "${KEYCLOAK_CLIENT}" | head -n 1 | sed 's/.*: "//g;s/".*//g')
+
+# Set redirect uris
+./kcadm.sh update clients/336a3620-c5b4-4914-8692-1fbc3fe1cc77 -r "${KEYCLOAK_REALM}" \
+    -s "redirectUris=[\"${AGNOS_PUBLIC_IP}:${AGNOS_PUBLIC_PORT}/*\"]" \
+    -s "rootUrl=\"${AGNOS_PUBLIC_IP}:${AGNOS_PUBLIC_PORT}\""

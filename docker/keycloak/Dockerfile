@@ -12,4 +12,4 @@ COPY setup.sh.template /opt/keycloak/setup.sh.template
 ENTRYPOINT /usr/bin/envsubst < /opt/keycloak/setup.sh.template > /opt/keycloak/setup.sh \
     && chmod +x /opt/keycloak/setup.sh \
     && /opt/keycloak/setup.sh \
-    && /opt/keycloak/bin/kc.sh start-dev
+    & /opt/keycloak/bin/kc.sh start-dev
