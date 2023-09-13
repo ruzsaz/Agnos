@@ -4,7 +4,7 @@
 var changelog = [
     {
         "language": "hu",
-        "history": [
+        "history": [            
             {"entity": "Agnos", "date": "2017-11-02", "change": "Panelek képként mentése elérhető."},
             {"entity": "AgnosCSVImporter", "date": "2017-10-24", "change": "Rögzített formájú .xls és .xlsx fájlok automatikus betöltése."},
             {"entity": "AgnosServer", "date": "2017-12-01", "change": "A szerver felkészítése több nyelv támogatására."},
@@ -19,13 +19,15 @@ var changelog = [
             {"entity": "Agnos", "date": "2018-11-11", "change": "A help oldalak angol fordítása."},
             {"entity": "Agnos", "date": "2020-01-29", "change": "Szín és stílusválasztás."},
             {"entity": "Agnos", "date": "2020-02-07", "change": "További színsémák hozzáadása."},
-            {"entity": "Agnos", "date": "2020-04-08", "change": "Új térképek: Világ, EU, Kína, USA, Ausztrália, Kanada."}
+            {"entity": "Agnos", "date": "2020-04-08", "change": "Új térképek: Világ, EU, Kína, USA, Ausztrália, Kanada."},
+            {"entity": "Agnos", "date": "2023-07-23", "change": "Új térkép: Magyarország, járás réteg"},
+            {"entity": "Agnos", "date": "2023-09-05", "change": "Keycloak integráció."}
         ],
-        "updated": "2020-04-08"
+        "updated": "2023-09-05"
     },
     {
         "language": "en",
-        "history": [
+        "history": [            
             {"entity": "Agnos", "date": "2017-11-02", "change": "Save panels as pictures."},
             {"entity": "AgnosCSVImporter", "date": "2017-10-24", "change": "Automatic processing of .xls and .xlsx files."},
             {"entity": "AgnosServer", "date": "2017-12-01", "change": "Localization supported in the server."},
@@ -40,8 +42,10 @@ var changelog = [
             {"entity": "Agnos", "date": "2018-11-11", "change": "English translation of the help pages."},
             {"entity": "Agnos", "date": "2020-01-29", "change": "Color and style selector."},
             {"entity": "Agnos", "date": "2020-02-07", "change": "Additional styles added."},
-            {"entity": "Agnos", "date": "2020-04-08", "change": "New maps added: World, EU, China, USA, Australia, Canada."}
+            {"entity": "Agnos", "date": "2020-04-08", "change": "New maps added: World, EU, China, USA, Australia, Canada."},
+            {"entity": "Agnos", "date": "2023-07-23", "change": "New map added: Hungary with járás layer"},
+            {"entity": "Agnos", "date": "2023-09-05", "change": "Keycloak integration."}
         ],
-        "updated": "2020-04-08"
+        "updated": "2023-09-05"
     }
 ];

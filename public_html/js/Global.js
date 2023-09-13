@@ -485,7 +485,7 @@ var global = function () {
      * 
      * @returns {undefined}
      */
-    var login = function () {        
+    var login = function () {
         keycloak.login({"prompt": true, "locale": getCookie("language"), "loginHint": getCookie("css")});
     };
 
@@ -557,6 +557,7 @@ var global = function () {
 
     /**
      * Aszinkron ajax adatletöltés GET-en át, hibakezeléssel.
+     * A keycloak tokent frissíti, ha lejáróban van.
      * 
      * @param {String} url Az URL, ahonnan le kell tölteni.
      * @param {String} data A felküldendő adat.
@@ -570,42 +571,54 @@ var global = function () {
             progressDiv.style("z-index", 1000);
         }, 200);
 
-        $.ajax({
-            url: url,
-            data: data,
-            timeout: 5000,
-            beforeSend: function (xhr) {
-                if (keycloak.token !== undefined) {
-                    xhr.setRequestHeader('authorization', `Bearer ${keycloak.token}`);
-                }
-            },
-            success: function (result, status) { // Sikeres letöltés esetén.
-                // Esetleges hibaüzenet levétele.
-                if (isDeleteDialogRequired === undefined || isDeleteDialogRequired) {
-                    setDialog();
-                }
-                callback(result, status);
-            },
-            error: function (jqXHR, textStatus, errorThrown) { // Hálózati, vagy autentikációs hiba esetén.
-                $(':focus').blur();
-                // Esetleges homokóra letörlése.
-                clearTimeout(progressCounter);
-                progressDiv.style("z-index", -1);
-                if (jqXHR.status === 401) { // Ha a szerver 'nem vagy autentikálva' választ ad, autentikáljuk.
-                    showNotAuthenticated();
-                } else if (jqXHR.status === 403) { // Ha az autentikáció jó, de nincs olvasási jog az adathoz
-                    showNotAuthorized();
-                } else { // Más hiba esetén...    
-                    alert('egyéb hiba')
-                }
-            },
-            complete: function () {
-                // Esetleges homokóra letörlése.
-                clearTimeout(progressCounter);
-                progressDiv.style("z-index", -1);
+        keycloak.updateToken(10).then(function (refreshed) {
+            if (refreshed) {
+                console.log('Token was successfully refreshed');
+            } else {
+                console.log('Token is still valid');
             }
+        }).catch(function () {
+            console.log('Failed to refresh the token, or the session has expired');
+        }).finally(() => {
+            $.ajax({
+                url: url,
+                data: data,
+                timeout: 5000,
+                beforeSend: function (xhr) {
+                    if (keycloak.token !== undefined) {
+                        xhr.setRequestHeader('authorization', `Bearer ${keycloak.token}`);
+                    }
+                },
+                success: function (result, status) { // Sikeres letöltés esetén.
+                    // Esetleges hibaüzenet levétele.
+                    if (isDeleteDialogRequired === undefined || isDeleteDialogRequired) {
+                        setDialog();
+                    }
+                    callback(result, status);
+                },
+                error: function (jqXHR, textStatus, errorThrown) { // Hálózati, vagy autentikációs hiba esetén.
+                    $(':focus').blur();
+                    // Esetleges homokóra letörlése.
+                    clearTimeout(progressCounter);
+                    progressDiv.style("z-index", -1);
+                    if (jqXHR.status === 401) { // Ha a szerver 'nem vagy autentikálva' választ ad, autentikáljuk.
+                        showNotAuthenticated();
+                    } else if (jqXHR.status === 403) { // Ha az autentikáció jó, de nincs olvasási jog az adathoz
+                        showNotAuthorized();
+                    } else { // Más hiba esetén...    
+                        alert('egyéb hiba');
+                    }
+                },
+                complete: function () {
+                    // Esetleges homokóra letörlése.
+                    clearTimeout(progressCounter);
+                    progressDiv.style("z-index", -1);
+                }
+
+            });
 
         });
+
     };
 
     /**
@@ -1475,7 +1488,7 @@ var global = function () {
         // Globálisan elérendő változók.        
         url: agnosConfig.url,
         i18nRequired: agnosConfig.i18nRequired,
-        saveToBookmarkRequired: agnosConfig.saveToBookmarkRequired,        
+        saveToBookmarkRequired: agnosConfig.saveToBookmarkRequired,
         facts: [], // Az adatokat tartalmazó 2 elemű tömb.
         maxPanelCount: 6, // Egy oldalon levő panelek maximális száma.		
         panelNumberOnScreen: undefined, // Megjelenítendő panelszám soronként.
