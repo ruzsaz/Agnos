@@ -2,6 +2,9 @@
 
 cd /opt/keycloak/bin
 
+# Start keycloak
+nohup ./kc.sh ${KEYCLOAK_COMMAND_ARG} &
+
 # Log in into keycloak, and repeat until successful (= KC initialized and running)
 while ! ./kcadm.sh config credentials --server "http://agnos-keycloak:8080${KC_HTTP_RELATIVE_PATH}" \
 	--realm master \
@@ -18,3 +21,6 @@ CL_ID=$(./kcadm.sh get clients -r "${KEYCLOAK_REALM}" --fields id,clientId | gre
 ./kcadm.sh update clients/336a3620-c5b4-4914-8692-1fbc3fe1cc77 -r "${KEYCLOAK_REALM}" \
     -s "redirectUris=[\"${AGNOS_PUBLIC_IP}/*\"]" \
     -s "rootUrl=\"${AGNOS_PUBLIC_IP}\""
+
+# Sleep forever
+while true; do sleep 1; done
