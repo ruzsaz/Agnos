@@ -18,8 +18,8 @@ done
 CL_ID=$(./kcadm.sh get clients -r "${KEYCLOAK_REALM}" --fields id,clientId | grep -B 1 "${KEYCLOAK_CLIENT}" | head -n 1 | sed 's/.*: "//g;s/".*//g')
 
 # Set redirect uris
-./kcadm.sh update clients/336a3620-c5b4-4914-8692-1fbc3fe1cc77 -r "${KEYCLOAK_REALM}" \
-    -s "redirectUris=[\"${AGNOS_PUBLIC_IP}/*\"]" \
+./kcadm.sh update "clients/${CL_ID_PLACEHOLDER}" -r "${KEYCLOAK_REALM}" \
+    -s 'redirectUris=[${REDIRECT_URIS}]' \
     -s "rootUrl=\"${AGNOS_PUBLIC_IP}\""
 
 # Sleep forever

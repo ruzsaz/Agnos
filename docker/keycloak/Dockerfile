@@ -1,5 +1,8 @@
 FROM quay.io/keycloak/keycloak:22.0.1
 
+# Ehhh... to prevent premature variable substitution in the setup.sh.template file
+ENV CL_ID_PLACEHOLDER='${CL_ID}'
+
 # Download the envsubst program to be able to exchange env variables in the scripts
 COPY ./envsubst /usr/bin/envsubst
 
