@@ -566,6 +566,11 @@ var global = function () {
      * @returns {undefined}
      */
     var get = function (url, data, callback, isDeleteDialogRequired) {
+        getWithRetries(url, data, callback, isDeleteDialogRequired, 3);
+    };
+
+    var getWithRetries = function (url, data, callback, isDeleteDialogRequired, triesLeft) {
+        triesLeft--;
         var progressDiv = d3.select("#progressDiv");
         var progressCounter = setTimeout(function () {
             progressDiv.style("z-index", 1000);
@@ -573,9 +578,7 @@ var global = function () {
 
         keycloak.updateToken(10).then(function (refreshed) {
             if (refreshed) {
-                console.log('Token was successfully refreshed');
-            } else {
-                console.log('Token is still valid');
+                console.log('Token is successfully refreshed');
             }
         }).catch(function () {
             console.log('Failed to refresh the token, or the session has expired');
@@ -606,7 +609,12 @@ var global = function () {
                     } else if (jqXHR.status === 403) { // Ha az autentikáció jó, de nincs olvasási jog az adathoz
                         showNotAuthorized();
                     } else { // Más hiba esetén...    
-                        alert('egyéb hiba');
+                        if (triesLeft > 0) {
+                            console.log("Hmmm...", jqXHR.status, textStatus, errorThrown, "no problem, ", triesLeft, " tries still left before giving up.");
+                            getWithRetries(url, data, callback, isDeleteDialogRequired, triesLeft);
+                        } else {
+                            alert('Unknown error. Not good...');
+                        }
                     }
                 },
                 complete: function () {
@@ -620,6 +628,7 @@ var global = function () {
         });
 
     };
+
 
     /**
      * Egy panel animálásának ideje. Csak azonakat animálja, amelyek
