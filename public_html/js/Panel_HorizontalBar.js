@@ -464,11 +464,11 @@ panel_horizontalbar.prototype.update = function(data, drill) {
     var forbidRatio = false;
     var forbidNominator = false;
     for (var i = 0, iMax = that.legendArray.length; i < iMax; i++) {
-        if (that.meta.indicators[that.legendArray[i].id].value.hide) {
+        if (that.localMeta.indicators[that.legendArray[i].id].value.hide) {
             forbidNominator = true;
             that.valFraction = true;
         }
-        if (that.meta.indicators[that.legendArray[i].id].fraction.hide) {
+        if (that.localMeta.indicators[that.legendArray[i].id].fraction.hide) {
             forbidRatio = true;
             that.valFraction = false;
         }
@@ -492,7 +492,7 @@ panel_horizontalbar.prototype.update = function(data, drill) {
             // A szorzó-tömb felfrissítése.
             that.valMultipliers = [];
             for (var i = 0, iMax = that.valBarNumber; i < iMax; i++) {
-                var mult = parseFloat(that.meta.indicators[that.valBarsToShow[i]].fraction.multiplier);
+                var mult = parseFloat(that.localMeta.indicators[that.valBarsToShow[i]].fraction.multiplier);
                 that.valMultipliers.push((isNaN(mult)) ? 1 : mult);
             }
 
@@ -940,7 +940,7 @@ panel_horizontalbar.prototype.doChangeValue = function(panelId, value, ratio, ta
 
             // A fejlécre klikkelés esetén.
             if (value === -1 && that.singleValMode) {
-                var newVal = (that.legendArray[0].id + 1) % that.meta.indicators.length;
+                var newVal = (that.legendArray[0].id + 1) % that.localMeta.indicators.length;
                 if (that.valPosNumber === 1) {
                     that.valPosToShow[0] = newVal;
                 }

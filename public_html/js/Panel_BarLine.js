@@ -893,11 +893,12 @@ panel_barline.prototype.update = function(data, drill, duration) {
     var forbidRatio = false;
     var forbidNominator = false;
     for (var i = 0, iMax = that.legendArray.length; i < iMax; i++) {
-        if (that.meta.indicators[that.legendArray[i].id].value.hide) {
+        if (that.localMeta.indicators[that.legendArray[i].id].valueIsHidden) {
             forbidNominator = true;
             that.valFraction = true;
         }
-        if (that.meta.indicators[that.legendArray[i].id].fraction.hide) {
+        console.log(that.localMeta, that.legendArray[i].id)
+        if (that.localMeta.indicators[that.legendArray[i].id].fraction.hide) {
             forbidRatio = true;
             that.valFraction = false;
         }
@@ -921,17 +922,17 @@ panel_barline.prototype.update = function(data, drill, duration) {
             // A szorzó-tömb felfrissítése.
             that.valBarMultipliers = [];
             for (var i = 0, iMax = that.valBarNumber; i < iMax; i++) {
-                var mult = parseFloat(that.meta.indicators[that.valBarsToShow[i]].fraction.multiplier);
+                var mult = parseFloat(that.localMeta.indicators[that.valBarsToShow[i]].fraction.multiplier);
                 that.valBarMultipliers.push((isNaN(mult)) ? 1 : mult);
             }
             that.valLineMultipliers = [];
             for (var i = 0, iMax = that.valLineNumber; i < iMax; i++) {
-                var mult = parseFloat(that.meta.indicators[that.valLinesToShow[i]].fraction.multiplier);
+                var mult = parseFloat(that.localMeta.indicators[that.valLinesToShow[i]].fraction.multiplier);
                 that.valLineMultipliers.push((isNaN(mult)) ? 1 : mult);
             }
             that.valAvgMultipliers = [];
             for (var i = 0, iMax = that.valAvgNumber; i < iMax; i++) {
-                var mult = parseFloat(that.meta.indicators[that.valAvgToShow[i]].fraction.multiplier);
+                var mult = parseFloat(that.localMeta.indicators[that.valAvgToShow[i]].fraction.multiplier);
                 that.valAvgMultipliers.push((isNaN(mult)) ? 1 : mult);
             }
 
@@ -1409,6 +1410,7 @@ panel_barline.prototype.drawLegend = function() {
                     return global.readableColor((d.isBarRequired) ? global.colorValue(d.id) : global.panelBackgroundColor);
                 })
                 .text(function(d, i) {
+                    console.log(that.localMeta, that.legendArray[i].id)
                     return that.localMeta.indicators[that.legendArray[i].id].caption;
                 });
 
@@ -1722,7 +1724,7 @@ panel_barline.prototype.doChangeValue = function(panelId, value, ratio, targetId
             // A fejlécre klikkelés esetén.
             if (value === -1 && that.singleValMode) {
                 anythingchanged = true;
-                var newVal = (that.legendArray[0].id + 1) % that.meta.indicators.length;
+                var newVal = (that.legendArray[0].id + 1) % that.localMeta.indicators.length;
                 if (that.valBarNumber === 1) {
                     that.valBarsToShow[0] = newVal;
                 }

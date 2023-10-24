@@ -142,9 +142,10 @@ HeadPanel_Browser.prototype.searchFilter = function() {
 HeadPanel_Browser.prototype.initPanel = function(duration) {
     
     // Elemek nyelvfüggő sorbarendezése.
-    this.superMeta.sort(function(a, b) {
-        return global.getFromArrayByLangArray(a.languages, a.captions).localeCompare(global.getFromArrayByLangArray(b.languages, b.captions), {sensitivity: 'variant', caseFirst: 'upper'});
-    });
+//    this.superMeta.sort(function(a, b) {
+//        return global.getFromArrayByLangArray(a.languages, a.captions).localeCompare(global.getFromArrayByLangArray(b.languages, b.captions), {sensitivity: 'variant', caseFirst: 'upper'});
+//    });
+        
     
     // Adatok újratársítása, sorok letörlése.
     var row = this.table.selectAll(".row").data(this.superMeta)
@@ -159,7 +160,7 @@ HeadPanel_Browser.prototype.initPanel = function(duration) {
 
         tempRowCell.append("html:text")
                 .text(function(d) {
-                    return global.getFromArrayByLangArray(d.languages, d.captions);
+                    return global.getFromArrayByLang(d.labels).caption;
                 });
 
         tempRowCell.append("html:span")
@@ -173,7 +174,7 @@ HeadPanel_Browser.prototype.initPanel = function(duration) {
 
         tempRowCell.append("html:text")
                 .text(function(d) {
-                    return global.getFromArrayByLangArray(d.languages, d.descriptions);
+                    return global.getFromArrayByLang(d.labels).description;
                 });
 
         tempRowCell.append("html:span")
@@ -187,7 +188,7 @@ HeadPanel_Browser.prototype.initPanel = function(duration) {
 
         tempRowCell.append("html:text")
                 .text(function(d) {
-                    return global.getFromArrayByLangArray(d.languages, d.datasources);
+                    return global.getFromArrayByLang(d.labels).datasource;
                 });
 
         tempRowCell.append("html:span")

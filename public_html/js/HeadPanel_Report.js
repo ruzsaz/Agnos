@@ -109,7 +109,7 @@ function HeadPanel_Report(init, reportMeta, startScale) {
             .style("opacity", "1");
 
     // Dimenzió tábla feltöltése a meta alapján
-    var dimRow = that.dimTable.selectAll(".row").data(that.meta.dimensions);
+    var dimRow = that.dimTable.selectAll(".row").data(that.meta.hierarchies);
 
     var newDimRow = dimRow.enter().append("html:div")
             .attr("class", "row alterColored")
@@ -349,7 +349,7 @@ HeadPanel_Report.prototype.initPanel = function (trans) {
     // Második cella: a mutató abszolút értéke, helykitöltés.
     valRow.select(".tableText1.spacer")
             .text(function (d) {
-                return (d.value.hide) ? _("nem értelmezett") : _("99.9Mrd ") + _(d.value.unitPlural);
+                return (d.valueIsHidden) ? _("nem értelmezett") : _("99.9Mrd ") + _(d.value.unitPlural);
             });
 
     // Harmadik cella: a mutató arányosított értéke.
@@ -411,7 +411,7 @@ HeadPanel_Report.prototype.prepareData = function (data) {
             });
 
     // Értékek aktuális értékeinek elkészítése.
-    for (var i = 0, iMax = that.meta.indicators.length; i < iMax; i++) {
+    for (var i = 0, iMax = that.localMeta.indicators.length; i < iMax; i++) {
         var meta = that.localMeta.indicators[i];
         valData.push({
             value: that.valToShow(data, meta.value, i),

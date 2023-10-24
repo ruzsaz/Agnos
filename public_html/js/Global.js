@@ -7,17 +7,6 @@ console.log("A fordítás segítéséhez: global.getUntranslated('lang');");
 // A bookmark-lehetőség kiiktatásához a "location.hash"-t tartalmazó sort kell kikommentelni.
 
 
-
-//const loginPromise = keycloak.init({onLoad: 'login-required'});
-
-//try {
-//    const authenticated = keycloak.init({onLoad: 'login-required'});
-//    console.log(`User is ${authenticated ? 'authenticated' : 'not authenticated'}`);
-//} catch (error) {
-//    console.error('Failed to initialize adapter:', error);
-//}
-
-
 /**
  * Kiterjeszti a d3.selectiont egy .moveToFront() függvénnyel, ami az adott
  * elemeket a vele egy szinten levő elemek elé mozgatja.
@@ -808,23 +797,23 @@ var global = function () {
      * @param {String} lang Nyelvkód. Ha undefined, az aktuálist veszi.
      * @returns {undefined|Globalglobal.getFromArrayByLang.array}
      */
-    var getIndexOfLang = function (array, lang) {
-        var returnIndex = -1;
-        var indexOfDefault = 0;
-        if (lang === undefined) {
-            lang = String.locale;
-        }
-
-        for (var i = 0, iMax = array.length; i < iMax; i++) {
-            if (array[i] === "") {
-                indexOfDefault = i;
-            }
-            if (array[i] === lang) {
-                returnIndex = i;
-            }
-        }
-        return (returnIndex === -1) ? indexOfDefault : returnIndex;
-    };
+//    var getIndexOfLang = function (array, lang) {
+//        var returnIndex = -1;
+//        var indexOfDefault = 0;
+//        if (lang === undefined) {
+//            lang = String.locale;
+//        }
+//
+//        for (var i = 0, iMax = array.length; i < iMax; i++) {
+//            if (array[i] === "") {
+//                indexOfDefault = i;
+//            }
+//            if (array[i] === lang) {
+//                returnIndex = i;
+//            }
+//        }
+//        return (returnIndex === -1) ? indexOfDefault : returnIndex;
+//    };
 
     /**
      * Megkeresi egy tömb elemét a nyelvkód alapján. Ha adott nyelvkódú nincs, akkor a
@@ -863,13 +852,13 @@ var global = function () {
      * @param {String} lang Nyelvkód. Ha undefined, az aktuálist veszi.
      * @returns {undefined|Globalglobal.getFromArrayByLang.array}
      */
-    var getFromArrayByLangArray = function (langArray, subArray, lang) {
-        if (lang === undefined) {
-            lang = String.locale;
-        }
-        var returnIndex = global.getIndexOfLang(langArray, lang);
-        return (returnIndex === -1) ? subArray[0] : subArray[returnIndex];
-    };
+//    var getFromArrayByLangArray = function (langArray, subArray, lang) {
+//        if (lang === undefined) {
+//            lang = String.locale;
+//        }
+//        var returnIndex = global.getIndexOfLang(langArray, lang);
+//        return (returnIndex === -1) ? subArray[0] : subArray[returnIndex];
+//    };
 
     /**
      * Megkeresi egy tömb elemét az elem egyik property-je alapján.
@@ -1530,9 +1519,9 @@ var global = function () {
         getCookie: getCookie, // Kiolvas egy cookie-t.
         setLanguage: setLanguage, // Nyelvváltoztató függvény.
         axisTextSize: axisTextSize, // Az oszlopdiagram tengelybetű-méretét határozza meg.
-        getIndexOfLang: getIndexOfLang, // Megkeresi egy tömb elemének indexét a nyelvkód alapján.
+//        getIndexOfLang: getIndexOfLang, // Megkeresi egy tömb elemének indexét a nyelvkód alapján.
         getFromArrayByLang: getFromArrayByLang, // Megkeresi egy tömb elemét a nyalvkód alapján.
-        getFromArrayByLangArray: getFromArrayByLangArray,
+//        getFromArrayByLangArray: getFromArrayByLangArray,
         getFromArrayByProperty: getFromArrayByProperty, // Megkeresi egy tömb elemét az elem egyik property-je alapján.
         positionInArrayByProperty: positionInArrayByProperty, // Megkeresi egy tömb elemének indexét az elem egyik property-je alapján.
         positionInArray: positionInArray, // Megnézi, hogy a tömb hányadik eleme egy érték.

@@ -108,7 +108,7 @@ HeadPanel.prototype.resize = function(duration, panelNumberPerRow) {
  * Letörli, és alaphelyzetbe hozza a fejlécpanelt.
  * 
  * @param {String} additionalClass A html objektumhoz adandó további class-nevek.
- * @param {Number} duration Az előtűnisi animáció időtartama.
+ * @param {Number} duration Az előtűnési animáció időtartama.
  * @returns {undefined}
  */
 HeadPanel.prototype.reset = function(additionalClass, duration) {

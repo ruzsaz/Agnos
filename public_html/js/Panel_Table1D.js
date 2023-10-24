@@ -185,7 +185,7 @@ panel_table1d.prototype.valuesToShow = function (d) {
                 });
             }
             if (that.columnHeadVector[i].hide >> 1 === 0) { // Ha a hányadost meg kell mutatni.
-                var val = that.meta.indicators[i].fraction.multiplier * d.vals[i].sz / d.vals[i].n;
+                var val = that.localMeta.indicators[i].fraction.multiplier * d.vals[i].sz / d.vals[i].n;
                 if (isNaN(parseFloat(val))) {
                     val = 0;
                 }
@@ -247,7 +247,7 @@ panel_table1d.prototype.preUpdate = function (drill) {
         else if (drill.direction === 1) {
 
             // Ha nem a legalsó szinten vagyunk, akkor minden sor törlése.
-            if ((global.baseLevels[that.panelSide])[that.dimToShow].length + 2 !== that.meta.dimensions[that.dimToShow].levels.length) {
+            if ((global.baseLevels[that.panelSide])[that.dimToShow].length + 2 !== that.localMeta.dimensions[that.dimToShow].levels) {
                 that.gRowHeads.selectAll(".svgRowHead").remove();
                 that.gTable.selectAll(".svgTableRow").remove();
             }
@@ -357,10 +357,10 @@ panel_table1d.prototype.drawCells = function (preparedData, trans) {
 
     // A színek kitalálása
     that.columnColorIndex = [];
-    for (var i = 0, iMax = that.meta.indicators.length; i < iMax; i++) {
-        var ind = that.meta.indicators[i];
+    for (var i = 0, iMax = that.localMeta.indicators.length; i < iMax; i++) {
+        var ind = that.localMeta.indicators[i];
         that.columnHeadVector.push({
-            hide: ((ind.value.hide) ? 1 : 0) + ((ind.fraction.hide) ? 2 : 0),
+            hide: ((ind.valueIsHidden) ? 1 : 0) + ((ind.fraction.hide) ? 2 : 0),
             tooltip: that.createTooltip(
                     [{name: that.localMeta.indicators[i].description}], [])
         });
@@ -695,10 +695,10 @@ panel_table1d.prototype.langSwitch = function (duration, isInitial) {
     that.columnHeadVector = [];
 
     // Az oszlopfejléc-adatok összerakása.
-    for (var i = 0, iMax = that.meta.indicators.length; i < iMax; i++) {
-        var ind = that.meta.indicators[i];
+    for (var i = 0, iMax = that.localMeta.indicators.length; i < iMax; i++) {
+        var ind = that.localMeta.indicators[i];
         that.columnHeadVector.push({
-            hide: ((ind.value.hide) ? 1 : 0) + ((ind.fraction.hide) ? 2 : 0),
+            hide: ((ind.valueIsHidden) ? 1 : 0) + ((ind.denominatorIsHidden) ? 2 : 0),
             tooltip: that.createTooltip(
                     [{name: that.localMeta.indicators[i].description}], [])
         });

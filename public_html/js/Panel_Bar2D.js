@@ -623,11 +623,11 @@ panel_bar2d.prototype.update = function (data, drill) {
     drill = drill || {dim: -1, direction: 0};
 
     // A hányados kijelzés, és a szorzó felfrissítése.
-    that.valMultiplier = (isNaN(parseFloat(that.meta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.meta.indicators[that.valToShow].fraction.multiplier);
-    if (that.valFraction && that.meta.indicators[that.valToShow].fraction.hide) {
+    that.valMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier);
+    if (that.valFraction && that.localMeta.indicators[that.valToShow].fraction.hide) {
         that.valFraction = false;
     }
-    if (!that.valFraction && that.meta.indicators[that.valToShow].value.hide) {
+    if (!that.valFraction && that.localMeta.indicators[that.valToShow].valueIsHidden) {
         that.valFraction = true;
     }
 
@@ -996,7 +996,7 @@ panel_bar2d.prototype.doChangeValue = function (panelId, value, ratio) {
     var that = this;
     if (panelId === undefined || panelId === that.panelId) {
         if (value !== undefined) {
-            that.valToShow = (value === -1) ? (that.valToShow + 1) % that.meta.indicators.length : value;
+            that.valToShow = (value === -1) ? (that.valToShow + 1) % that.localMeta.indicators.length : value;
             that.actualInit.val = that.valToShow;
         }
         if (ratio !== undefined) {

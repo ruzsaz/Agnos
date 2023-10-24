@@ -51,7 +51,7 @@ DataDirector.prototype.register = function(context, panelId, dimsToShow, preUpda
             oldPosition = this.panelRoster.length;
         }
         var ds = [];
-        for (var d = 0, dMax = global.facts[this.side].reportMeta.dimensions.length; d < dMax; d++) {
+        for (var d = 0, dMax = global.facts[this.side].reportMeta.hierarchies.length; d < dMax; d++) {
             ds.push((dimsToShow.indexOf(d) > -1) ? 1 : 0);
         }
 
@@ -97,7 +97,7 @@ DataDirector.prototype.getFirstFreeIndex = function() {
  * @returns {Number} A tippelt dimenzió sorszáma.
  */
 DataDirector.prototype.guessDimension = function(exceptDim) {
-    var meta = global.facts[this.side].reportMeta;
+    var meta = global.facts[this.side].localMeta;
     var bestDim = -1;
     var bestDimScore = 10000;
     for (var d = 0, dMax = meta.dimensions.length; d < dMax; d++) {
@@ -135,7 +135,8 @@ DataDirector.prototype.drill = function(drill) {
     var dim = drill.dim;
     var baseDim = (global.baseLevels[that.side])[dim];
     if (drill.direction === -1) {
-        if (drill.toId !== undefined && baseDim.length < global.facts[that.side].reportMeta.dimensions[dim].levels.length - 1) {
+        console.log(global.facts[that.side].localMeta, dim)
+        if (drill.toId !== undefined && baseDim.length < global.facts[that.side].localMeta.dimensions[dim].levels - 1) {
             isSuccessful = true;
             drill.fromId = (baseDim.length === 0) ? null : (baseDim[baseDim.length - 1]).id;
             baseDim.push({id: drill.toId, name: drill.toName});
@@ -170,7 +171,7 @@ DataDirector.prototype.initiatePreUpdates = function(drill) {
 
 /**
  * Lefúrás után új adatot szerez be az olap kockából.
- * Az adat megérkeztekor kisztja a panelek update-függvényének.
+ * Az adat megérkeztekor kiosztja a panelek update-függvényének.
  * 
  * @param {Object} drill A lefúrás objektum.
  * @returns {undefined}
@@ -178,32 +179,44 @@ DataDirector.prototype.initiatePreUpdates = function(drill) {
 DataDirector.prototype.requestNewData = function(drill) {
     var that = this;
 
-    var cubeNameString = global.facts[that.side].reportMeta.cube_unique_name;
-    var baseLevelQueryString = "";
-    var separator0 = "";
+    var baseVector = [];
     for (var d = 0, dMax = (global.baseLevels[that.side]).length; d < dMax; d++) {
-        var separator1 = "";
-        baseLevelQueryString += separator0;
+        var baseVectorCoordinate = {};
+        baseVectorCoordinate.name = global.facts[that.side].reportMeta.hierarchies[d].name;
+        baseVectorCoordinate.levelValues = [];
         for (var l = 0, lMax = (global.baseLevels[that.side])[d].length; l < lMax; l++) {
-            baseLevelQueryString += separator1 + ((global.baseLevels[that.side])[d])[l].id;
-            separator1 = ",";
+            baseVectorCoordinate.levelValues.push(((global.baseLevels[that.side])[d])[l].id); 
         }
-        separator0 = ":";
+        baseVector.push(baseVectorCoordinate);
     }
 
+    var queriesStamp = [];
     var queries = [];
     for (var p = 0, pMax = this.panelRoster.length; p < pMax; p++) {
-        queries.push(this.panelRoster[p].dimsToShow.toString().replace(/,/g, ":"));
+        const elementStamp = this.panelRoster[p].dimsToShow.toString().replace(/,/g, ":");
+        console.log(elementStamp)
+        queriesStamp.push(elementStamp);
+        
+        // If it is a new query according to the stamp, put it into the query array,
+        // so queries in the array will be unique.
+        if (queriesStamp.indexOf(elementStamp) === queriesStamp.length - 1) {
+            var query = [];
+            for (var dts = 0, dtsMax = global.facts[this.side].reportMeta.hierarchies.length; dts < dtsMax; dts++) {
+                if (this.panelRoster[p].dimsToShow[dts] === 1) {
+                    query.push(global.facts[this.side].reportMeta.hierarchies[dts].name);
+                }
+            }
+            queries.push({"dimsToDrill" : query});
+        }
     }
 
-    var uniqueQueries = queries.filter(function(element, position) {
-        return queries.indexOf(element) === position;
-    });
-
-    var queriesString = uniqueQueries.toString().replace(/,/g, ";");
-    var query = cubeNameString + ":" + String.locale + ";" + baseLevelQueryString + ";" + queriesString;
-    var encodedQuery = "queries=" + window.btoa(query);
-
+    var requestObject = {
+        "reportName" : global.facts[that.side].reportMeta.name,
+        "baseVector": baseVector,
+        "drillVectors": queries
+    };
+    console.log(requestObject);
+    const encodedQuery = "queries=" + window.btoa(JSON.stringify(requestObject));
     // A letöltés élesben.
     global.get(global.url.fact, encodedQuery, function(result) {
         that.processNewData(drill, result);
@@ -218,7 +231,10 @@ DataDirector.prototype.requestNewData = function(drill) {
  * @returns {undefined}
  */
 DataDirector.prototype.processNewData = function(drill, newDataJson) {
-    var newData = newDataJson;
+    var newData = newDataJson.answer;
+    for (var i = 0, iMax = newData.length; i < iMax; i++) {
+        newData[i].name = newData[i].richName.replace(/[^:0]+/g, '1');
+    }
     for (var i = 0, iMax = this.panelRoster.length; i < iMax; i++) {
         var pos = global.positionInArrayByProperty(newData, "name", this.panelRoster[i].dimsToShow.toString().replace(/,/g, ":"));
         var data = newData[pos].response;
@@ -274,9 +290,9 @@ DataDirector.prototype.getConfigs = function(callback) {
     // Ha callbackolni kell, íme.
     if (typeof callback === 'function') {
         var configObject = {};
-        if (global.facts[this.side] && global.facts[this.side].reportMeta) {
+        if (global.facts[this.side] && global.facts[this.side].localMeta) {
             configObject.s = this.side; // Az oldal, amire vonatkozik (0 vagy 1).
-            configObject.c = global.facts[this.side].reportMeta.cube_unique_name; // A cube neve.
+            configObject.c = global.facts[this.side].localMeta.cube_unique_name; // A cube neve.
             configObject.b = global.baseLevels[this.side]; // A bázisszintek, amire épp lefúrva van.
             configObject.v = global.minifyInits(configs); // A panelek init sztringje, minifyolva.
         }

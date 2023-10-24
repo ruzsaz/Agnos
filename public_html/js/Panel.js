@@ -45,7 +45,6 @@ function Panel(panelInitString, mediator, isLegendRequired, leftOffset, rightOff
     this.fromMagLevel = panelInitString.fromMag || 1;          // Ahonnan érkezik a nagyítás.
     this.w = that.w * that.magLevel;
     this.legendWidth = that.w - 2 * global.legendOffsetX;
-//    this.legendWidth = that.legendWidth * that.magLevel;
     this.h = that.h * that.magLevel;
     this.legendOffsetX = global.legendOffsetX;// * that.magLevel;
     if (this.magLevel !== 1) {

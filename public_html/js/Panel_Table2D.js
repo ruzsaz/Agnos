@@ -304,7 +304,7 @@ panel_table2d.prototype.preUpdate = function(drill) {
         else if (drill.direction === 1) {
 
             // Ha nem a legalsó szinten vagyunk, akkor minden sor törlése.
-            if ((global.baseLevels[that.panelSide])[that.dimRToShow].length + 2 !== that.meta.dimensions[that.dimRToShow].levels.length) {
+            if ((global.baseLevels[that.panelSide])[that.dimRToShow].length + 2 !== that.localMeta.dimensions[that.dimRToShow].levels) {
                 that.gRowHeads.selectAll(".svgRowHead").remove();
                 that.gTable.selectAll(".svgTableRow").remove();
             }
@@ -333,7 +333,7 @@ panel_table2d.prototype.preUpdate = function(drill) {
 
         // Ha felfúrás.		
         else if (drill.direction === 1) {
-            if ((global.baseLevels[that.panelSide])[that.dimCToShow].length + 2 !== that.meta.dimensions[that.dimCToShow].levels.length) {
+            if ((global.baseLevels[that.panelSide])[that.dimCToShow].length + 2 !== that.localMeta.dimensions[that.dimCToShow].levels) {
 
                 // Ha nem a legalsó szinten vagyunk, akkor minden oszlop törlése.
                 that.gColumnHeads.selectAll(".svgColumnHead").remove();
@@ -500,11 +500,11 @@ panel_table2d.prototype.update = function(data, drill) {
     drill = drill || {dim: -1, direction: 0};
 
     // A hányados kijelzés, és a szorzó felfrissítése.
-    that.valMultiplier = (isNaN(parseFloat(that.meta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.meta.indicators[that.valToShow].fraction.multiplier);
-    if (that.valFraction && that.meta.indicators[that.valToShow].fraction.hide) {
+    that.valMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier);
+    if (that.valFraction && that.localMeta.indicators[that.valToShow].fraction.hide) {
         that.valFraction = false;
     }
-    if (!that.valFraction && that.meta.indicators[that.valToShow].value.hide) {
+    if (!that.valFraction && that.localMeta.indicators[that.valToShow].value.hide) {
         that.valFraction = true;
     }
 
@@ -823,7 +823,7 @@ panel_table2d.prototype.doChangeValue = function(panelId, value, ratio) {
     var that = this;
     if (panelId === undefined || panelId === that.panelId) {
         if (value !== undefined) {
-            that.valToShow = (value === -1) ? (that.valToShow + 1) % that.meta.indicators.length : value;
+            that.valToShow = (value === -1) ? (that.valToShow + 1) % that.localMeta.indicators.length : value;
             that.actualInit.val = that.valToShow;
         }
         if (ratio !== undefined) {
@@ -879,10 +879,10 @@ panel_table2d.prototype.langSwitch = function(duration, isInitial) {
 //    that.columnHeadVector = [];
 //
 //    // Az oszlopfejléc-adatok összerakása.
-//    for (var i = 0, iMax = that.meta.indicators.length; i < iMax; i++) {
-//        var ind = that.meta.indicators[i];
+//    for (var i = 0, iMax = that.localMeta.indicators.length; i < iMax; i++) {
+//        var ind = that.localMeta.indicators[i];
 //        that.columnHeadVector.push({
-//            hide: ((ind.value.hide) ? 1 : 0) + ((ind.fraction.hide) ? 2 : 0),
+//            hide: ((ind.valueIsHidden) ? 1 : 0) + ((ind.fraction.hide) ? 2 : 0),
 //            tooltip: that.createTooltip(
 //                    [{name: that.localMeta.indicators[i].description}], [])
 //        });

@@ -38,7 +38,7 @@ function panel_map(init) {
     this.isPoiRequired = that.actualInit.poi;	// Kell-e POI?
     this.mapKey = that.meta.mapKey;
     this.currentLevel;							// Az épp kirajzolt szint.
-    this.maxDepth = that.meta.dimensions[that.dimToShow].levels.length - 1;	// Maximális lefúrási szint. 1: megye, 2: kistérség, 3: település
+    this.maxDepth = that.localMeta.dimensions[that.dimToShow].levels - 1;	// Maximális lefúrási szint. 1: megye, 2: kistérség, 3: település
     
     this.imageWidthCover = 0.9 * that.width / that.w;
     this.imageHeightCover = that.height / that.h; // Ennyiszerese fedhető le a panelnek térképpel.
@@ -259,6 +259,7 @@ panel_map.prototype.setColorRange = function (dMin, dMed, dMax) {
  * @returns {Json} Hozzá tartozó térképi elemkupac.
  */
 panel_map.prototype.topoLevel = function (level) {
+    
     switch (level) {
         case 1:
             return (this.maxDepth >= 1) ? this.topology.objects.level1 : this.topology.objects.level0;
@@ -565,13 +566,13 @@ panel_map.prototype.update = function (data, drill) {
     }
 
     // A hányados kijelzés, és a szorzó felfrissítése.
-    if (that.valFraction && that.meta.indicators[that.valToShow].fraction.hide) {
+    if (that.valFraction && that.localMeta.indicators[that.valToShow].fraction.hide) {
         that.valFraction = false;
     }
-    if (!that.valFraction && that.meta.indicators[that.valToShow].value.hide) {
+    if (!that.valFraction && that.localMeta.indicators[that.valToShow].valueIsHidden) {
         that.valFraction = true;
     }
-    that.valMultiplier = (isNaN(parseFloat(that.meta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.meta.indicators[that.valToShow].fraction.multiplier);
+    that.valMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier);
 
     var tweenDuration = (drill.duration === undefined) ? global.getAnimDuration(-1, that.panelId) : drill.duration;
 
@@ -1009,7 +1010,7 @@ panel_map.prototype.doChangeValue = function (panelId, value, ratio) {
     var that = this;
     if (panelId === undefined || panelId === that.panelId) {
         if (value !== undefined) {
-            that.valToShow = (value === -1) ? (that.valToShow + 1) % that.meta.indicators.length : value;
+            that.valToShow = (value === -1) ? (that.valToShow + 1) % that.localMeta.indicators.length : value;
             that.actualInit.val = that.valToShow;
         }
         if (ratio !== undefined) {
@@ -1034,13 +1035,13 @@ panel_map.prototype.doChangeValue = function (panelId, value, ratio) {
 panel_map.prototype.doChangeDimension = function (panelId, newDimId) {
     var that = this;
     if (panelId === that.panelId) {
-        if (that.meta.dimensions[newDimId].is_territorial === 1) {
+        if (that.localMeta.dimensions[newDimId].is_territorial === 1) {
             that.dimToShow = newDimId;
             that.actualInit.dim = that.dimToShow;
             that.mediator.publish("register", that, that.panelId, [that.dimToShow], that.preUpdate, that.update, that.getConfig);
             global.tooltip.kill();
             that.currentLevel = undefined;
-            this.maxDepth = that.meta.dimensions[that.dimToShow].levels.length - 1;
+            this.maxDepth = that.localMeta.dimensions[that.dimToShow].levels - 1;
             this.mediator.publish("drill", {dim: -2, direction: 0, toId: undefined});
         }
     }

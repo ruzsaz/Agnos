@@ -20,9 +20,9 @@ agnosConfig.keycloakSettings = {url: 'http://localhost:8082/auth', realm: 'Agnos
 //agnosConfig.keycloakSettings = {url: 'http://192.168.1.2:8082/auth', realm: 'AgnosRealm', clientId: 'agnos'};
 agnosConfig.url = {
     auth: baseUrl + "/auth/login",
-    superMeta: baseUrl + "/meta/cubes",
-    meta: baseUrl + "/meta/cube",
-    fact: baseUrl + "/cube"};
+    superMeta: baseUrl + "/reports",
+    meta: baseUrl + "/report_meta",
+    fact: baseUrl + "/report"};
 
 agnosConfig.i18nRequired = true;
 agnosConfig.saveToBookmarkRequired = true;

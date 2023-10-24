@@ -290,6 +290,10 @@ Container.prototype.newReport = function(side, reportSuperMeta, startObject) {
     this.isSideInUse[side] = true;
     this.updateHelp(side, reportSuperMeta);
     global.facts[side] = new Fact(reportSuperMeta, side, this.newReportReady, this, startObject);
+    
+    console.log(side, global.facts)
+    this.newReportReady(side, reportSuperMeta);
+    
 };
 
 /**
@@ -304,10 +308,11 @@ Container.prototype.updateHelp = function(side, reportSuperMeta) {
     for (var i = 0, iMax = localHelps.length; i < iMax; i++) {
         var localHelp = d3.select(localHelps[i]);
         var lang = localHelp.attr("lang");        
-        var localMeta = (reportSuperMeta !== undefined) ? global.getFromArrayByLangArray(reportSuperMeta.languages, reportSuperMeta.helpHTMLs, lang) : undefined;
-        var header = (localMeta !== undefined) ? "<h3>" + global.getFromArrayByLangArray(reportSuperMeta.languages, reportSuperMeta.descriptions, lang) + "</h3>" : "";
+        var localMeta = (reportSuperMeta !== undefined) ? global.getFromArrayByLang(reportSuperMeta.helps, lang) : undefined;
+        var header = (localMeta !== undefined) ? "<h3>" + global.getFromArrayByLang(reportSuperMeta.labels, lang).description + "</h3>" : "";
         var updateTime = (localMeta !== undefined) ? "<em>frissítve: " + reportSuperMeta.updated + "</em><br>" : "";
-        var content = "<div class='helpInnerHTML'>" + ((localMeta !== undefined) ? ((global.getFromArrayByLangArray(reportSuperMeta.languages, reportSuperMeta.helpHTMLs, lang).length > 4) ? LZString.decode(global.getFromArrayByLangArray(reportSuperMeta.languages, reportSuperMeta.helpHTMLs, lang)) : "Nincs elérhető információ.") : "") + "</div>";
+        var content = "<div class='helpInnerHTML'>" + ((localMeta !== undefined) ?
+                ((localMeta.message.length > 4) ? LZString.decode(localMeta.message) : "Nincs elérhető információ.") : "") + "</div>";
         var html = header + updateTime + content;
 
         if (this.isSideInUse[0] && this.isSideInUse[1]) {   // Ha mindkét oldalon van report
@@ -382,9 +387,9 @@ Container.prototype.newReportReady = function(side, reportMeta) {
     that.resizeInProgress = true;
 
     // Megjelenítés a meta alapján
-    for (var i = 0, iMax = reportMeta.visualization.length; i < iMax; i++) {
+    for (var i = 0, iMax = reportMeta.visualizations.length; i < iMax; i++) {
         // De előbb a megfelelő oldalra kell hozni...
-        var initString = reportMeta.visualization[i].toLowerCase();
+        var initString = reportMeta.visualizations[i].initString.toLowerCase();
         if (initString.indexOf("})") > -1) {
             initString = initString.replace("})", ", group: " + side + "})");
             initString = initString.replace("({, ", "({");
@@ -397,11 +402,8 @@ Container.prototype.newReportReady = function(side, reportMeta) {
     }
 
     global.mediators[side].publish("killPanel", "#panel" + side + "P-1");	// Esetleges régi fejlécpanel megölése.    
-    var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, reportMeta.visualization.length);
+    var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, reportMeta.visualizations.length);
     new HeadPanel_Report({group: side}, reportMeta, scaleRatio);			// Fejlécpanel létrehozása.
-
-//    global.mediators[side].publish("drill", {dim: -1, direction: 0});		// Kezdeti belefúrás.
-
 
     var sizePercentage = 0;
     if ((this.panelState === 0 && side === 0) || (this.panelState === 2 && side === 1)) {
@@ -410,7 +412,7 @@ Container.prototype.newReportReady = function(side, reportMeta) {
         sizePercentage = 0.5;
     }
 
-    var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, reportMeta.visualization.length);
+    var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, reportMeta.visualizations.length);
     this.resizeContainer(side, 0, sizePercentage, global.panelNumberOnScreen, scaleRatio);
 
     that.counter--;
@@ -673,7 +675,7 @@ Container.prototype.saveAsCsv = function(side, requestedDims) {
 
         // Értékek fejlécének hozzáadása.
         for (var v = 0, vMax = meta.indicators.length; v < vMax; v++) {
-            var valueHeader = (meta.indicators[v].value.hide) ? "\"Nem értelmezett\"" : "\"" + (meta.indicators[v].caption + " (" + meta.indicators[v].value.unit + ")\"");
+            var valueHeader = (meta.indicators[v].valueIsHidden) ? "\"Nem értelmezett\"" : "\"" + (meta.indicators[v].caption + " (" + meta.indicators[v].value.unit + ")\"");
             var ratioHeader = (meta.indicators[v].fraction.hide) ? "\"Nem értelmezett\"" : "\"" + (meta.indicators[v].caption + " (" + meta.indicators[v].fraction.unit + ")\"");
             resultString += separator + valueHeader + "," + ratioHeader;
             separator = ",";
@@ -700,7 +702,7 @@ Container.prototype.saveAsCsv = function(side, requestedDims) {
 
             // Értékek beírása a sorba.
             for (var v = 0, vMax = row.vals.length; v < vMax; v++) {
-                var value = (meta.indicators[v].value.hide) ? "" : row.vals[v].sz;
+                var value = (meta.indicators[v].valueIsHidden) ? "" : row.vals[v].sz;
                 var ratio = (meta.indicators[v].fraction.hide) ? "" : valMultipliers[v] * row.vals[v].sz / row.vals[v].n;
                 resultline += separator + value + "," + ratio;
                 separator = ",";
