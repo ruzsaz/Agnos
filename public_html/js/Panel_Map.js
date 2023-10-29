@@ -280,7 +280,7 @@ panel_map.prototype.topoLevel = function (level) {
 };
 
 /**
- * Megkeresi egy térképi elem-kupac közös szülőelemét a knownId-ja alapján. TODO: nem megy egyszerűbben?
+ * Megkeresi egy térképi elem-kupac közös szülőelemét a id-ja alapján. TODO: nem megy egyszerűbben?
  * 
  * @param {Array} dataRows A térképi elemeket leíró adattömb.
  * @returns {panel_map.prototype.getParent.parentObj} A szülő térképi elem.
@@ -289,7 +289,7 @@ panel_map.prototype.getParent = function (dataRows) {
     var parentObj;
     if (dataRows.length > 0) {
         // Vesszük az adatkupac első elemét. Ha az épp N/A, akkor a másodikat. TODO: Itt most gányolás van!!! Ki kéne javítani.
-        var shapeId = (dataRows[0].dims[0].knownId !== "N/A") ? dataRows[0].dims[0].knownId : (dataRows.length > 1) ? dataRows[1].dims[0].knownId : undefined;
+        var shapeId = (dataRows[0].dims[0].id !== "N/A") ? dataRows[0].dims[0].id : (dataRows.length > 1) ? dataRows[1].dims[0].id : undefined;
         for (var level = 0; level <= 3; level++) { // TODO: 3 helyett ahány van kéne...
             var thisObj = topojson.feature(this.topology, this.topoLevel(level)).features.filter(function (d) {
                 return shapeId == d.properties.shapeid;
@@ -306,9 +306,9 @@ panel_map.prototype.getParent = function (dataRows) {
 };
 
 /**
- * Megkeres egy térképi element a knownId-ja alapján.
+ * Megkeres egy térképi element a id-ja alapján.
  * 
- * @param {String} shapeId A keresett elem knownId-ja.
+ * @param {String} shapeId A keresett elem id-ja.
  * @returns {Feature} A térképi elem.
  */
 panel_map.prototype.getSelf = function (shapeId) {
@@ -399,7 +399,7 @@ panel_map.prototype.preUpdate = function (drill) {
                 for (var i = 0, iMax = that.data.rows.length; i < iMax; i++) {
                     var dim = that.data.rows[i].dims[0];
                     if (dim.id === drill.toId) {
-                        var toFeature = that.getSelf(dim.knownId);
+                        var toFeature = that.getSelf(dim.id);
                         break;
                     }
                 }
@@ -445,7 +445,7 @@ panel_map.prototype.prepareData = function (newDataRows) {
     var that = this;
 
     // Ha nincs térképen ábrázolható adat, akkor üres választ adunk.
-    if (newDataRows.length === 0 || (newDataRows[0].dims[0].knownId === "N/A" && newDataRows.length === 1)) {
+    if (newDataRows.length === 0 || (newDataRows[0].dims[0].id === "N/A" && newDataRows.length === 1)) {
         return undefined;
 
         // Különben valódit.
@@ -458,7 +458,7 @@ panel_map.prototype.prepareData = function (newDataRows) {
         }
 
         // Az épp kirajzolandó területek parent-je.
-        var parentShape = (that.currentLevel !== that.maxDepth + 1) ? that.getParent(newDataRows) : that.getSelf(newDataRows[0].dims[0].knownId);
+        var parentShape = (that.currentLevel !== that.maxDepth + 1) ? that.getParent(newDataRows) : that.getSelf(newDataRows[0].dims[0].id);
         if (parentShape === undefined) {
             return undefined;
         } else {
@@ -474,7 +474,7 @@ panel_map.prototype.prepareData = function (newDataRows) {
             var bounds = that.path.bounds;
             featuresToDraw.map(function (d) {
                 for (var w = 0, wMax = newDataRows.length; w < wMax; w++) {
-                    if (newDataRows[w].dims[0].knownId == d.properties.shapeid) {
+                    if (newDataRows[w].dims[0].id == d.properties.shapeid) {
                         var datarow = newDataRows[w];
                         var b = bounds(d);
                         var val = that.valueToShow(datarow);
@@ -511,7 +511,7 @@ panel_map.prototype.prepareData = function (newDataRows) {
 panel_map.prototype.preparePoiData = function (rawPois, newDataRows) {
     var that = this;
 
-    var parentShape = (that.currentLevel !== that.maxDepth + 1) ? that.getParent(newDataRows) : that.getSelf(newDataRows[0].dims[0].knownId);
+    var parentShape = (that.currentLevel !== that.maxDepth + 1) ? that.getParent(newDataRows) : that.getSelf(newDataRows[0].dims[0].id);
 
     var preparedPois = [];
     for (var p = 0, pMax = rawPois.length; p < pMax; p++) {

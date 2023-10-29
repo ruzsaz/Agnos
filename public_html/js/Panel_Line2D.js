@@ -564,7 +564,7 @@ panel_line2d.prototype.prepareData = function (oldPreparedData, newDataRows, dri
                 index: index,
                 id: dimY.id,
                 uniqueId: levelY + "L" + dimY.id,
-                knownId: dimY.knownId,
+                id: dimY.id,
                 name: dimY.name.trim(),
                 parentId: dimY.parentId,
                 tooltip: "<html>" + dimY.name.trim() + "</html>"

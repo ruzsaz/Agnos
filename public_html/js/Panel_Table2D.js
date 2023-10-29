@@ -379,7 +379,7 @@ panel_table2d.prototype.prepareData = function(oldPreparedData, newDataRows, dri
                 oldColumnIndex: index,
                 id: dimC.id,
                 uniqueId: levelC + "L" + dimC.id,
-                knownId: dimC.knownId,
+                id: dimC.id,
                 name: dimC.name.trim(),
                 parentId: dimC.parentId,
                 tooltip: that.getTooltip(undefined, dimC),
