@@ -109,7 +109,7 @@ function HeadPanel_Report(init, reportMeta, startScale) {
             .style("opacity", "1");
 
     // Dimenzió tábla feltöltése a meta alapján
-    var dimRow = that.dimTable.selectAll(".row").data(that.meta.hierarchies);
+    var dimRow = that.dimTable.selectAll(".row").data(that.meta.dimensions);
 
     var newDimRow = dimRow.enter().append("html:div")
             .attr("class", "row alterColored")

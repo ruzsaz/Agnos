@@ -87,6 +87,7 @@ function Container() {
             try {
                 that.counter = 2;   // 2 report betöltésére várunk, bal, jobbpanel.
                 var startObject = JSON.parse(LZString.decompressFromEncodedURIComponent(startString));
+                console.log("start", startObject)
                 that.navigateTo(startObject);
             } catch (e) {
                 if (global.preferredUsername === undefined) {

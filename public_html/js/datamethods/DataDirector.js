@@ -51,7 +51,7 @@ DataDirector.prototype.register = function(context, panelId, dimsToShow, preUpda
             oldPosition = this.panelRoster.length;
         }
         var ds = [];
-        for (var d = 0, dMax = global.facts[this.side].reportMeta.hierarchies.length; d < dMax; d++) {
+        for (var d = 0, dMax = global.facts[this.side].reportMeta.dimensions.length; d < dMax; d++) {
             ds.push((dimsToShow.indexOf(d) > -1) ? 1 : 0);
         }
 
@@ -182,7 +182,7 @@ DataDirector.prototype.requestNewData = function(drill) {
     var baseVector = [];
     for (var d = 0, dMax = (global.baseLevels[that.side]).length; d < dMax; d++) {
         var baseVectorCoordinate = {};
-        baseVectorCoordinate.name = global.facts[that.side].reportMeta.hierarchies[d].name;
+        baseVectorCoordinate.name = global.facts[that.side].reportMeta.dimensions[d].name;
         baseVectorCoordinate.levelValues = [];
         for (var l = 0, lMax = (global.baseLevels[that.side])[d].length; l < lMax; l++) {
             baseVectorCoordinate.levelValues.push(((global.baseLevels[that.side])[d])[l].id); 
@@ -201,9 +201,9 @@ DataDirector.prototype.requestNewData = function(drill) {
         // so queries in the array will be unique.
         if (queriesStamp.indexOf(elementStamp) === queriesStamp.length - 1) {
             var query = [];
-            for (var dts = 0, dtsMax = global.facts[this.side].reportMeta.hierarchies.length; dts < dtsMax; dts++) {
+            for (var dts = 0, dtsMax = global.facts[this.side].reportMeta.dimensions.length; dts < dtsMax; dts++) {
                 if (this.panelRoster[p].dimsToShow[dts] === 1) {
-                    query.push(global.facts[this.side].reportMeta.hierarchies[dts].name);
+                    query.push(global.facts[this.side].reportMeta.dimensions[dts].name);
                 }
             }
             queries.push({"dimsToDrill" : query});

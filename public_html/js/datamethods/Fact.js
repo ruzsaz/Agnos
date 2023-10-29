@@ -39,7 +39,7 @@ Fact.prototype.enrichReportMeta = function(startObject) {
     console.log(this.reportMeta)
         
     // A bázisszintet tartalmazó tömb kezdeti beállítása.
-    for (var i = 0, iMax = this.reportMeta.hierarchies.length; i < iMax; i++) {
+    for (var i = 0, iMax = this.reportMeta.dimensions.length; i < iMax; i++) {
         (global.baseLevels[this.side]).push([]); // Kezdetben a legfelsőbb szint a bázisszint.
     }
     if (startObject) {
@@ -48,13 +48,13 @@ Fact.prototype.enrichReportMeta = function(startObject) {
     }
 
     // A dimenziók id-jének beállítása, tooltip beállítása;
-    for (var i = 0, iMax = this.reportMeta.hierarchies.length; i < iMax; i++) {
-        this.reportMeta.hierarchies[i].id = i;
+    for (var i = 0, iMax = this.reportMeta.dimensions.length; i < iMax; i++) {
+        this.reportMeta.dimensions[i].id = i;
     }
 
     // Ha van térkép, a térképkód kinyerése;
-    for (var i = 0, iMax = this.reportMeta.hierarchies.length; i < iMax; i++) {
-        const dimType = this.reportMeta.hierarchies[i].type;
+    for (var i = 0, iMax = this.reportMeta.dimensions.length; i < iMax; i++) {
+        const dimType = this.reportMeta.dimensions[i].type;
         if (typeof dimType === "string" && dimType.search("map") !== -1) {
             this.reportMeta.mapKey = dimType.replace("map(", "").replace(")", "");
             break;
@@ -88,13 +88,13 @@ Fact.prototype.getLocalMeta = function() {
         this.localMeta.description = localLabel.description;
         
         this.localMeta.dimensions = [];
-        for (var i = 0, iMax = this.reportMeta.hierarchies.length; i < iMax; i++) {
-            var d = this.reportMeta.hierarchies[i];
+        for (var i = 0, iMax = this.reportMeta.dimensions.length; i < iMax; i++) {
+            var d = this.reportMeta.dimensions[i];
             const localLabel = global.getFromArrayByLang(d.multilingualization, language);
             var dimension = {
                 'caption': localLabel.caption,
                 'description': localLabel.description,
-                'hierarchy_unique_name': d.name,
+                'dimension_unique_name': d.name,
                 'id': d.id,
                 'is_territorial': (d.type === "" || d.type === null) ? 0 : 1,
                 'levels': d.allowedDepth + 1,

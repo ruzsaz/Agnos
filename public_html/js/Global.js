@@ -447,6 +447,7 @@ var global = function () {
 
                 // Tényleges URL-be írás. Ha nem kell, kikommentelendő.
                 if (global.saveToBookmarkRequired) {
+                    console.log(startObject);
                     const newUrl = location.origin + location.pathname + "?q=" + LZString.compressToEncodedURIComponent(JSON.stringify(startObject));
                     window.history.replaceState({id: "100"}, "Page 3", newUrl);
                     //location.hash = LZString.compressToEncodedURIComponent(JSON.stringify(startObject));
@@ -1519,9 +1520,7 @@ var global = function () {
         getCookie: getCookie, // Kiolvas egy cookie-t.
         setLanguage: setLanguage, // Nyelvváltoztató függvény.
         axisTextSize: axisTextSize, // Az oszlopdiagram tengelybetű-méretét határozza meg.
-//        getIndexOfLang: getIndexOfLang, // Megkeresi egy tömb elemének indexét a nyelvkód alapján.
         getFromArrayByLang: getFromArrayByLang, // Megkeresi egy tömb elemét a nyalvkód alapján.
-//        getFromArrayByLangArray: getFromArrayByLangArray,
         getFromArrayByProperty: getFromArrayByProperty, // Megkeresi egy tömb elemét az elem egyik property-je alapján.
         positionInArrayByProperty: positionInArrayByProperty, // Megkeresi egy tömb elemének indexét az elem egyik property-je alapján.
         positionInArray: positionInArray, // Megnézi, hogy a tömb hányadik eleme egy érték.
