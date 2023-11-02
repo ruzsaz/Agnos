@@ -897,7 +897,6 @@ panel_barline.prototype.update = function(data, drill, duration) {
             forbidNominator = true;
             that.valFraction = true;
         }
-        console.log(that.localMeta, that.legendArray[i].id)
         if (that.localMeta.indicators[that.legendArray[i].id].fraction.hide) {
             forbidRatio = true;
             that.valFraction = false;
@@ -1010,7 +1009,7 @@ panel_barline.prototype.drawBars = function(preparedData, trans) {
                 });
 
         // Elemi oszlopelemek megrajzolása.
-        var oldWidth = preparedData.dataArray[0].oldWidth; // A régi téglalapszélesség; ki kell szedni, hogy minden elemhez használhassuk.
+        var oldWidth = (preparedData.dataArray.length > 0) ? preparedData.dataArray[0].oldWidth : 0; // A régi téglalapszélesség; ki kell szedni, hogy minden elemhez használhassuk.
         gBarNew.selectAll("rect")
                 .data(function(d) {
                     return d.barValues;

@@ -689,7 +689,7 @@ panel_bar2d.prototype.drawBars = function (preparedData, trans) {
             });
 
     // Elemi oszlopelemek megrajzolása, kilépők letörlése.
-    var oldWidth = preparedData.dataArray[0].oldWidth; // A régi téglalapszélesség; ki kell szedni, hogy minden elemhez használhassuk.
+    var oldWidth = (preparedData.dataArray.length > 0) ? preparedData.dataArray[0].oldWidth : 0; // A régi téglalapszélesség; ki kell szedni, hogy minden elemhez használhassuk.
     var barRect = gBar.selectAll("rect")
             .data(function (d) {
                 return d.values;

@@ -87,7 +87,6 @@ function Container() {
             try {
                 that.counter = 2;   // 2 report betöltésére várunk, bal, jobbpanel.
                 var startObject = JSON.parse(LZString.decompressFromEncodedURIComponent(startString));
-                console.log("start", startObject)
                 that.navigateTo(startObject);
             } catch (e) {
                 if (global.preferredUsername === undefined) {
@@ -291,10 +290,7 @@ Container.prototype.newReport = function(side, reportSuperMeta, startObject) {
     this.isSideInUse[side] = true;
     this.updateHelp(side, reportSuperMeta);
     global.facts[side] = new Fact(reportSuperMeta, side, this.newReportReady, this, startObject);
-    
-    console.log(side, global.facts)
-    this.newReportReady(side, reportSuperMeta);
-    
+    this.newReportReady(side, reportSuperMeta);    
 };
 
 /**
@@ -356,9 +352,12 @@ Container.prototype.navigateTo = function(startObject) {
         } else if (that.panelState === 1) {
             sizePercentage = 0.5;
         }
-        if (sideInit.v) {
+        if (sideInit.v) { // Visualizatzions
             var reportMeta = global.getFromArrayByProperty(global.superMeta, 'name', sideInit.c); // A reporthoz tartozó meta.
             sideInit.v = global.minifyInits(sideInit.v, true).split(';'); // A panelek indító konstruktorai.
+            for (var i = 0, iMax = sideInit.v.length; i < iMax; i++) {
+                sideInit.v[i] = {'initString' : sideInit.v[i]}
+            }
             that.newReport(side, reportMeta, sideInit);
             var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, sideInit.v.length);
             that.resizeContainer(side, 0, sizePercentage, global.panelNumberOnScreen, scaleRatio);

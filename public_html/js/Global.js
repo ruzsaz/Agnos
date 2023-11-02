@@ -447,10 +447,8 @@ var global = function () {
 
                 // Tényleges URL-be írás. Ha nem kell, kikommentelendő.
                 if (global.saveToBookmarkRequired) {
-                    console.log(startObject);
                     const newUrl = location.origin + location.pathname + "?q=" + LZString.compressToEncodedURIComponent(JSON.stringify(startObject));
                     window.history.replaceState({id: "100"}, "Page 3", newUrl);
-                    //location.hash = LZString.compressToEncodedURIComponent(JSON.stringify(startObject));
                 }
             }
         };
@@ -689,23 +687,41 @@ var global = function () {
     };
 
     /**
-     * Szám rövid kijelzése kiíráshoz, max 3 számkarakterrel. (pl. 3.51 Mrd.)
+     * Szám rövid kijelzése kiíráshoz, max 4 számkarakterrel. (pl. 32.51 Mrd.)
      * 
      * @param {Number} n Kijelzendő szám.
      * @returns {String} A kiírandó sztring.
      */
     var cleverRound3 = function (n) {
-        return (n !== undefined) ? ((isFinite(n)) ? (parseFloat(d3.format(".3s")(n)).toLocaleString(String.locale) + _(d3.format(".3s")(n).replace(/-*\d*\.*\d*/g, ''))) : _("inf")) : "???";
+        if (n === undefined) {
+            return "???";
+        }
+        if (!isFinite(n)) {
+            return "inf";            
+        }
+        if (Math.abs(n) > 0.01 && Math.abs(n) < 9999.5) {
+            return parseFloat(d3.format(".4g")(n)).toLocaleString(String.locale);
+        }
+        return parseFloat(d3.format(".4s")(n)).toLocaleString(String.locale) + _(d3.format(".4s")(n).replace(/-*\d*\.*\d*/g, ''));        
     };
 
     /**
-     * Szám hosszabb kijelzése kiíráshoz, max 5 számkarakterrel. (pl. 35123 M.)
+     * Szám hosszabb kijelzése kiíráshoz, max 6 számkarakterrel. (pl. 35123 M.)
      *  
      * @param {Number} n Kijelzendő szám.
      * @returns {String} A kiírandó sztring.
      */
     var cleverRound5 = function (n) {
-        return (n !== undefined) ? ((isFinite(n)) ? (parseFloat(d3.format(".4s")(n)).toLocaleString(String.locale) + _(d3.format(".4s")(n).replace(/-*\d*\.*\d*/g, ''))) : _("inf")) : "???";
+        if (n === undefined) {
+            return "???";
+        }
+        if (!isFinite(n)) {
+            return "inf";            
+        }        
+        if (Math.abs(n) > 0.001 && Math.abs(n) < 999999.5) {
+            return parseFloat(d3.format(".6g")(n)).toLocaleString(String.locale);
+        }
+        return parseFloat(d3.format(".6s")(n)).toLocaleString(String.locale) + _(d3.format(".6s")(n).replace(/-*\d*\.*\d*/g, ''));
     };
 
     /**
@@ -790,33 +806,6 @@ var global = function () {
     };
 
     /**
-     * Megkeresi egy tömb elemének indexét a nyelvkód alapján.
-     * Ha adott nyelvkódú nincs, akkor a
-     * "" nyelvkódut adja vissza. Ha az sincs, akkor 0-t.
-     * 
-     * @param {Array} array A tömb.
-     * @param {String} lang Nyelvkód. Ha undefined, az aktuálist veszi.
-     * @returns {undefined|Globalglobal.getFromArrayByLang.array}
-     */
-//    var getIndexOfLang = function (array, lang) {
-//        var returnIndex = -1;
-//        var indexOfDefault = 0;
-//        if (lang === undefined) {
-//            lang = String.locale;
-//        }
-//
-//        for (var i = 0, iMax = array.length; i < iMax; i++) {
-//            if (array[i] === "") {
-//                indexOfDefault = i;
-//            }
-//            if (array[i] === lang) {
-//                returnIndex = i;
-//            }
-//        }
-//        return (returnIndex === -1) ? indexOfDefault : returnIndex;
-//    };
-
-    /**
      * Megkeresi egy tömb elemét a nyelvkód alapján. Ha adott nyelvkódú nincs, akkor a
      * "" nyelvkódut adja vissza. Ha az sincs, akkor a tömb első elemét.
      * 
@@ -841,25 +830,6 @@ var global = function () {
         }
         return (returnIndex === -1) ? array[0] : array[returnIndex];
     };
-
-    /**
-     * Megkeresi egy tömb elemét a nyelvkód, és a nyelvkód-tömb alapján.
-     * A két tömbben a nyelveknek azonos sorrendben kell lenniük.
-     * Ha nem találja a nyelvet, a "" nyelvkódut adja vissza.
-     * Ha az sincs, akkor a tömb első elemét.
-     * 
-     * @param {Array} langArray A nyelvkódok tömbje.
-     * @param {Array} subArray A kiolvasandó értékek tömbje.
-     * @param {String} lang Nyelvkód. Ha undefined, az aktuálist veszi.
-     * @returns {undefined|Globalglobal.getFromArrayByLang.array}
-     */
-//    var getFromArrayByLangArray = function (langArray, subArray, lang) {
-//        if (lang === undefined) {
-//            lang = String.locale;
-//        }
-//        var returnIndex = global.getIndexOfLang(langArray, lang);
-//        return (returnIndex === -1) ? subArray[0] : subArray[returnIndex];
-//    };
 
     /**
      * Megkeresi egy tömb elemét az elem egyik property-je alapján.
@@ -1006,7 +976,6 @@ var global = function () {
      * @returns {String} Az átalakított sztring.
      */
     var minifyInits = function (initString, isBack) {
-
         // Az oda-visszaalakító szótár. Vigyázni kell, nehogy valamelyik oldalon
         // valami más részhalmazát adjunk meg, mert a csere elbaszódik!
         var dictionary = [

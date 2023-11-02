@@ -35,8 +35,6 @@ function Fact(reportSuperMeta, side, callbackFunction, callContext, startObject)
  * @returns {Fact.reportMetaReady}
  */
 Fact.prototype.enrichReportMeta = function(startObject) {
-    
-    console.log(this.reportMeta)
         
     // A bázisszintet tartalmazó tömb kezdeti beállítása.
     for (var i = 0, iMax = this.reportMeta.dimensions.length; i < iMax; i++) {
@@ -66,7 +64,6 @@ Fact.prototype.enrichReportMeta = function(startObject) {
         this.reportMeta.indicators[i].id = i;
     }
 
-    console.log(this.callback, this.callContext, this.side)
 };
 
 /**

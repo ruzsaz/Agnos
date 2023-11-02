@@ -135,7 +135,6 @@ DataDirector.prototype.drill = function(drill) {
     var dim = drill.dim;
     var baseDim = (global.baseLevels[that.side])[dim];
     if (drill.direction === -1) {
-        console.log(global.facts[that.side].localMeta, dim)
         if (drill.toId !== undefined && baseDim.length < global.facts[that.side].localMeta.dimensions[dim].levels - 1) {
             isSuccessful = true;
             drill.fromId = (baseDim.length === 0) ? null : (baseDim[baseDim.length - 1]).id;
@@ -194,7 +193,6 @@ DataDirector.prototype.requestNewData = function(drill) {
     var queries = [];
     for (var p = 0, pMax = this.panelRoster.length; p < pMax; p++) {
         const elementStamp = this.panelRoster[p].dimsToShow.toString().replace(/,/g, ":");
-        console.log(elementStamp)
         queriesStamp.push(elementStamp);
         
         // If it is a new query according to the stamp, put it into the query array,
@@ -215,7 +213,6 @@ DataDirector.prototype.requestNewData = function(drill) {
         "baseVector": baseVector,
         "drillVectors": queries
     };
-    console.log(requestObject);
     const encodedQuery = "queries=" + window.btoa(JSON.stringify(requestObject));
     // A letöltés élesben.
     global.get(global.url.fact, encodedQuery, function(result) {

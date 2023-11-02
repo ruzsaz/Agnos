@@ -566,7 +566,7 @@ panel_horizontalbar.prototype.drawBars = function(preparedData, trans) {
             });
 
     // Elemi oszlopelemek megrajzolása.
-    var oldHeight = preparedData.dataArray[0].oldHeight;
+    var oldHeight = (preparedData.dataArray.length > 0) ? preparedData.dataArray[0].oldHeight : 0;
     gBarNew.selectAll("rect")
             .data(function(d) {
                 return d.values;
