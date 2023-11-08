@@ -882,7 +882,6 @@ panel_barline.prototype.prepareData = function(oldPreparedData, newDataRows, dri
  */
 panel_barline.prototype.update = function(data, drill, duration) {
     var that = this;
-
     if (drill && drill.duration !== undefined) {
         duration = drill.duration;
     }
@@ -893,7 +892,7 @@ panel_barline.prototype.update = function(data, drill, duration) {
     var forbidRatio = false;
     var forbidNominator = false;
     for (var i = 0, iMax = that.legendArray.length; i < iMax; i++) {
-        if (that.localMeta.indicators[that.legendArray[i].id].valueIsHidden) {
+        if (that.localMeta.indicators[that.legendArray[i].id].value.hide) {
             forbidNominator = true;
             that.valFraction = true;
         }

@@ -349,7 +349,7 @@ HeadPanel_Report.prototype.initPanel = function (trans) {
     // Második cella: a mutató abszolút értéke, helykitöltés.
     valRow.select(".tableText1.spacer")
             .text(function (d) {
-                return (d.valueIsHidden) ? _("nem értelmezett") : _("99.9Mrd ") + _(d.value.unitPlural);
+                return (d.value.hide) ? _("nem értelmezett") : _("99.9Mrd ") + _(d.value.unitPlural);
             });
 
     // Harmadik cella: a mutató arányosított értéke.

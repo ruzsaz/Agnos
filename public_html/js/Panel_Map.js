@@ -569,7 +569,7 @@ panel_map.prototype.update = function (data, drill) {
     if (that.valFraction && that.localMeta.indicators[that.valToShow].fraction.hide) {
         that.valFraction = false;
     }
-    if (!that.valFraction && that.localMeta.indicators[that.valToShow].valueIsHidden) {
+    if (!that.valFraction && that.localMeta.indicators[that.valToShow].value.hide) {
         that.valFraction = true;
     }
     that.valMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier);

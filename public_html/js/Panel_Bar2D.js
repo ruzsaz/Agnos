@@ -627,7 +627,7 @@ panel_bar2d.prototype.update = function (data, drill) {
     if (that.valFraction && that.localMeta.indicators[that.valToShow].fraction.hide) {
         that.valFraction = false;
     }
-    if (!that.valFraction && that.localMeta.indicators[that.valToShow].valueIsHidden) {
+    if (!that.valFraction && that.localMeta.indicators[that.valToShow].value.hide) {
         that.valFraction = true;
     }
 

@@ -644,20 +644,35 @@ Container.prototype.saveAsCsv = function(side, requestedDims) {
         headerString += ",\"" + meta.dimensions[i].caption + ":\",\"" + ((baseDim.length === 0) ? meta.dimensions[i].top_level_caption : baseDim[baseDim.length - 1].name) + "\"\n";
     }
 
-    // A lekérdezés összeállítása.
-    var baseLevelQueryString = "";
-    var separator0 = "";
-    for (var d = 0, dMax = baseLevels.length; d < dMax; d++) {
-        var separator1 = "";
-        baseLevelQueryString += separator0;
-        for (var l = 0, lMax = baseLevels[d].length; l < lMax; l++) {
-            baseLevelQueryString += separator1 + (baseLevels[d])[l].id;
-            separator1 = ",";
+    // Assemble the base vector
+    var baseVector = [];
+    for (var d = 0, dMax = (global.baseLevels[side]).length; d < dMax; d++) {
+        var baseVectorCoordinate = {};
+        baseVectorCoordinate.name = global.facts[side].reportMeta.dimensions[d].name;
+        baseVectorCoordinate.levelValues = [];
+        for (var l = 0, lMax = (global.baseLevels[side])[d].length; l < lMax; l++) {
+            baseVectorCoordinate.levelValues.push(((global.baseLevels[side])[d])[l].id); 
         }
-        separator0 = ":";
+        baseVector.push(baseVectorCoordinate);
     }
-    var query = meta.cube_unique_name + ":" + String.locale + ";" + baseLevelQueryString + ";" + requestedDims.toString().replace(/,/g, ":");
-    var encodedQuery = "queries=" + window.btoa(query);
+    
+    // Assemble the drill vector
+    var queries = [];
+    var query = [];    
+    for (var dts = 0, dtsMax = global.facts[side].reportMeta.dimensions.length; dts < dtsMax; dts++) {
+        if (requestedDims[dts] === 1) {
+            query.push(global.facts[side].reportMeta.dimensions[dts].name);
+        }
+    }
+    queries.push({"dimsToDrill" : query});
+
+    var requestObject = {
+        "reportName" : global.facts[side].reportMeta.name,
+        "baseVector": baseVector,
+        "drillVectors": queries
+    };
+    
+    const encodedQuery = "queries=" + window.btoa(JSON.stringify(requestObject));
 
     // Adatok letöltése, és a belőlük származó csv-törzs összerakása.
     global.get(global.url.fact, encodedQuery, function(resultJson) {
@@ -672,10 +687,10 @@ Container.prototype.saveAsCsv = function(side, requestedDims) {
                 separator = ",";
             }
         }
-
+console.log(meta)
         // Értékek fejlécének hozzáadása.
         for (var v = 0, vMax = meta.indicators.length; v < vMax; v++) {
-            var valueHeader = (meta.indicators[v].valueIsHidden) ? "\"Nem értelmezett\"" : "\"" + (meta.indicators[v].caption + " (" + meta.indicators[v].value.unit + ")\"");
+            var valueHeader = (meta.indicators[v].value.hide) ? "\"Nem értelmezett\"" : "\"" + (meta.indicators[v].caption + " (" + meta.indicators[v].value.unit + ")\"");
             var ratioHeader = (meta.indicators[v].fraction.hide) ? "\"Nem értelmezett\"" : "\"" + (meta.indicators[v].caption + " (" + meta.indicators[v].fraction.unit + ")\"");
             resultString += separator + valueHeader + "," + ratioHeader;
             separator = ",";
@@ -689,8 +704,8 @@ Container.prototype.saveAsCsv = function(side, requestedDims) {
         }
 
         // Az eredmény feldolgozása soronként.
-        for (var r = 0, rMax = result[0].response.rows.length; r < rMax; r++) {
-            var row = result[0].response.rows[r];
+        for (var r = 0, rMax = result.answer[0].response.rows.length; r < rMax; r++) {
+            var row = result.answer[0].response.rows[r];
             var resultline = "";
 
             // Dimenziók beírása a sorba.
@@ -702,7 +717,7 @@ Container.prototype.saveAsCsv = function(side, requestedDims) {
 
             // Értékek beírása a sorba.
             for (var v = 0, vMax = row.vals.length; v < vMax; v++) {
-                var value = (meta.indicators[v].valueIsHidden) ? "" : row.vals[v].sz;
+                var value = (meta.indicators[v].value.hide) ? "" : row.vals[v].sz;
                 var ratio = (meta.indicators[v].fraction.hide) ? "" : valMultipliers[v] * row.vals[v].sz / row.vals[v].n;
                 resultline += separator + value + "," + ratio;
                 separator = ",";

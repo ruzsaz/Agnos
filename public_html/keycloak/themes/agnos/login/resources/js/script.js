@@ -31,13 +31,17 @@ function getCookie(name) {
 
 function getBasePath() {
     var scripts = document.getElementsByTagName("script");
-    var path = scripts[scripts.length - 1].src;
-    return /.*agnos\//g.exec(path)[0];
+    for (var i = 0; i < scripts.length; i++) {
+        var path = /.*agnos\//g.exec(scripts[i].src);
+        if (path !== null) {
+            return path[0];
+        }
+    }
 }
 
 const basePath = getBasePath();
 
-window.onload = function() {    
+window.onload = function() {
     const cssToUse = getCssFile();
     if (cssToUse !== undefined) {
         changeCSS(basePath + cssToUse);

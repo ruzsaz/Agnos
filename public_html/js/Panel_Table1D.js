@@ -360,7 +360,7 @@ panel_table1d.prototype.drawCells = function (preparedData, trans) {
     for (var i = 0, iMax = that.localMeta.indicators.length; i < iMax; i++) {
         var ind = that.localMeta.indicators[i];
         that.columnHeadVector.push({
-            hide: ((ind.valueIsHidden) ? 1 : 0) + ((ind.fraction.hide) ? 2 : 0),
+            hide: ((ind.value.hide) ? 1 : 0) + ((ind.fraction.hide) ? 2 : 0),
             tooltip: that.createTooltip(
                     [{name: that.localMeta.indicators[i].description}], [])
         });
@@ -698,7 +698,7 @@ panel_table1d.prototype.langSwitch = function (duration, isInitial) {
     for (var i = 0, iMax = that.localMeta.indicators.length; i < iMax; i++) {
         var ind = that.localMeta.indicators[i];
         that.columnHeadVector.push({
-            hide: ((ind.valueIsHidden) ? 1 : 0) + ((ind.denominatorIsHidden) ? 2 : 0),
+            hide: ((ind.value.hide) ? 1 : 0) + ((ind.fraction.hide) ? 2 : 0),
             tooltip: that.createTooltip(
                     [{name: that.localMeta.indicators[i].description}], [])
         });
