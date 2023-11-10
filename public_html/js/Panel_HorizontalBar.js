@@ -37,7 +37,7 @@ function panel_horizontalbar(init) {
     // Vízszintes skála.
     this.xScale = d3.scaleLinear()
             .range([0, that.width])
-            .nice(7);
+            .nice(global.niceX);
 
     // Függőleges skála.
     this.yScale = d3.scaleLinear()
@@ -245,7 +245,7 @@ panel_horizontalbar.prototype.setXScale = function(scale) {
     } else {
         this.xScale.domain(scale);
     }
-    this.xScale.nice(10);
+    this.xScale.nice(global.niceX);
 };
 
 //////////////////////////////////////////////////

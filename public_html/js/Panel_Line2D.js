@@ -41,7 +41,7 @@ function panel_line2d(init) {
     // Függőleges skála.
     this.yScale = d3.scaleLinear()
             .range([that.height, 0])
-            .nice(10);
+            .nice(global.niceY);
 
     // A vízszintes tengely.
     d3.axisBottom(that.xScale);
@@ -344,7 +344,7 @@ panel_line2d.prototype.setYScale = function (scale) {
     } else {
         this.yScale.domain(scale);
     }
-    this.yScale.nice(10);
+    this.yScale.nice(global.niceY);
 };
 
 //////////////////////////////////////////////////

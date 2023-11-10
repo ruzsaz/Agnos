@@ -53,7 +53,7 @@ function panel_barline(init) {
     // Függőleges skála.
     this.yScale = d3.scaleLinear()
             .range([that.height, 0])
-            .nice(10);
+            .nice(global.niceY);
 
     // Függőleges skála széthúzott módra.
     this.yScaleStreched = d3.scaleLinear()
@@ -459,7 +459,7 @@ panel_barline.prototype.setYScale = function(scale) {
         this.yScale.domain(scale);
     }
     if (!this.isStretched) {
-        this.yScale.nice(10);
+        this.yScale.nice(global.niceY);
     }
 };
 

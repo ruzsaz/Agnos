@@ -41,7 +41,7 @@ function panel_bar2d(init) {
     // Függőleges skála.
     this.yScale = d3.scaleLinear()
             .range([that.height, 0])
-            .nice(10);
+            .nice(global.niceY);
 
     // A vízszintes tengely.
     d3.axisBottom(that.xScale);
@@ -241,7 +241,7 @@ panel_bar2d.prototype.setYScale = function (scale) {
         this.yScale.domain(scale);
     }
     if (!this.isStretched) {
-        this.yScale.nice(10);
+        this.yScale.nice(global.niceY);
     }
 };
 

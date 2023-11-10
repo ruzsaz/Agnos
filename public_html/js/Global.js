@@ -1475,6 +1475,8 @@ var global = function () {
         tooltip: undefined, // Épp aktuális tooltip törzse, html.
         maxEntriesIn1D: 350,
         maxEntriesIn2D: 10000,
+        niceX: 4, // A vízszintes skála kerekítési finomsága
+        niceY: 3, // A függőleges skála kerekítési finomsága (ha csak 1 dim. van, ez használatos)
         preferredUsername: preferredUsername,
         // Globálisan elérendő függvények.
         logout: logout, // Logs the current user out from the identity provider
