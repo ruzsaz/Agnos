@@ -309,7 +309,7 @@ Container.prototype.updateHelp = function(side, reportSuperMeta) {
         var header = (localMeta !== undefined) ? "<h3>" + global.getFromArrayByLang(reportSuperMeta.labels, lang).description + "</h3>" : "";
         var updateTime = (localMeta !== undefined) ? "<em>frissítve: " + reportSuperMeta.updated + "</em><br>" : "";
         var content = "<div class='helpInnerHTML'>" + ((localMeta !== undefined) ?
-                ((localMeta.message.length > 4) ? LZString.decode(localMeta.message) : "Nincs elérhető információ.") : "") + "</div>";
+                ((localMeta.message && localMeta.message.length > 4) ? LZString.decode(localMeta.message) : "Nincs elérhető információ.") : "") + "</div>";
         var html = header + updateTime + content;
 
         if (this.isSideInUse[0] && this.isSideInUse[1]) {   // Ha mindkét oldalon van report
