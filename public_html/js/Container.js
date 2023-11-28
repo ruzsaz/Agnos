@@ -486,8 +486,8 @@ Container.prototype.initSide = function(side, duration) {
  */
 Container.prototype.killSide = function(side) {
     if (this.isSideInUse[side] && (this.panelState / 2 === side || this.panelState === 1 || this.panelState === 3)) {
-        const that = this;
-        global.initGlobals(function() {
+        
+        
             global.mediators[side].publish("killListeners");
             global.mediators[side].publish("killPanel", undefined);
 
@@ -512,11 +512,17 @@ Container.prototype.killSide = function(side) {
             global.baseLevels[side] = [];
 
             global.facts[side] = null;
-            that.dataDirector[side] = undefined;
+            this.dataDirector[side] = undefined;
         
-            that.initSide(side, global.selfDuration);
-            global.mainToolbar_refreshState();
-        });
+            //this.initSide(side, global.selfDuration);
+            //global.mainToolbar_refreshState();
+            const that = this;
+            global.get(global.url.superMeta, "", function (result, status) {
+                global.superMeta = result.reports;
+                that.initSide(side, global.selfDuration);
+                global.mainToolbar_refreshState();
+                global.getConfig2();
+            });
     }
 };
 
