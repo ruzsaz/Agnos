@@ -119,6 +119,7 @@ Fact.prototype.getLocalMeta = function() {
                 'value': {
                     'hide': d.valueIsHidden,
                     'measure_unique_name': d.valueName,
+                    'multiplier': d.valueMultiplier,
                     'sign': d.valueSign,
                     'unit': localLabel.valueUnit,
                     'unitPlural': localLabel.valueUnitPlural

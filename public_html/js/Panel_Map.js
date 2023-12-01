@@ -32,6 +32,7 @@ function panel_map(init) {
     }
 
     this.valMultiplier = 1;						// A mutatott érték szorzója.
+    this.fracMultiplier = 1;						// A mutatott érték szorzója.
     this.dimToShow = that.actualInit.dim;		// A mutatott dimenzió.
     this.valToShow = that.actualInit.val;		// Az ennyiedik mutatót mutatja.
     this.valFraction = that.actualInit.ratio;	// Hányadost mutasson, vagy abszolútértéket?
@@ -182,7 +183,7 @@ function panel_map(init) {
 panel_map.prototype.valueToShow = function (d) {
     var that = this;
     if (d !== undefined && d.vals !== undefined) {
-        var val = (that.valFraction) ? that.valMultiplier * d.vals[that.valToShow].sz / d.vals[that.valToShow].n : d.vals[that.valToShow].sz;
+        var val = (that.valFraction) ? that.fracMultiplier * d.vals[that.valToShow].sz / d.vals[that.valToShow].n : that.valMultiplier * d.vals[that.valToShow].sz;
         var origVal = val;
         if (!isFinite(parseFloat(val))) {
             val = 0;
@@ -572,7 +573,8 @@ panel_map.prototype.update = function (data, drill) {
     if (!that.valFraction && that.localMeta.indicators[that.valToShow].value.hide) {
         that.valFraction = true;
     }
-    that.valMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier);
+    that.valMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].value.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].value.multiplier);
+    that.fracMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier);
 
     var tweenDuration = (drill.duration === undefined) ? global.getAnimDuration(-1, that.panelId) : drill.duration;
 

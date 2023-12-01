@@ -20,10 +20,12 @@ function panel_table2d(init) {
     Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], false, 0, 0); // A Panel konstruktorának meghívása.
 
     this.valMultiplier = 1;							// A mutatott érték szorzója.
+    this.fracMultiplier = 1;							// A mutatott érték szorzója.
     this.dimRToShow = that.actualInit.dimr;			// Az X tengely mentén mutatott dimenzió.
     this.dimCToShow = that.actualInit.dimc;			// Az Y tengely mentén mutatott dimenzió.
     this.valToShow = that.actualInit.val;			// Az ennyiedik mutatót mutatja.
     this.valMultiplier = that.actualInit.multiplier;// Ennyiszeresét kell mutatni az értékeknek.	
+    this.fracMultiplier = that.actualInit.multiplier;// Ennyiszeresét kell mutatni az értékeknek.	
     this.valFraction = that.actualInit.ratio;		// Hányadost mutasson, vagy abszolútértéket?
     this.dimR = (that.dimRToShow <= that.dimCToShow) ? 0 : 1;// Az x tengelyen megjelenítendő dimenzió sorszáma (a data-n belül).
     this.dimC = (that.dimRToShow < that.dimCToShow) ? 1 : 0;// Az oszloposztásban megjelenítendő dimenzió sorszáma (a data-n belül).
@@ -184,7 +186,7 @@ function panel_table2d(init) {
 panel_table2d.prototype.valueToShow = function(d) {
     var that = this;
     if (d !== undefined && d.vals !== undefined) {
-        var val = (that.valFraction) ? that.valMultiplier * d.vals[that.valToShow].sz / d.vals[that.valToShow].n : d.vals[that.valToShow].sz;
+        var val = (that.valFraction) ? that.fracMultiplier * d.vals[that.valToShow].sz / d.vals[that.valToShow].n : that.valMultiplier * d.vals[that.valToShow].sz;
         if (isNaN(parseFloat(val))) {
             val = 0;
         }
@@ -500,7 +502,8 @@ panel_table2d.prototype.update = function(data, drill) {
     drill = drill || {dim: -1, direction: 0};
 
     // A hányados kijelzés, és a szorzó felfrissítése.
-    that.valMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier);
+    that.valMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].value.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].value.multiplier);
+    that.fracMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier);
     if (that.valFraction && that.localMeta.indicators[that.valToShow].fraction.hide) {
         that.valFraction = false;
     }

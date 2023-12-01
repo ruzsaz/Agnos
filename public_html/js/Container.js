@@ -309,7 +309,7 @@ Container.prototype.updateHelp = function(side, reportSuperMeta) {
         var header = (localMeta !== undefined) ? "<h3>" + global.getFromArrayByLang(reportSuperMeta.labels, lang).description + "</h3>" : "";
         var updateTime = (localMeta !== undefined) ? "<em>frissítve: " + reportSuperMeta.updated + "</em><br>" : "";
         var content = "<div class='helpInnerHTML'>" + ((localMeta !== undefined) ?
-                ((localMeta.message && localMeta.message.length > 4) ? LZString.decode(localMeta.message) : "Nincs elérhető információ.") : "") + "</div>";
+                ((localMeta.message && localMeta.message.length > 4) ? localMeta.message : "Nincs elérhető információ.") : "") + "</div>";
         var html = header + updateTime + content;
 
         if (this.isSideInUse[0] && this.isSideInUse[1]) {   // Ha mindkét oldalon van report
@@ -706,11 +706,17 @@ console.log(meta)
         }
         resultString = resultString + "\n";
 
-        // Az értékekhez tartozó hányados-szorzó tömbbe kiszedése.
+        // Az értékekhez tartozó szorzó tömbbe kiszedése.
         var valMultipliers = [];
         for (var v = 0, vMax = meta.indicators.length; v < vMax; v++) {
-            valMultipliers.push((isNaN(parseFloat(meta.indicators[v].fraction.multiplier))) ? 1 : parseFloat(meta.indicators[v].fraction.multiplier));
+            valMultipliers.push((isNaN(parseFloat(meta.indicators[v].value.multiplier))) ? 1 : parseFloat(meta.indicators[v].value.multiplier));
         }
+
+        // Az értékekhez tartozó hányados-szorzó tömbbe kiszedése.
+        var fracMultipliers = [];
+        for (var v = 0, vMax = meta.indicators.length; v < vMax; v++) {
+            fracMultipliers.push((isNaN(parseFloat(meta.indicators[v].fraction.multiplier))) ? 1 : parseFloat(meta.indicators[v].fraction.multiplier));
+        }        
 
         // Az eredmény feldolgozása soronként.
         for (var r = 0, rMax = result.answer[0].response.rows.length; r < rMax; r++) {

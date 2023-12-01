@@ -166,7 +166,7 @@ panel_table1d.prototype.valuesToShow = function (d) {
     if (d !== undefined && d.vals !== undefined) {
         for (var i = 0, iMax = d.vals.length; i < iMax; i++) {
             if (that.columnHeadVector[i].hide % 2 === 0) { // Ha az értéket meg kell mutatni.
-                var val = d.vals[i].sz;
+                var val = that.localMeta.indicators[i].value.multiplier * d.vals[i].sz;
                 if (isNaN(parseFloat(val))) {
                     val = 0;
                 }

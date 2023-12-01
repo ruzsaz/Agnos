@@ -232,6 +232,7 @@ DataDirector.prototype.processNewData = function(drill, newDataJson) {
     for (var i = 0, iMax = newData.length; i < iMax; i++) {
         newData[i].name = newData[i].richName.replace(/[^:0]+/g, '1');
     }
+    this.localizeNewData(newDataJson);    
     for (var i = 0, iMax = this.panelRoster.length; i < iMax; i++) {
         var pos = global.positionInArrayByProperty(newData, "name", this.panelRoster[i].dimsToShow.toString().replace(/,/g, ":"));
         var data = newData[pos].response;
@@ -240,6 +241,26 @@ DataDirector.prototype.processNewData = function(drill, newDataJson) {
         }
     }
     global.getConfig2();
+};
+
+/**
+ * Localizes the "name" dimension attributes in the raw data.
+ * There is no return value, the input data is changed.
+ * 
+ * @param {type} newDataJson New data to process
+ * @returns {undefined} 
+ */
+DataDirector.prototype.localizeNewData = function(newDataJson) {
+    var newData = newDataJson.answer;
+    for (var i = 0, iMax = newData.length; i < iMax; i++) {
+        const rows = newData[i].response.rows;
+        for (var r = 0, rMax = rows.length; r < rMax; r++) {
+            const dims = rows[r].dims;
+            for (var d = 0, dMax = dims.length; d < dMax; d++) {
+                dims[d].name = _(dims[d].name);            
+            }
+        }
+    }   
 };
 
 /**

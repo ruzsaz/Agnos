@@ -159,7 +159,7 @@ function panel_bar2d(init) {
 panel_bar2d.prototype.valueToShow = function (d) {
     var that = this;
     if (d !== undefined && d.vals !== undefined) {
-        var val = (that.valFraction) ? that.valMultiplier * d.vals[that.valToShow].sz / d.vals[that.valToShow].n : d.vals[that.valToShow].sz;
+        var val = (that.valFraction) ? that.fracMultiplier * d.vals[that.valToShow].sz / d.vals[that.valToShow].n : that.valMultiplier * d.vals[that.valToShow].sz;
         var origVal = val;
         if (!isFinite(parseFloat(val))) {
             val = 0;
@@ -623,7 +623,8 @@ panel_bar2d.prototype.update = function (data, drill) {
     drill = drill || {dim: -1, direction: 0};
 
     // A hányados kijelzés, és a szorzó felfrissítése.
-    that.valMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier);
+    that.fracMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier);
+    that.valMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].value.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].value.multiplier);
     if (that.valFraction && that.localMeta.indicators[that.valToShow].fraction.hide) {
         that.valFraction = false;
     }

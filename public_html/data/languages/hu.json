@@ -14,8 +14,10 @@
 	"Fejléc": "Fejléc",
     "A programról": "A programról",
     "Irányítás": "Irányítás",
-    "Dimenzió neve": "Dimenzió neve"
+    "Dimenzió neve": "Dimenzió neve",
     
-    
+    "Male": "Férfi",
+    "Female": "Nő",
+    "quarter": "negyedév"
     
 }

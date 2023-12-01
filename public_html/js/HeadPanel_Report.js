@@ -250,7 +250,7 @@ function HeadPanel_Report(init, reportMeta, startScale) {
 HeadPanel_Report.prototype.valToShow = function (data, valueMeta, i) {
     var val = "";
     if (data !== undefined && data.rows[0] !== undefined && data.rows[0].vals[i] !== undefined) {
-        val = (valueMeta.hide) ? _("nem értelmezett") : global.cleverRound3(data.rows[0].vals[i].sz) + " " + ((data.rows[0].vals[i].sz === 1) ? valueMeta.unit : valueMeta.unitPlural);
+        val = (valueMeta.hide) ? _("nem értelmezett") : global.cleverRound3(valueMeta.multiplier * data.rows[0].vals[i].sz) + " " + ((data.rows[0].vals[i].sz === 1) ? valueMeta.unit : valueMeta.unitPlural);
     } else {
         val = "??? " + valueMeta.unitPlurar;
     }

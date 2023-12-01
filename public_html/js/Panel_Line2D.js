@@ -25,6 +25,7 @@ function panel_line2d(init) {
     this.dimXToShow = that.actualInit.dimx;					// Az X tengely mentén mutatott dimenzió.
     this.dimYToShow = that.actualInit.dimy;					// Az Y tengely mentén mutatott dimenzió.
     this.valMultiplier = that.actualInit.multiplier;		// Ennyiszeresét kell mutatni az értékeknek.
+    this.fracMultiplier = that.actualInit.multiplier;		// Ennyiszeresét kell mutatni az értékeknek.
     this.dimX = (that.dimXToShow <= that.dimYToShow) ? 0 : 1;// Az x tengelyen megjelenítendő dimenzió sorszáma (a data-n belül).
     this.dimY = (that.dimXToShow < that.dimYToShow) ? 1 : 0;// Az oszloposztásban megjelenítendő dimenzió sorszáma (a data-n belül).
     this.isSymbolsRequired = that.actualInit.symbols;	// Rajzoljunk jelölőt a vonaldiagramra?
@@ -196,7 +197,7 @@ function panel_line2d(init) {
 panel_line2d.prototype.valueToShow = function (d) {
     var that = this;
     if (d !== undefined && d.vals !== undefined) {
-        var val = (that.valFraction) ? that.valMultiplier * d.vals[that.valToShow].sz / d.vals[that.valToShow].n : d.vals[that.valToShow].sz;
+        var val = (that.valFraction) ? that.fracMultiplier * d.vals[that.valToShow].sz / d.vals[that.valToShow].n : that.valMultiplier * d.vals[that.valToShow].sz;
         var origVal = val;
         if (!isFinite(parseFloat(val))) {
             val = 0;
@@ -784,7 +785,8 @@ panel_line2d.prototype.update = function (data, drill) {
     drill = drill || {dim: -1, direction: 0};
 
     // A hányados kijelzés, és a szorzó felfrissítése.
-    that.valMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier);
+    that.valMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].value.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].value.multiplier);
+    that.fracMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier);
     if (that.valFraction && that.localMeta.indicators[that.valToShow].fraction.hide) {
         that.valFraction = false;
     }

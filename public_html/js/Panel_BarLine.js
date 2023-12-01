@@ -37,6 +37,9 @@ function panel_barline(init) {
     this.valBarMultipliers = [];// Ennyiszeresét kell mutatni az értékeknek.
     this.valLineMultipliers = [];// Ennyiszeresét kell mutatni az értékeknek.
     this.valAvgMultipliers = [];	// Ennyiszeresét kell mutatni az értékeknek.
+    this.fracBarMultipliers = [];// Ennyiszeresét kell mutatni az értékeknek.
+    this.fracLineMultipliers = [];// Ennyiszeresét kell mutatni az értékeknek.
+    this.fracAvgMultipliers = [];	// Ennyiszeresét kell mutatni az értékeknek.    
     this.isSymbolsRequired = that.actualInit.symbols;	// Rajzoljunk jelölőt a vonaldiagramra?
     this.processedData;									// A megjelenítendő feldolgozott adat.
     this.maxEntries = (this.actualInit.top10) ? 999999999 : global.maxEntriesIn1D;    // A panel által maximálisan megjeleníthető adatok száma.    
@@ -246,7 +249,7 @@ panel_barline.prototype.barValuesToShow = function(d) {
     if (d !== undefined && d.vals !== undefined) {
         var accumulation = 0; // Az alatta levő oszlopelemek érték-összege.
         for (var i = 0, iMax = this.valBarNumber; i < iMax; i++) {
-            var val = (this.valFraction) ? this.valBarMultipliers[i] * d.vals[this.valBarsToShow[i]].sz / d.vals[this.valBarsToShow[i]].n : d.vals[this.valBarsToShow[i]].sz;
+            var val = (this.valFraction) ? this.fracBarMultipliers[i] * d.vals[this.valBarsToShow[i]].sz / d.vals[this.valBarsToShow[i]].n : this.valBarMultipliers[i] * d.vals[this.valBarsToShow[i]].sz;
             var origVal = val;
             if (!isFinite(parseFloat(val))) {
                 val = 0;
@@ -271,7 +274,7 @@ panel_barline.prototype.lineValuesToShow = function(d) {
     var vals = [];
     if (d !== undefined && d.vals !== undefined) {
         for (var i = 0; i < this.valLineNumber; i++) {
-            var val = (this.valFraction) ? this.valLineMultipliers[i] * d.vals[this.valLinesToShow[i]].sz / d.vals[this.valLinesToShow[i]].n : d.vals[this.valLinesToShow[i]].sz;
+            var val = (this.valFraction) ? this.fracLineMultipliers[i] * d.vals[this.valLinesToShow[i]].sz / d.vals[this.valLinesToShow[i]].n : this.valLineMultipliers[i] * d.vals[this.valLinesToShow[i]].sz;
             var origVal = val;
             if (!isFinite(parseFloat(val))) {
                 val = 0;
@@ -326,7 +329,7 @@ panel_barline.prototype.avgLineValuesToShow = function(dataRows) {
                 denominator += d.vals[this.valAvgToShow[ln]].n;
             }
         }
-        var val = (this.valFraction) ? this.valAvgMultipliers[ln] * nominator / denominator : nominator / dataRows.length;
+        var val = (this.valFraction) ? this.fracAvgMultipliers[ln] * nominator / denominator : this.valAvgMultipliers[ln] * nominator / dataRows.length;
         if (isNaN(parseInt(val))) {
             val = 0;
         }
@@ -918,22 +921,37 @@ panel_barline.prototype.update = function(data, drill, duration) {
             that.panic(false);
 
             // A szorzó-tömb felfrissítése.
-            that.valBarMultipliers = [];
+            that.fracBarMultipliers = [];            
             for (var i = 0, iMax = that.valBarNumber; i < iMax; i++) {
                 var mult = parseFloat(that.localMeta.indicators[that.valBarsToShow[i]].fraction.multiplier);
+                that.fracBarMultipliers.push((isNaN(mult)) ? 1 : mult);
+            }
+            that.fracLineMultipliers = [];
+            for (var i = 0, iMax = that.valLineNumber; i < iMax; i++) {
+                var mult = parseFloat(that.localMeta.indicators[that.valLinesToShow[i]].fraction.multiplier);
+                that.fracLineMultipliers.push((isNaN(mult)) ? 1 : mult);
+            }
+            that.fracAvgMultipliers = [];
+            for (var i = 0, iMax = that.valAvgNumber; i < iMax; i++) {
+                var mult = parseFloat(that.localMeta.indicators[that.valAvgToShow[i]].fraction.multiplier);
+                that.fracAvgMultipliers.push((isNaN(mult)) ? 1 : mult);
+            }
+            
+            that.valBarMultipliers = [];            
+            for (var i = 0, iMax = that.valBarNumber; i < iMax; i++) {
+                var mult = parseFloat(that.localMeta.indicators[that.valBarsToShow[i]].value.multiplier);
                 that.valBarMultipliers.push((isNaN(mult)) ? 1 : mult);
             }
             that.valLineMultipliers = [];
             for (var i = 0, iMax = that.valLineNumber; i < iMax; i++) {
-                var mult = parseFloat(that.localMeta.indicators[that.valLinesToShow[i]].fraction.multiplier);
+                var mult = parseFloat(that.localMeta.indicators[that.valLinesToShow[i]].value.multiplier);
                 that.valLineMultipliers.push((isNaN(mult)) ? 1 : mult);
             }
             that.valAvgMultipliers = [];
             for (var i = 0, iMax = that.valAvgNumber; i < iMax; i++) {
-                var mult = parseFloat(that.localMeta.indicators[that.valAvgToShow[i]].fraction.multiplier);
+                var mult = parseFloat(that.localMeta.indicators[that.valAvgToShow[i]].value.multiplier);
                 that.valAvgMultipliers.push((isNaN(mult)) ? 1 : mult);
             }
-
             // Adatok feldolgozása, a magejelenési adatok elkészítése.
             that.processedData = that.prepareData(that.processedData, that.data.rows, drill);
 

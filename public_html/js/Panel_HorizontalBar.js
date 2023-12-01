@@ -25,6 +25,7 @@ function panel_horizontalbar(init) {
 
     this.dimToShow = that.actualInit.dim;				// Ennyiedik dimenzió a panel dimenziója.
     this.valMultipliers = [];							// Ennyiszeresét kell mutatni az értékeknek.
+    this.fracMultipliers = [];							// Ennyiszeresét kell mutatni az értékeknek.
     this.valFraction = that.actualInit.ratio;			// Hányadost mutasson?
     this.isAlwaysCentered = that.actualInit.centered;	// Mindig középen legyen az y tengely?
     this.preparedData;									// A megjelenítendő feldolgozott adat.
@@ -178,8 +179,9 @@ panel_horizontalbar.prototype.valuesToShow = function(d, pos) {
     if (d !== undefined && d.vals !== undefined) {
         var accumulation = 0;
         for (var i = 0; i < valToShow.length; i++) {
-            var mult = (pos) ? this.valMultipliers[this.valNegNumber + i] : this.valMultipliers[i];
-            var val = (this.valFraction) ? mult * d.vals[valToShow[i]].sz / d.vals[valToShow[i]].n : d.vals[valToShow[i]].sz;
+            var valMult = (pos) ? this.valMultipliers[this.valNegNumber + i] : this.valMultipliers[i];
+            var fracMult = (pos) ? this.fracMultipliers[this.valNegNumber + i] : this.fracMultipliers[i];
+            var val = (this.valFraction) ? fracMult * d.vals[valToShow[i]].sz / d.vals[valToShow[i]].n : valMult * d.vals[valToShow[i]].sz;
             var origVal = val;
             if (!isFinite(parseFloat(val))) {
                 val = 0;
@@ -492,8 +494,13 @@ panel_horizontalbar.prototype.update = function(data, drill) {
             // A szorzó-tömb felfrissítése.
             that.valMultipliers = [];
             for (var i = 0, iMax = that.valBarNumber; i < iMax; i++) {
-                var mult = parseFloat(that.localMeta.indicators[that.valBarsToShow[i]].fraction.multiplier);
+                var mult = parseFloat(that.localMeta.indicators[that.valBarsToShow[i]].value.multiplier);
                 that.valMultipliers.push((isNaN(mult)) ? 1 : mult);
+            }
+            that.fracMultipliers = [];
+            for (var i = 0, iMax = that.valBarNumber; i < iMax; i++) {
+                var mult = parseFloat(that.localMeta.indicators[that.valBarsToShow[i]].fraction.multiplier);
+                that.fracMultipliers.push((isNaN(mult)) ? 1 : mult);
             }
 
             // Adatok feldolgozása, a magejelenési adatok elkészítése.

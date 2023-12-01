@@ -37,6 +37,7 @@ function Panel(panelInitString, mediator, isLegendRequired, leftOffset, rightOff
     this.dimsToShow = [];
 
     this.valMultiplier = 1;		// Ennyiszeresét
+    this.fracMultiplier = 1;		// Ennyiszeresét
     this.valFraction = false;	// Hányadost mutasson?
     this.inPanic = false;		// Hibaüzemmódban van a panel?
     this.mediatorIds = [];		// A mediátorok id-jeit tartalmazó tömb.
