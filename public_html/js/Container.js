@@ -732,8 +732,8 @@ console.log(meta)
 
             // Értékek beírása a sorba.
             for (var v = 0, vMax = row.vals.length; v < vMax; v++) {
-                var value = (meta.indicators[v].value.hide) ? "" : row.vals[v].sz;
-                var ratio = (meta.indicators[v].fraction.hide) ? "" : valMultipliers[v] * row.vals[v].sz / row.vals[v].n;
+                var value = (meta.indicators[v].value.hide) ? "" : valMultipliers[v] * row.vals[v].sz;
+                var ratio = (meta.indicators[v].fraction.hide) ? "" : fracMultipliers[v] * row.vals[v].sz / row.vals[v].n;
                 resultline += separator + value + "," + ratio;
                 separator = ",";
             }
