@@ -1426,7 +1426,6 @@ panel_barline.prototype.drawLegend = function() {
                     return global.readableColor((d.isBarRequired) ? global.colorValue(d.id) : global.panelBackgroundColor);
                 })
                 .text(function(d, i) {
-                    console.log(that.localMeta, that.legendArray[i].id)
                     return that.localMeta.indicators[that.legendArray[i].id].caption;
                 });
 

@@ -200,8 +200,16 @@
 			if (locale in load_queues) {
 				process_load_queue(locale);
 			}
-			if (locale in localizations && this_val in localizations[locale]) {
-				return localizations[locale][this_val];
+			//if (locale in localizations) {                                              // RZ
+                        if (locale in localizations && this_val in localizations[locale]) {      // Original RZ
+                        //        var this_val_array = this_val.split(" ");                           // RZ
+                        //        for (var i = 0; i < this_val_array.length; i++) {                   // RZ
+                        //            if (this_val_array[i] in localizations[locale]) {               // RZ
+                        //                this_val_array[i] = localizations[locale][this_val_array[i]];   // RZ
+                        //            }                                                               // RZ
+                        //        }                                                                   // RZ                                
+                        //        return this_val_array.join(" ");                                    // RZ                            
+                             return localizations[locale][this_val];                          // Original RZ
 			}
 		}
 		while (i--);

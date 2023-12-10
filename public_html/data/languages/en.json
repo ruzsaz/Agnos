@@ -100,7 +100,10 @@
     "Hozzáférés megtagadva": "Forbidden",
     "Sajnálom&nbsp;": "Sorry&nbsp;",
     ", a kért jelentés megtekintésére nem jogosult.": ", the report you requested is not available for you.",
-    "Kérjen hozzáférést az adminisztrátortól, vagy lépjen be más identitással!": "Ask permission from the administrator, or log in with a different identity."
-    
+    "Kérjen hozzáférést az adminisztrátortól, vagy lépjen be más identitással!": "Ask permission from the administrator, or log in with a different identity.",
+    "Férfi": "Male",
+    "férfi": "Male",
+    "Nő": "Female",
+    "nő": "Female"
     
 }
