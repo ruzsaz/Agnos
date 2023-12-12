@@ -104,6 +104,10 @@
     "Férfi": "Male",
     "férfi": "Male",
     "Nő": "Female",
-    "nő": "Female"
+    "nő": "Female",
+    "00-59 éves": "00-59 years",
+    "60-69 éves": "60-69 years",
+    "70-79 éves": "70-79 years",
+    "80-XX éves": "80-XX years"
     
 }

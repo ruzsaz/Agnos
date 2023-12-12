@@ -213,7 +213,7 @@ DataDirector.prototype.requestNewData = function(drill) {
         "baseVector": baseVector,
         "drillVectors": queries
     };
-    const encodedQuery = "queries=" + window.btoa(JSON.stringify(requestObject));
+    const encodedQuery = "queries=" + window.btoa(encodeURIComponent((JSON.stringify(requestObject))));
     // A letöltés élesben.
     global.get(global.url.fact, encodedQuery, function(result) {
         that.processNewData(drill, result);
