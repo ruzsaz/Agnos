@@ -21,8 +21,8 @@ d3.selection.prototype.moveToFront = function () {
 
 
 // Nyelv beállító függvény. "blabla" helyett _("blabla") írandó.
-var _ = function (string) {
-    return string.toLocaleString();
+var _ = function (string) {    
+    return (string) ? string.toLocaleString() : "";
 };
 
 

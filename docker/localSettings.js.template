@@ -9,9 +9,9 @@ var agnosConfig = {};
 agnosConfig.keycloakSettings = {url: "${KEYCLOAK_PUBLIC_IP}/auth", realm: 'AgnosRealm', clientId: 'agnos'};
 agnosConfig.url = {
     auth: baseUrl + "/auth/login",
-    superMeta: baseUrl + "/meta/cubes",
-    meta: baseUrl + "/meta/cube",
-    fact: baseUrl + "/cube"};
+    superMeta: baseUrl + "/reports",
+    meta: baseUrl + "/report_meta",
+    fact: baseUrl + "/report"};
 
 agnosConfig.i18nRequired = true;
 agnosConfig.saveToBookmarkRequired = true;

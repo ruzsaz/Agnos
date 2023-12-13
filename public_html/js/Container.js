@@ -74,12 +74,12 @@ function Container() {
         that.tableBaseOffset =
                 parseInt(d3.select("#headPanelP0").style("margin-top")) +
                 parseInt(d3.select("#headPanelP0").style("margin-bottom")) +
-                parseInt(d3.select("#searchP0").style("margin-top")) +
-                parseInt(d3.select("#searchP0").style("margin-bottom")) +
-                parseInt(d3.select("#searchP0").style("height")) +
+                parseInt(d3.select("#greetingBadge").style("padding-top")) +
+                parseInt(d3.select("#greetingBadge").style("padding-bottom")) +
+                parseInt(d3.select("#greetingBadge").style("height")) +
                 parseInt(d3.select(".divTableBase").style("margin-bottom")) +
-                parseInt(d3.select(".tableScrollPane").style("padding-top")) +
-                parseInt(d3.select(".tableScrollPane").style("padding-bottom"));
+                parseInt(d3.select(".tableScrollPane").style("margin-top")) +
+                parseInt(d3.select(".tableScrollPane").style("margin-bottom"));
 
         // Ha a bookmarkba van kódolva valami, annak megfelelően indítunk.
         var startString = location.href.split("#")[1];
