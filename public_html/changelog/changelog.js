@@ -5,6 +5,7 @@ var changelog = [
     {
         "language": "hu",
         "history": [
+            {"entity": "Agnos", "date": "2024-04-09", "change": "Panel becsukó gomb a panelek jobb felső sarkában"},
             {"entity": "Agnos", "date": "2023-12-01", "change": "Dimenzió értékek többnyelvűsítése"},
             {"entity": "AgnosServer", "date": "2023-11-27", "change": "Count distinct típusú lekérdezést lehetővé tevő adatkocka integrálása."},
             {"entity": "AgnosServer", "date": "2023-11-16", "change": "Lekérdezés egyszerre több adatkockából."},
@@ -30,6 +31,7 @@ var changelog = [
     {
         "language": "en",
         "history": [
+            {"entity": "Agnos", "date": "2024-04-09", "change": "Close button added to the panels"},
             {"entity": "Agnos", "date": "2023-12-01", "change": "Localization of dimension values"},
             {"entity": "AgnosServer", "date": "2023-11-27", "change": "New type of datacube to allow count distinct type queries."},
             {"entity": "AgnosServer", "date": "2023-11-16", "change": "Parallel queries from separate datacubes."},

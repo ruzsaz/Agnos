@@ -201,7 +201,7 @@ HeadPanel_Browser.prototype.initPanel = function(duration) {
 
         tempRowCell.append("html:text")
                 .text(function(d) {
-                    return (new Date(d.updated.replace(/-/g, "/"))).toLocaleString(String.locale);
+                    return (new Date(d.updated.replace(/-/g, "/"))).toLocaleString(String.locale).replace(/(.*)\D\d+/, '$1');
                 });
 
         tempRowCell.append("html:span")

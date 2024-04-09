@@ -133,6 +133,20 @@ function Panel(panelInitString, mediator, isLegendRequired, leftOffset, rightOff
     rz.append("svg:g")
             .html('<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#magnify_panel_button"></use>');
     
+    // A becsukó gomb fül
+    var closeButton = that.svg.append("svg:g")
+            .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
+            .attr("transform", "translate(" + (that.w - 24)  + ", 0)")
+            .on('click', function() {
+                if (global.panelNumberOnScreen !== 1) {
+                    that.mediator.publish("killPanel", that.panelId);
+                }
+            });
+
+    
+    closeButton.append("svg:g")
+            .html('<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close_panel_button"></use>');
+        
 
     // Fejléc.
     this.titleBox = new TitleBox(that.svg, that.panelId, that.mediator, that.magLevel);

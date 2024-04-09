@@ -321,7 +321,12 @@ HeadPanel_Report.prototype.initPanel = function (trans) {
             .text(function (d) {
                 return d.caption;
             });
-
+            
+    dimRow.select(".tableText1.spacer")
+        .text(function (d) {
+            return "&nbsp;";
+        });
+        
     // Érték tábla: az adatok társítása.
     var valRow = that.valTable.selectAll(".row").data(that.localMeta.indicators);
 
