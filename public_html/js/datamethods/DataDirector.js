@@ -230,7 +230,8 @@ DataDirector.prototype.requestNewData = function(drill) {
 DataDirector.prototype.processNewData = function(drill, newDataJson) {
     var newData = newDataJson.answer;
     for (var i = 0, iMax = newData.length; i < iMax; i++) {
-        newData[i].name = newData[i].richName.replace(/[^:0]+/g, '1');
+        //newData[i].name = newData[i].richName.replace(/[^:0]+/g, '1');
+        newData[i].name = newData[i].richName.replace(/(?<=:|^)[^:][^:]+(?=:|$)/g, '1');
     }
     this.localizeNewData(newDataJson);    
     for (var i = 0, iMax = this.panelRoster.length; i < iMax; i++) {
