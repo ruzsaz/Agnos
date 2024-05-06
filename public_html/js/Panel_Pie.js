@@ -70,6 +70,11 @@ function panel_pie(init) {
             .attr("class", "label_group noEvents")
             .attr("transform", "translate(" + (that.margin.left + that.width / 2) + "," + (that.margin.top + that.height / 2) + ")");
 
+    // A panel dimenziójának ráírása.
+    this.axisXCaption = that.svg.insert("svg:text", ".title_group")
+            .attr("class", "dimensionLabel noEvents")
+            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");
+
     // Feliratkozás a mediátorokra.
     var med;
     med = that.mediator.subscribe("changeValue", function (id, val, ratio) {
@@ -420,6 +425,14 @@ panel_pie.prototype.drawPie = function (preparedData, trans) {
 panel_pie.prototype.drawLabels = function (preparedData, trans) {
     var that = this;
 
+    // A panel dimenziójának beállítása
+    that.axisXCaption
+            .text(that.localMeta.dimensions[that.dimToShow].caption)
+            .attr("text-anchor", "end")
+            .transition(trans).attrs({
+                x: that.width,
+                y: 0 });
+
     // A vonások kirajzolása, animálása.
     var lines = that.label_group.selectAll("line").data(preparedData, function (d) {
         return d.uniqueId;
@@ -517,7 +530,7 @@ panel_pie.prototype.drawLabels = function (preparedData, trans) {
  */
 panel_pie.prototype.drill = function (d) {
     var that = this;
-    global.tooltip.kill();
+    global.tooltip.kill();    
     var drill = {
         dim: that.dimToShow,
         direction: (d === undefined) ? 1 : -1,

@@ -114,6 +114,16 @@ function panel_bar2d(init) {
             .attr("x2", that.width)
             .attr("y2", that.height);
 
+    // Vízszintes tengelyre a dimenzió ráírása.
+    this.axisXCaption = that.svg.insert("svg:text", ".title_group")
+            .attr("class", "dimensionLabel noEvents")
+            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");    
+
+    // Második dimenzió jelkulcsához a dimenzió ráírása.
+    this.axisYCaption = that.svg.insert("svg:text", ".droptarget1")
+            .attr("class", "dimensionLabel noEvents")
+            .attr("transform", "translate(" + that.margin.left + ", " + (that.h - global.legendOffsetY) + ")");    
+
     // Függőleges tengely rétege.
     this.gAxisY = that.svg.insert("svg:g", ".title_group")
             .attr("class", "axis axisY noEvents")
@@ -878,6 +888,23 @@ panel_bar2d.prototype.drawAxes = function (preparedData, trans) {
     } else {
         that.gAxisY.call(that.yAxis);
     }
+
+    // A tengely felirat beállítása
+    that.axisXCaption
+            .text(that.localMeta.dimensions[that.dimXToShow].caption)
+            .attr("text-anchor", "end")
+            .transition(trans).attrs({
+                x: that.width,
+                y: that.height + global.captionDistance
+                });
+
+    // A 2. dimenzióhoz tartozó jelkulcs felirat beállítása
+    that.axisYCaption
+            .text(that.localMeta.dimensions[that.dimYToShow].caption)
+            .attr("text-anchor", "end")
+            .transition(trans).attrs({
+                x: that.width,
+                y: global.captionDistance});    
 
     // Feliratok a vízszintes tengelyre, és a hozzá tartozó adat.
     var axisLabelX = that.gAxisX.selectAll("text")

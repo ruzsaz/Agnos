@@ -118,7 +118,12 @@ function panel_horizontalbar(init) {
             .attr("y1", 0)
             .attr("x2", 0)
             .attr("y2", that.height);
-
+    
+    // Függőleges tengelyre a dimenzió ráírása.
+    this.axisYCaption = that.svg.insert("svg:text", ".title_group")
+            .attr("class", "dimensionLabel noEvents")
+            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");
+   
     // Feliratkozás az értékváltás mediátorra.
     var med;
     med = that.mediator.subscribe("changeValue", function(id, val, ratio, valToChange) {
@@ -730,6 +735,14 @@ panel_horizontalbar.prototype.drawAxes = function(preparedData, trans) {
 
     that.gAxisY.transition(trans)
             .attr("transform", "translate(" + (that.margin.left + that.xScale(0)) + "," + that.margin.top + ")");
+
+    // A tengely felirat beállítása
+    that.axisYCaption
+            .text(that.localMeta.dimensions[that.dimToShow].caption)
+            .attr("text-anchor", (isRightBound) ? "start" : "end")
+            .transition(trans).attrs({
+                x: that.xScale(0),
+                y: -2});
 
     that.svg.select(".minus rect")
             .attr("x", 0)

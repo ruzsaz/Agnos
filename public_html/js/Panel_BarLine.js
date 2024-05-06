@@ -64,7 +64,7 @@ function panel_barline(init) {
             .domain([0, 1]);
 
     // A vízszintes tengely.
-    this.xAxis = d3.axisBottom(that.xScale);
+    this.xAxis = d3.axisBottom(that.xScale);    
 
     // A függőleges tengelyt generáló függvény.
     this.yAxis = d3.axisLeft(that.yScale)
@@ -164,6 +164,11 @@ function panel_barline(init) {
             .attr("y1", that.height)
             .attr("x2", that.width)
             .attr("y2", that.height);
+    
+    // Vízszintes tengelyre a dimenzió ráírása.
+    this.axisXCaption = that.svg.insert("svg:text", ".title_group")
+            .attr("class", "dimensionLabel noEvents")
+            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");
 
     // Függőleges tengely rétege.
     this.gAxisY = that.svg.insert("svg:g", ".title_group")
@@ -1487,7 +1492,15 @@ panel_barline.prototype.drawAxes = function(preparedData, trans) {
         y1: that.yScale(0),
         x2: that.width,
         y2: that.yScale(0)});
-
+    
+    // A tengely felirat beállítása
+    that.axisXCaption
+            .text(that.localMeta.dimensions[that.dimToShow].caption)
+            .attr("text-anchor", "end")
+            .transition(trans).attrs({
+                x: that.width,
+                y: that.yScale(0) + global.captionDistance});
+                     
     // Feliratok a vízszintes tengelyre, és a hozzá tartozó adat.
     var axisLabelX = that.gAxisX.selectAll("text")
             .data(preparedData.dataArray, function(d) {

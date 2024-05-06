@@ -1477,6 +1477,7 @@ var global = function () {
         maxEntriesIn2D: 10000,
         niceX: 4, // A vízszintes skála kerekítési finomsága
         niceY: 3, // A függőleges skála kerekítési finomsága (ha csak 1 dim. van, ez használatos)
+        captionDistance: 10, // A tengelyekre írandó dimenziónév függőleges távolsága a tengelytől
         preferredUsername: preferredUsername,
         // Globálisan elérendő függvények.
         logout: logout, // Logs the current user out from the identity provider

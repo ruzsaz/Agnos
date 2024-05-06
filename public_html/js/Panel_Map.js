@@ -111,6 +111,11 @@ function panel_map(init) {
     this.gLegend = that.svg.insert("svg:g", ".title_group")
             .attr("class", "legend noEvents");
 
+    // A dimenzió felírása.
+    this.axisXCaption = that.svg.insert("svg:text", ".title_group")
+            .attr("class", "dimensionLabel noEvents")
+            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");
+
     // A zoomolásnál nem kellő elmeket kitakaró maszk.
     this.mask = that.svg.append("svg:mask")
             .attr("id", "maskurl" + that.maskId);
@@ -961,6 +966,15 @@ panel_map.prototype.drawLegend = function (trans) {
             })
             .transition(trans)
             .attr("opacity", 1);
+    
+    // A dimenzió felirat beállítása
+    that.axisXCaption
+            .text(that.localMeta.dimensions[that.dimToShow].caption)
+            .attr("text-anchor", "end")
+            .transition(trans).attrs({
+                x: that.width,
+                y: 0 });
+            
 };
 
 //////////////////////////////////////////////////

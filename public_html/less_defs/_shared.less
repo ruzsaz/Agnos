@@ -114,6 +114,9 @@
 @fontSizeBig: 16px;
 @fontSizeNormal: 16px;
 @fontSizeSmall: 12px;
+@fontSizeTiny: 11px;
+@dimensionTextOpacity: 0.6;
+
 
 @lineSymbolStroke: black;
 
@@ -155,6 +158,7 @@
     .stripeWidth {width: @stripeWidth;}
     .axisTextOpacity {opacity: @axisTextOpacity;}
     .fontSizeSmall { width:@fontSizeSmall;}
+    .fontSizeTiny { width:@fontSizeTiny;}
     .mainToolbarHeight { width: @mainToolbarHeight;}
     .scrollbarWidth { width: @scrollbarWidth;}
 
@@ -488,9 +492,16 @@ mask path {
 }
 
 .axisY text {
-    font-size: @fontSizeSmall;
-    font-weight: bold;
+    font-size: @fontSizeTiny;
+    font-weight: normal;
     fill: @panelWriteColor;
+}
+
+.dimensionLabel {
+    font-size: @fontSizeTiny;
+    font-weight: normal;
+    fill: @panelWriteColor;
+    opacity: @dimensionTextOpacity;
 }
 
 /* Panel_Table2D, Panel_Table1D */
@@ -720,9 +731,7 @@ mask path {
 }
 
 #headPanelP0 .row .cell text:not(.spacer), #headPanelP1 .row .cell text:not(.spacer) {
-    /* position: absolute; A legújabb próbálkozás szerint ez nem kell */
-    max-width: 90%;
-    /* white-space: nowrap; A legújabb próbálkozás szerint ez nem kell */
+    max-width: 95%;
     overflow-x: hidden;
     overflow-y: hidden;
     text-overflow: ellipsis;

@@ -23,8 +23,8 @@ function SVGScrollbar(parentElement, isHorizontal, length, scrollFunction, wheel
     this.height = (that.isHorizontal) ? global.scrollbarWidth + 1 : length;
     this.className = (that.isHorizontal) ? "horizontal" : "vertical";
     this.length = length;
-    this.color = null;
-    this.opacity = 0;
+    //this.color = null;
+    //this.opacity = 0;
     this.thumbStyle = undefined;
     this.isDragging = false;
     this.scrollRatio;
@@ -154,19 +154,10 @@ SVGScrollbar.prototype.set = function(scrollPaneLength, color, trans) {
 
     var newX = oldX * (this.length - this.scrollThumbLength) / (this.length - oldLength) || 0;
 
-    // Ha változott a kijelzendőség, berakjuk az új opacityt a stílusobjektumba.
     var newOpacity = (scrollPaneLength <= this.length) ? 0 : 1;
-    if (this.opacity !== newOpacity) {
-        this.gStyle["opacity"] = newOpacity;
-        this.opacity = newOpacity;
-    }
-
-    // Ha változott a szín, berakjuk az új színt a stílusobjektumba.
-    if (this.color !== color && color !== null && color !== undefined) {
-        this.thumbStyle["fill"] = color;
-        this.color = color;
-    }
-
+    this.gStyle["opacity"] = newOpacity;
+    this.thumbStyle["fill"] = color;
+    
     this.scrollThumb.transition(trans)
             .attr(this.lengthStringToSet, this.scrollThumbLength + "px")
             .attr(this.positionStringToSet, newX + "px")

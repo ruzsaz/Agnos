@@ -112,6 +112,9 @@ function HeadPanel_Report(init, reportMeta, startScale) {
     var dimRow = that.dimTable.selectAll(".row").data(that.meta.dimensions);
 
     var newDimRow = dimRow.enter().append("html:div")
+            .on("click", function (d, i) {
+                that.drillUp(i);
+            })
             .attr("class", "row alterColored")
             .attr("parity", function (d, i) {
                 return i % 2;
@@ -216,7 +219,7 @@ function HeadPanel_Report(init, reportMeta, startScale) {
     // A sor háttere.
     {
         newValRow.append("html:div")
-                .attr("class", "cell backgroundCell")
+                .attr("class", "cell backgroundCell");
     }
 
     that.initPanel(trans);
@@ -288,7 +291,7 @@ HeadPanel_Report.prototype.ratioToShow = function (data, ratioMeta, i) {
  */
 HeadPanel_Report.prototype.initPanel = function (trans) {
     var that = this;
-    that.localMeta = global.facts[that.panelSide].getLocalMeta();
+    that.localMeta = global.facts[that.panelSide].getLocalMeta();    
     trans = trans || d3.transition().duration(global.selfDuration);
 
     // A fejléc-szöveg frissítése
@@ -403,9 +406,14 @@ HeadPanel_Report.prototype.prepareData = function (data) {
 
     // Dimenziók aktuális értékeinek elkészítése.
     for (var i = 0, iMax = (global.baseLevels[that.panelSide]).length; i < iMax; i++) {
-        var baseDim = (global.baseLevels[that.panelSide])[i];
+        var baseDim = (global.baseLevels[that.panelSide])[i];        
+        var pathString = that.localMeta.dimensions[i].top_level_caption;
+        for (var d = 0, dMax = baseDim.length; d < dMax; d++) {
+            pathString = pathString + " > " + baseDim[d].name.trim();
+        }
+        
         dimData.push({
-            text: (baseDim.length === 0) ? that.localMeta.dimensions[i].top_level_caption : baseDim[baseDim.length - 1].name.trim()
+            text: pathString
         });
     }
 
@@ -490,4 +498,27 @@ HeadPanel_Report.prototype.update = function (data) {
 
 HeadPanel_Report.prototype.refresh = function () {
 
+};
+
+//////////////////////////////////////////////////
+// // Irányítást végző függvények
+//////////////////////////////////////////////////
+
+/**
+ * Az aktuális dimenzióban történő felfúrást kezdeményező függvény.
+ * 
+ * @param {Integer} d A dimenzió sorszáma.
+ * @returns {undefined}
+ */
+HeadPanel_Report.prototype.drillUp = function (d) {
+    var that = this;
+    global.tooltip.kill();
+    console.log(d);
+    var drill = {
+        dim: d,
+        direction: 1,
+        toId: undefined,
+        toName: undefined
+    };
+    that.mediator.publish("drill", drill);
 };

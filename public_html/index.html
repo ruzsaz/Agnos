@@ -38,8 +38,7 @@
                 <link id="cssLink" rel="stylesheet" type="text/css" href="css/white.css?ver=3.1"/>
         -->
         <link rel="localization" hreflang="en" href="data/languages/en.json" type="application/vnd.oftn.l10n+json"/>
-        <link rel="localization" hreflang="hu" href="data/languages/hu.json" type="application/vnd.oftn.l10n+json"/>
-        <link rel="localization" hreflang="ru" href="data/languages/ru.json" type="application/vnd.oftn.l10n+json"/>
+        <link rel="localization" hreflang="hu" href="data/languages/hu.json" type="application/vnd.oftn.l10n+json"/>        
 
         <!-- Favicon. -->
         <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
@@ -139,9 +138,9 @@
         <script>
             'use strict';
             var numberOfLoadedResources = 0;	// A már betöltött külső js-ek száma.
-            var numberOfResources = 33;			// Az összes betöltendő külső js-ek száma.
+            var numberOfResources = 34;			// Az összes betöltendő külső js-ek száma.
             var finalThreads = 3;				// Ennyi betöltési szálnak kell lefutnia az elinduláshoz.
-            var version = "4.024";
+            var version = "4.1";
             var min = "";           // "" vagy "min." attól függően, hogy a minify-s verziók kellenek-e?     
             var keycloak;
 
@@ -264,7 +263,8 @@
                     "js/libs/d3-4.12.0/d3-selection-multi.min.js",
                     "js/Global." + min + "js",
                     "js/DragLayer." + min + "js",
-                    "js/datamethods/DataDirector." + min + "js"
+                    "js/datamethods/DataDirector." + min + "js",
+                    "data/ordering/StringOrdering." + min + "js"
                 ], loadLevel3);
             }
 

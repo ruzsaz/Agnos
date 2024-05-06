@@ -96,6 +96,9 @@ and open the template in the editor.
 #less .fontSizeSmall {
   width: 12px;
 }
+#less .fontSizeTiny {
+  width: 11px;
+}
 #less .mainToolbarHeight {
   width: 32px;
 }
@@ -444,9 +447,15 @@ mask path {
   fill: darkred;
 }
 .axisY text {
-  font-size: 12px;
-  font-weight: bold;
+  font-size: 11px;
+  font-weight: normal;
   fill: darkred;
+}
+.dimensionLabel {
+  font-size: 11px;
+  font-weight: normal;
+  fill: darkred;
+  opacity: 0.6;
 }
 /* Panel_Table2D, Panel_Table1D */
 .svgRowHeadLabel {
@@ -643,9 +652,7 @@ mask path {
 }
 #headPanelP0 .row .cell text:not(.spacer),
 #headPanelP1 .row .cell text:not(.spacer) {
-  /* position: absolute; A legújabb próbálkozás szerint ez nem kell */
-  max-width: 90%;
-  /* white-space: nowrap; A legújabb próbálkozás szerint ez nem kell */
+  max-width: 95%;
   overflow-x: hidden;
   overflow-y: hidden;
   text-overflow: ellipsis;

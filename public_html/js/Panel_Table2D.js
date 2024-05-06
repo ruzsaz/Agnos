@@ -78,6 +78,16 @@ function panel_table2d(init) {
             .attr("class", "svgTableHolder")
             .attr("transform", "translate(" + that.tableLeftMargin + "," + that.tableTopMargin + ")");
 
+    // A sorfejek fölé a dimenzió kiírása
+    this.axisRCaption = that.svg.insert("svg:text", ".svgTableHolder")
+            .attr("class", "dimensionLabel noEvents")
+            .attr("transform", "translate(" + that.tableLeftMargin + ", " + (that.tableTopMargin + that.tableHeadHeight) + ")");
+
+    // Az oszlopfejek fölé a dimenzió kiírása
+    this.axisCCaption = that.svg.insert("svg:text", ".svgTableHolder")
+            .attr("class", "dimensionLabel noEvents")
+            .attr("transform", "translate(" + (that.tableLeftMargin + that.tableHeadWidth + that.tableElementGap) + ", " + (that.tableTopMargin - that.tableElementGap) + ")");
+
     // A sorfejeket tartó konténer.
     this.gRowHeads = tableHolder.append("svg:svg")
             .attr("x", 0)
@@ -653,6 +663,14 @@ panel_table2d.prototype.drawCells = function(preparedData, trans) {
 panel_table2d.prototype.drawRowHeaders = function(preparedData, trans) {
     var that = this;
 
+    // A sorok fölé a dimenzió kiírása
+    that.axisRCaption
+            .text(that.localMeta.dimensions[that.dimRToShow].caption)
+            .attr("text-anchor", "start")
+            .transition(trans).attrs({
+                x: 0,
+                y: 0});
+
     // Sorfejekhez való adattársítás.
     var gRowHead = that.gRowHeads.selectAll(".svgRowHead")
             .data(preparedData.dataArray, function(d) {
@@ -727,6 +745,14 @@ panel_table2d.prototype.drawRowHeaders = function(preparedData, trans) {
  */
 panel_table2d.prototype.drawColumnHeaders = function(preparedData, trans) {
     var that = this;
+
+    // Az oszlopok fölé a dimenzió kiírása
+    that.axisCCaption
+            .text(that.localMeta.dimensions[that.dimCToShow].caption)
+            .attr("text-anchor", "start")
+            .transition(trans).attrs({
+                x: 0,
+                y: 0});   
 
     // Feliratok az oszlopok elején.
     var gColumnHead = that.gColumnHeads.selectAll(".svgColumnHead")

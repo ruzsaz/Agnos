@@ -61,6 +61,11 @@ function panel_table1d(init) {
             .attr("class", "svgTableHolder")
             .attr("transform", "translate(" + that.tableLeftMargin + "," + that.tableTopMargin + ")");
 
+    // A sorfejek fölé a dimenzió kiírása
+    this.axisXCaption = that.svg.insert("svg:text", ".svgTableHolder")
+            .attr("class", "dimensionLabel noEvents")
+            .attr("transform", "translate(" + that.tableLeftMargin + ", " + (that.tableTopMargin + that.tableHeadHeight) + ")");
+
     // A sorfejeket tartó konténer.
     this.gRowHeads = tableHolder.append("svg:svg")
             .attr("x", 0)
@@ -68,7 +73,7 @@ function panel_table1d(init) {
             .attr("width", that.tableHeadWidth)
             .attr("height", that.tableHeight)
             .attr("viewBox", "0 0 " + that.tableHeadWidth + " " + that.tableHeight);
-
+        
     // Az oszlopfejeket tartó konténer.
     this.gColumnHeads = tableHolder.append("svg:svg")
             .attr("x", that.tableHeadWidth + that.tableElementGap)
@@ -573,6 +578,14 @@ panel_table1d.prototype.drawColumnHeaders = function (trans) {
  */
 panel_table1d.prototype.drawRowHeaders = function (preparedData, trans) {
     var that = this;
+
+    // A sorok fölé a dimenzió kiírása
+    that.axisXCaption
+            .text(that.localMeta.dimensions[that.dimToShow].caption)
+            .attr("text-anchor", "start")
+            .transition(trans).attrs({
+                x: 0,
+                y: 0});
 
     // Feliratok a sorok elején.
     var gRowHead = that.gRowHeads.selectAll(".svgRowHead")
