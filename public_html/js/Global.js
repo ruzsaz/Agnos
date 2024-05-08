@@ -326,7 +326,8 @@ var global = function () {
      * @param {String} lang A nyelv kódja, pl. 'hu', 'en'.
      * @returns {undefined}
      */
-    var setLanguage = function (lang) {
+    var setLanguage = function (lang, side) {
+        lang = lang || getCookie("language") || 'en';
         tagForLocalization();
         String.locale = lang;
 
@@ -344,17 +345,22 @@ var global = function () {
             d3.selectAll(".localized.language_" + lang).style("display", "block");
         }
 
-        // Féldinamikus (metával megkapott) szövegek átírása.
-        global.mediators[0].publish("langSwitch");
-        global.mediators[1].publish("langSwitch");
-
-        // Dinamikus (adattal megkapott) szövegek átírása egy önmagába fúrással.
-        if (global.facts[0] && global.facts[0].reportMeta) {
-            global.mediators[0].publish("drill", {dim: -1, direction: 0});
+        if (side === undefined || side === 0) {
+            // Féldinamikus (metával megkapott) szövegek átírása.
+            global.mediators[0].publish("langSwitch");
+            // Dinamikus (adattal megkapott) szövegek átírása egy önmagába fúrással.
+            if (global.facts[0] && global.facts[0].reportMeta) {
+                global.mediators[0].publish("drill", {dim: -1, direction: 0});
+            }
         }
-        if (global.facts[1] && global.facts[1].reportMeta) {
-            global.mediators[1].publish("drill", {dim: -1, direction: 0});
+        
+        if (side === undefined || side === 1) {
+            global.mediators[1].publish("langSwitch");
+            if (global.facts[1] && global.facts[1].reportMeta) {
+                global.mediators[1].publish("drill", {dim: -1, direction: 0});
+            }
         }
+        
     };
 
     /**
@@ -1487,6 +1493,7 @@ var global = function () {
         changeCSSInProgress: changeCSSInProgress,
         changeCSS: changeCSS, // Css-t vált
         tagForLocalization: tagForLocalization, // Nyelvváltoztatás előtt a szövegeket az 'origText' attrib-ba írja.
+        localizeAll: localizeAll, // Elvégzi a lokalizálást az épp látható elemeken
         convertFileFriendly: convertFileFriendly, // Átalakítja egy sztring filenévben nem szívesen látott karaktereit.
         setCookie: setCookie, // Beállít egy cookie-t.
         getCookie: getCookie, // Kiolvas egy cookie-t.

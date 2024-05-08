@@ -1,6 +1,6 @@
 /* global d3, version, LZString, URL, global, changelog */
 
-'use strict'; // TODO: nyelv
+'use strict';
 
 /**
  * Az adatlekérdezőt tartalmazó konténer konstruktora.
@@ -215,7 +215,7 @@ Container.prototype.resizeContainer = function(side, duration, sizePercentage, p
 
     d3.select("body").style("width", null);
 
-    // A panelek (főleg a fejlécpanel) számáta kiadandó resize üzenet.
+    // A panelek (főleg a fejlécpanel) számára kiadandó resize üzenet.
     if (global.mediators[side]) {
         global.mediators[side].publish("resize", duration, panelNumberPerRow, scaleRatio);
     }
@@ -356,16 +356,17 @@ Container.prototype.navigateTo = function(startObject) {
             var reportMeta = global.getFromArrayByProperty(global.superMeta, 'name', sideInit.c); // A reporthoz tartozó meta.
             sideInit.v = global.minifyInits(sideInit.v, true).split(';'); // A panelek indító konstruktorai.
             for (var i = 0, iMax = sideInit.v.length; i < iMax; i++) {
-                sideInit.v[i] = {'initString' : sideInit.v[i]}
+                sideInit.v[i] = {'initString' : sideInit.v[i]};
             }
             that.newReport(side, reportMeta, sideInit);
-            var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, sideInit.v.length);
-            that.resizeContainer(side, 0, sizePercentage, global.panelNumberOnScreen, scaleRatio);
+            var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, sideInit.v.length);            
+            that.resizeContainer(side, 1000, sizePercentage, global.panelNumberOnScreen, scaleRatio);            
         } else {
             that.counter--;
             var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, 0);
             that.resizeContainer(side, 0, sizePercentage, global.panelNumberOnScreen, scaleRatio);
         }
+        
     }
 
     d3.select("#container0").classed("activeSide", (this.panelState !== 2));
@@ -467,15 +468,16 @@ Container.prototype.initSide = function(side, duration) {
                 .on("end", function() {
                     d3.select(this).style("opacity", null);
                     new HeadPanel_Browser({group: side}, global.superMeta, scaleRatio, 0); // Fejléc.
+                    global.setLanguage(undefined, side);
                     that.onResize();
                     global.mainToolbar_refreshState();
                 });
     } else {
-        new HeadPanel_Browser({group: side}, global.superMeta, scaleRatio); // Fejléc.
+        new HeadPanel_Browser({group: side}, global.superMeta, scaleRatio); // Fejléc.        
         that.onResize();
         global.mainToolbar_refreshState();
     }
-    this.dataDirector[side] = new DataDirector(side, global.mediators[side]);	// Adatrendező.    
+    this.dataDirector[side] = new DataDirector(side, global.mediators[side]);	// Adatrendező.        
 };
 
 /**
@@ -522,7 +524,7 @@ Container.prototype.killSide = function(side) {
                 that.initSide(side, global.selfDuration);
                 global.mainToolbar_refreshState();
                 global.getConfig2();
-            });
+            });            
     }
 };
 
@@ -610,18 +612,18 @@ Container.prototype.save = function(side) {
     if (this.panelState / 2 === side && this.isSideInUse[side]) {
         var str = "";
         for (var d = 0, dMax = global.facts[side].localMeta.dimensions.length; d < dMax; d++) {
-            str = str + "<input class = 'saveCheckBox' type='checkbox' checked/>" + global.facts[side].localMeta.dimensions[d].caption + "<br>";
+            str = str + "<input class = 'saveCheckBox' type='checkbox'/>" + global.facts[side].localMeta.dimensions[d].caption + "<br>";
         }
 
         global.setDialog(
-                "Adatok mentése CSV-ként",
-                "<div class='saveStaticText'>Az alábbi dimenziókat alábontva:</div>" +
+                _("Adatok mentése CSV-ként"),
+                "<div class='saveStaticText loc'>" + _("Az alábbi dimenziókat alábontva (maximum 3 választható):") + "</div>" +
                 "<div class='saveVariableText'>" + str + "</div>",
-                "Mégse",
+                _("Mégse"),
                 function() {
                     global.setDialog();
                 },
-                "Mentés",
+                _("Mentés"),
                 function() {
                     var requestedDims = [];
                     var checkBoxes = document.getElementsByClassName("saveCheckBox");
@@ -642,6 +644,18 @@ Container.prototype.save = function(side) {
  * @returns {undefined}
  */
 Container.prototype.saveAsCsv = function(side, requestedDims) {
+    
+    // Ha túl sokat választott, csak az első 3-at vesszük figyelembe
+    var numberOfRequestedDims = 0;
+    for (var i = 0, iMax = requestedDims.length; i < iMax; i++) {
+        if (requestedDims[i] === 1) {
+            numberOfRequestedDims++;
+            if (numberOfRequestedDims > 3) {
+                requestedDims[i] = 0;
+            }
+        }
+    }
+    
     var meta = global.facts[side].localMeta;
     var baseLevels = global.baseLevels[side];
 
@@ -696,7 +710,6 @@ Container.prototype.saveAsCsv = function(side, requestedDims) {
                 separator = ",";
             }
         }
-console.log(meta)
         // Értékek fejlécének hozzáadása.
         for (var v = 0, vMax = meta.indicators.length; v < vMax; v++) {
             var valueHeader = (meta.indicators[v].value.hide) ? "\"Nem értelmezett\"" : "\"" + (meta.indicators[v].caption + " (" + meta.indicators[v].value.unit + ")\"");

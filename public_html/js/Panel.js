@@ -38,7 +38,7 @@ function Panel(panelInitString, mediator, isLegendRequired, leftOffset, rightOff
 
     this.valMultiplier = 1;		// Ennyiszeresét
     this.fracMultiplier = 1;		// Ennyiszeresét
-    this.valFraction = false;	// Hányadost mutasson?
+    this.valFraction = false;           // Hányadost mutasson?
     this.inPanic = false;		// Hibaüzemmódban van a panel?
     this.mediatorIds = [];		// A mediátorok id-jeit tartalmazó tömb.
     this.replaceFunction;
@@ -416,6 +416,7 @@ Panel.prototype.killPanel = function(panelId, duration, fromStyle, toStyle, dont
         if (!dontResize) {
             $(window).trigger('resize');
         }
+        global.getConfig2();
     }
 };
 

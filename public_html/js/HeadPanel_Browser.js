@@ -87,9 +87,9 @@ function HeadPanel_Browser(init, superMeta, startScale, duration) {
             .on("click", function(d) {
                 that.showReport(d);
             });
-
+    
     // A supermetába kódolt dinamikus tartalom létrehozása.
-    that.initPanel();
+    that.initPanel();    
 }
 
 //////////////////////////////////////////////////

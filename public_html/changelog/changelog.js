@@ -5,8 +5,9 @@ var changelog = [
     {
         "language": "hu",
         "history": [
-            {"entity": "Agnos", "date": "2024-04-09", "change": "Panel becsukó gomb a panelek jobb felső sarkában"},
-            {"entity": "Agnos", "date": "2023-12-01", "change": "Dimenzió értékek többnyelvűsítése"},
+            {"entity": "Agnos", "date": "2024-05-08", "change": "Dimenzió kiírás a paneleken; dimenzió útvonal a fejlécben."},
+            {"entity": "Agnos", "date": "2024-04-09", "change": "Panel becsukó gomb a panelek jobb felső sarkában."},
+            {"entity": "Agnos", "date": "2023-12-01", "change": "Dimenzió értékek többnyelvűsítése."},
             {"entity": "AgnosServer", "date": "2023-11-27", "change": "Count distinct típusú lekérdezést lehetővé tevő adatkocka integrálása."},
             {"entity": "AgnosServer", "date": "2023-11-16", "change": "Lekérdezés egyszerre több adatkockából."},
             {"entity": "AgnosServer", "date": "2023-09-05", "change": "Keycloak integráció."},
@@ -26,13 +27,14 @@ var changelog = [
             {"entity": "AgnosCSVImporter", "date": "2017-10-24", "change": "Rögzített formájú .xls és .xlsx fájlok automatikus betöltése."},
             {"entity": "Agnos", "date": "2017-11-02", "change": "Panelek képként mentése elérhető."}
         ],
-        "updated": "2023-12-01"
+        "updated": "2024-05-08"
     },
     {
         "language": "en",
         "history": [
-            {"entity": "Agnos", "date": "2024-04-09", "change": "Close button added to the panels"},
-            {"entity": "Agnos", "date": "2023-12-01", "change": "Localization of dimension values"},
+            {"entity": "Agnos", "date": "2024-05-08", "change": "Display of dimensions on the panels, dimension path on the top panel."},
+            {"entity": "Agnos", "date": "2024-04-09", "change": "Close button added to the panels."},
+            {"entity": "Agnos", "date": "2023-12-01", "change": "Localization of dimension values."},
             {"entity": "AgnosServer", "date": "2023-11-27", "change": "New type of datacube to allow count distinct type queries."},
             {"entity": "AgnosServer", "date": "2023-11-16", "change": "Parallel queries from separate datacubes."},
             {"entity": "AgnosServer", "date": "2023-09-05", "change": "Keycloak integration."},
@@ -53,6 +55,6 @@ var changelog = [
             {"entity": "Agnos", "date": "2017-11-02", "change": "Save panels as pictures."}
             
         ],
-        "updated": "2023-12-01"
+        "updated": "2024-05-08"
     }
 ];

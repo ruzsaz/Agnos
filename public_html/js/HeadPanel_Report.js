@@ -18,6 +18,8 @@ function HeadPanel_Report(init, reportMeta, startScale) {
     this.meta = reportMeta; // A report metája.
     this.localMeta; // A report metájának lefordított változata.
     var trans = d3.transition().duration(global.selfDuration);
+    this.dimLevelsSeparator = " > "; // A dimenzióelemek összefűzésére szolgáló sztring lefúráskor.
+    this.dimLevelPlaceholder = "..."; // A túl hosszú dimenzióelemeket erre cseréljük megjelenítéskor.
 
     // Panel regisztrálása a nyilvántartóba.
     that.mediator.publish("register", that, that.panelId, [], that.preUpdate, that.update);
@@ -409,7 +411,7 @@ HeadPanel_Report.prototype.prepareData = function (data) {
         var baseDim = (global.baseLevels[that.panelSide])[i];        
         var pathString = that.localMeta.dimensions[i].top_level_caption;
         for (var d = 0, dMax = baseDim.length; d < dMax; d++) {
-            pathString = pathString + " > " + baseDim[d].name.trim();
+            pathString = pathString + that.dimLevelsSeparator + baseDim[d].name.trim();
         }
         
         dimData.push({
@@ -463,7 +465,12 @@ HeadPanel_Report.prototype.update = function (data) {
                 return d.text;
             }).transition(trans)
             .style("opacity", 1);
-
+    
+    dimRow.select(".tableText1:not(.spacer)")
+            .text(function (d) {
+                return that.shortenDimensionPath(d.text, this);
+            });
+    
     dimRow.select(".tableText1.spacer")
             .style("opacity", function (d) {
                 return (d.text === d3.select(this).text()) ? 1 : 0;
@@ -496,8 +503,46 @@ HeadPanel_Report.prototype.update = function (data) {
 
 };
 
-HeadPanel_Report.prototype.refresh = function () {
+/**
+ * Lerövidít egy "Magyarország > Pest > Fót" jellegű szöveget, hogy
+ * beleférjen egy maximalizált méretű html element-be. A szöveg első
+ * részét ... -al helyettesíti.
+ * 
+ * @param {String} string A lerövítendő szöveg.
+ * @param {Object} element A szöveget tartalmazó html element.
+ * @returns {String} A lerövídített szöveg, pl: "... > ... > Fót".
+ */
+HeadPanel_Report.prototype.shortenDimensionPath = function (string, element) {
+    element.innerText = string;
+    const elementWidth = element.offsetWidth;
+    element.innerText = string + ".";
+    const elementWidth2 = element.offsetWidth;
+    
+    if (elementWidth === elementWidth2) {
+        const subStrings = string.split(this.dimLevelsSeparator);
+        var isChanged = false;
+        for (var i = 0, iMax = subStrings.length - 1; i < iMax; i++) {
+            if (subStrings[i] !== this.dimLevelPlaceholder) {
+                subStrings[i] = this.dimLevelPlaceholder;
+                isChanged = true;
+                break;
+            }
+        }
+        if (isChanged) {
+            return this.shortenDimensionPath(subStrings.join(this.dimLevelsSeparator), element);
+        } else {
+            return subStrings.join(this.dimLevelsSeparator);
+        }
+    } 
+    return string;
+};
 
+HeadPanel_Report.prototype.refresh = function () {
+    var that = this;
+    that.dimTable.selectAll(".row").select(".tableText1:not(.spacer)")
+            .text(function (d) {
+                return that.shortenDimensionPath(d.text, this);
+            });
 };
 
 //////////////////////////////////////////////////
@@ -513,7 +558,6 @@ HeadPanel_Report.prototype.refresh = function () {
 HeadPanel_Report.prototype.drillUp = function (d) {
     var that = this;
     global.tooltip.kill();
-    console.log(d);
     var drill = {
         dim: d,
         direction: 1,

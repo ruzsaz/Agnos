@@ -101,7 +101,17 @@ HeadPanel.prototype.resize = function(duration, panelNumberPerRow) {
             .on("end", function() {                
                 that.panelDiv.selectAll(".halfHead")
                         .classed("vertical", (panelNumberPerRow === 1) ? true : false);
+                that.refresh();
             });
+};
+
+/**
+ * Felfrissíti a panelt méretváltozás után.
+ * A származtatott osztályok majd felülírják.
+ * 
+ * @returns {undefined}
+ */
+HeadPanel.prototype.refresh = function () {
 };
 
 /**
