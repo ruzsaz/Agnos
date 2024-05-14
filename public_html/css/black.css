@@ -652,7 +652,7 @@ mask path {
 }
 #headPanelP0 .row .cell text:not(.spacer),
 #headPanelP1 .row .cell text:not(.spacer) {
-  max-width: 95%;
+  max-width: 90%;
   overflow-x: hidden;
   overflow-y: hidden;
   text-overflow: ellipsis;

@@ -14,13 +14,12 @@
  * @param {Number} bottomOffset Alsó üresen hagyandó terület (margó) pixelben.
  * @returns {Panel} Az elkészült panel.
  */
-function Panel(panelInitString, mediator, isLegendRequired, leftOffset, rightOffset, topOffset, bottomOffset) {
+function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequired, leftOffset, rightOffset, topOffset, bottomOffset) {
     var that = this;
-
     leftOffset = leftOffset || 0;
     rightOffset = rightOffset || 0;
     topOffset = topOffset || 0;
-    bottomOffset = bottomOffset || 0;
+    bottomOffset = bottomOffset || 0;    
 
     this.panelInitString = panelInitString;
 
@@ -33,9 +32,11 @@ function Panel(panelInitString, mediator, isLegendRequired, leftOffset, rightOff
     this.panelId = "#panel" + that.panelSide + "P" + that.divPosition;
 
     this.mediator = mediator;
+    this.isShortingByValueEnabled = isShortingByValueEnabled;
     this.data;
     this.dimsToShow = [];
-
+    this.sortByValue = panelInitString.sortbyvalue || false;
+    
     this.valMultiplier = 1;		// Ennyiszeresét
     this.fracMultiplier = 1;		// Ennyiszeresét
     this.valFraction = false;           // Hányadost mutasson?
@@ -43,7 +44,7 @@ function Panel(panelInitString, mediator, isLegendRequired, leftOffset, rightOff
     this.mediatorIds = [];		// A mediátorok id-jeit tartalmazó tömb.
     this.replaceFunction;
     this.magLevel = panelInitString.mag || 1;          // Nagyítottsági szint.
-    this.fromMagLevel = panelInitString.fromMag || 1;          // Ahonnan érkezik a nagyítás.
+    this.fromMagLevel = panelInitString.frommg || 1;          // Ahonnan érkezik a nagyítás.
     this.w = that.w * that.magLevel;
     this.legendWidth = that.w - 2 * global.legendOffsetX;
     this.h = that.h * that.magLevel;
@@ -119,8 +120,21 @@ function Panel(panelInitString, mediator, isLegendRequired, leftOffset, rightOff
     });
     that.mediatorIds.push({"channel": "magnifyPanel", "id": med.id});
 
+    // Sorbarendezés váltó
+    if (that.isShortingByValueEnabled) {    
+        var sortSwitcher = that.svg.insert("svg:g")
+                .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
+                .attr("transform", "translate(0, " + (that.h - 30) +")")
+                .on('click', function() {
+                    that.sortSwitch();
+                });
+
+        sortSwitcher.append("svg:g")
+                .html('<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#sort_panel_button"></use>');
+    }
+
     // A nagyító fül
-    var rz = that.svg.append("svg:g")
+    var duplicator = that.svg.append("svg:g")
             .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
             .attr("transform", "translate(" + (that.w - 30)  + ", " + (that.h - 30) +")")
             .on('click', function() {
@@ -130,9 +144,9 @@ function Panel(panelInitString, mediator, isLegendRequired, leftOffset, rightOff
             });
 
     
-    rz.append("svg:g")
+    duplicator.append("svg:g")
             .html('<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#magnify_panel_button"></use>');
-    
+            
     // A becsukó gomb fül
     var closeButton = that.svg.append("svg:g")
             .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
@@ -553,6 +567,20 @@ Panel.prototype.panic = function(panic, reason) {
         that.svg.selectAll(".panic").selectAll("text").data([{tooltip: reason || that.defaultPanicText}]);
     }
 
+};
+
+/**
+ * Sorbarendezés váltó függvény; az alosztályok majd felülírják maguknak.
+ * 
+ * @returns {undefined}
+ */
+Panel.prototype.sortSwitch = function() {
+    var that = this;
+    global.tooltip.kill();       
+    that.sortByValue = !that.sortByValue;
+    that.update();    
+    that.actualInit.sortByValue = that.sortByValue;
+    global.getConfig2();
 };
 
 /**

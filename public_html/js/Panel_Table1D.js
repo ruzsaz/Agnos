@@ -14,10 +14,10 @@ function panel_table1d(init) {
     this.constructorName = "panel_table1d";
 
     // Inicializáló objektum beolvasása, feltöltése default értékekkel.
-    this.defaultInit = {group: 0, position: undefined, dim: 0, multiplier: 1, ratio: false, mag: 1, fromMag: 1};
+    this.defaultInit = {group: 0, position: undefined, dim: 0, multiplier: 1, ratio: false, mag: 1, frommg: 1, sortbyvalue: false};
     this.actualInit = global.combineObjects(that.defaultInit, init);
 
-    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], false, 0, 0); // A Panel konstruktorának meghívása.
+    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, false, 0, 0); // A Panel konstruktorának meghívása.
 
     this.dimToShow = that.actualInit.dim;			// A mutatott dimenzió.
     this.preparedData = [];							// Az ábrázolásra kerülő, feldolgozott adat.
@@ -213,6 +213,26 @@ panel_table1d.prototype.valuesToShow = function (d) {
     return vals;
 };
 
+/**
+ * Meghatározza a kért sorbarendezéshez szükséges comparator-függvényt.
+ * 
+ * @returns {Function} Az adatelemek sorbarendezéséhez szükséges comparator.
+ */
+panel_table1d.prototype.getSortingComparator = function() {
+    var that = this;        
+    if (that.sortByValue) {
+        return function(a, b) {
+            const aValue = that.valuesToShow(a)[0].value;
+            const bValue = that.valuesToShow(b)[0].value;        
+            if (aValue < bValue) return 1;
+            if (aValue > bValue) return -1;
+            return 0;
+        };
+    }
+    return that.cmp;
+};
+
+
 
 //////////////////////////////////////////////////
 // Rajzolási folyamat függvényei 
@@ -272,7 +292,7 @@ panel_table1d.prototype.prepareData = function (oldPreparedData, newDataRows, dr
     var that = this;
     var level = (global.baseLevels[that.panelSide])[that.dimToShow].length;
 
-    newDataRows.sort(that.cmp);	// Elemi adatok sorbarendezése.
+    newDataRows.sort(that.getSortingComparator());	// Elemi adatok sorbarendezése.
     var dataArray = [];		// Az adatok tömbje, az X dimenzió mentén tárolva, azon belül pedig az Y mentén.
 
     // Alapértékek beállítása.

@@ -15,10 +15,10 @@ function panel_bar2d(init) {
     this.constructorName = "panel_bar2d";
 
     // Inicializáló objektum beolvasása, feltöltése default értékekkel.
-    this.defaultInit = {group: 0, position: undefined, dimx: 0, dimy: 1, val: 0, multiplier: 1, ratio: false, streched: false, domain: [], domainr: [], mag: 1, fromMag: 1};
+    this.defaultInit = {group: 0, position: undefined, dimx: 0, dimy: 1, val: 0, multiplier: 1, ratio: false, streched: false, domain: [], domainr: [], mag: 1, frommg: 1, sortbyvalue: false};
     this.actualInit = global.combineObjects(that.defaultInit, init);
 
-    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, global.numberOffset, 0); // A Panel konstruktorának meghívása.
+    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], !that.actualInit.streched, true, global.numberOffset, 0); // A Panel konstruktorának meghívása.
 
     this.valToShow = that.actualInit.val;					// Az ennyiedik mutatót mutatja.
     this.valFraction = that.actualInit.ratio;				// Hányadost mutasson, vagy abszolútértéket?
@@ -232,7 +232,7 @@ panel_bar2d.prototype.getCmpFunction = function () {
  * @returns {boolean} Az összehasonlítás eredménye.
  */
 panel_bar2d.prototype.simpleCmp = function (a, b) {
-    return a.name.localeCompare(b.name);
+    return a.name.localeCompare(b.name, String.locale, {numeric: true});
 };
 
 /**
@@ -453,7 +453,6 @@ panel_bar2d.prototype.prepareData = function (oldPreparedData, newDataRows, dril
                 index: index,
                 id: dimY.id,
                 uniqueId: levelY + "L" + dimY.id,
-                id: dimY.id,
                 name: dimY.name.trim(),
                 parentId: dimY.parentId,
                 tooltip: "<html>" + dimY.name.trim() + "</html>"
@@ -473,7 +472,15 @@ panel_bar2d.prototype.prepareData = function (oldPreparedData, newDataRows, dril
             dimYName: dimY.name.trim()});
         element.sumValues = element.sumValues + val.value;
     }
-
+    
+    if (that.sortByValue) {
+        dataArray.sort(function (a, b) {
+            if (a.sumValues < b.sumValues) return 1;
+            if (a.sumValues > b.sumValues) return -1;
+            return 0;
+        });
+    }
+    
     // X irányú lefúrás esetén: ebből a régi elemből kell kinyitni mindent.
     var openFromXElement = (drill.dim === that.dimXToShow && drill.direction === -1 && oldPreparedData !== undefined) ? global.getFromArrayByProperty(oldPreparedData.dataArray, 'id', drill.toId) : null;
     var oldX = (openFromXElement) ? openFromXElement.x : 0; // Az új elemek kinyitásának kezdőpozíciója.

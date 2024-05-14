@@ -14,14 +14,14 @@ function panel_horizontalbar(init) {
 
     this.constructorName = "panel_horizontalbar";
 
-    this.defaultInit = {group: 0, position: undefined, dim: 0, valpos: [0], valneg: [], ratio: false, centered: false, domain: [], domainr: [], mag: 1, fromMag: 1};
+    this.defaultInit = {group: 0, position: undefined, dim: 0, valpos: [0], valneg: [], ratio: false, centered: false, domain: [], domainr: [], mag: 1, frommg: 1, sortbyvalue: false};
     this.actualInit = global.combineObjects(that.defaultInit, init);
 
     this.valPosToShow = that.actualInit.valpos;			// Ezeket kell pozitív irányban ábrázolni.
     this.valNegToShow = that.actualInit.valneg;			// Ezeket kell negatív irányban ábrázolni.
     this.buildValueVectors();
 
-    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], !that.singleValMode, global.legendOffsetX, global.legendOffsetX, 0, global.fontSizeSmall + 2); // A Panel konstruktorának meghívása.
+    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, !that.singleValMode, global.legendOffsetX, global.legendOffsetX, 0, global.fontSizeSmall + 2); // A Panel konstruktorának meghívása.
 
     this.dimToShow = that.actualInit.dim;				// Ennyiedik dimenzió a panel dimenziója.
     this.valMultipliers = [];							// Ennyiszeresét kell mutatni az értékeknek.
@@ -202,6 +202,28 @@ panel_horizontalbar.prototype.valuesToShow = function(d, pos) {
 };
 
 /**
+ * Meghatározza a kért sorbarendezéshez szükséges comparator-függvényt.
+ * 
+ * @returns {Function} Az adatelemek sorbarendezéséhez szükséges comparator.
+ */
+panel_horizontalbar.prototype.getSortingComparator = function() {
+    var that = this;        
+    if (that.sortByValue) {
+        return function(a, b) {            
+            const aValues = that.barValuesToShow(a);
+            const bValues = that.barValuesToShow(b);            
+            const arrayLength = aValues.length;
+            const aValue = aValues[arrayLength - 1].accumulation + aValues[arrayLength - 1].value;
+            const bValue = bValues[arrayLength - 1].accumulation + bValues[arrayLength - 1].value;            
+            if (aValue < bValue) return 1;
+            if (aValue > bValue) return -1;
+            return 0;
+        };
+    }
+    return that.cmp;
+};
+
+/**
  * Egy elemhez tartozó tooltipet legyártó függvény;
  * 
  * @param {Object} d Az elem.
@@ -359,7 +381,7 @@ panel_horizontalbar.prototype.prepareData = function(oldPreparedData, newDataRow
     var level = (global.baseLevels[that.panelSide])[this.dimToShow].length;
 
     var dataArray = [];			// A fő adattörzs, ez fogja a téglalapok megjelenítését tartalmazni.
-    newDataRows.sort(that.cmp); // Adatok névsorba rendezése.
+    newDataRows.sort(that.getSortingComparator()); // Adatok névsorba rendezése.
 
     // Vízszintes skála beállítása.
     that.yScale.domain([0, newDataRows.length]);

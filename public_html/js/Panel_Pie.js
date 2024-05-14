@@ -15,10 +15,11 @@ function panel_pie(init) {
     this.constructorName = "panel_pie";
 
     // Inicializáló objektum beolvasása, feltöltése default értékekkel.
-    this.defaultInit = {group: 0, position: undefined, dim: 0, val: 0, ratio: false, mag: 1, fromMag: 1};
+    this.defaultInit = {group: 0, position: undefined, dim: 0, val: 0, ratio: false, mag: 1, fromg: 1, sortbyvalue: false};
+    console.log(init)
     this.actualInit = global.combineObjects(that.defaultInit, init);
 
-    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], false, 0, 0); // A Panel konstruktorának meghívása.
+    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, false, 0, 0); // A Panel konstruktorának meghívása.
 
     this.valMultiplier = 1;						// A mutatott érték szorzója.
     this.fracMultiplier = 1;						// A mutatott érték szorzója.
@@ -126,6 +127,25 @@ panel_pie.prototype.valueToShow = function (d) {
     } else {
         return null;
     }
+};
+
+/**
+ * Meghatározza a kért sorbarendezéshez szükséges comparator-függvényt.
+ * 
+ * @returns {Function} Az adatelemek sorbarendezéséhez szükséges comparator.
+ */
+panel_pie.prototype.getSortingComparator = function() {
+    var that = this;        
+    if (that.sortByValue) {
+        return function(a, b) {
+            const aValue = that.valueToShow(a).value;
+            const bValue = that.valueToShow(b).value;
+            if (aValue < bValue) return 1;
+            if (aValue > bValue) return -1;
+            return 0;
+        };
+    }
+    return that.cmp;
 };
 
 /**
@@ -253,11 +273,10 @@ panel_pie.prototype.preUpdate = function (drill) {
 panel_pie.prototype.prepareData = function (oldPieData, newDataRows, drill) {
     var that = this;
     var level = (global.baseLevels[that.panelSide])[this.dimToShow].length;
-
-    newDataRows.sort(that.cmp); // Adatok névsorba rendezése.
-
+    
+    var comparator = that.getSortingComparator();
     var newPieData = d3.pie()
-            .sort(that.cmp)	// Használjuk a sorbarendezést [null: nincs rendezés, egész kihagyása: érték szerinti]
+            .sort(comparator) 	// Használjuk a sorbarendezést [null: nincs rendezés, egész kihagyása: érték szerinti]
             .value(function (d) {
                 return that.valueToShow(d).value;
             })(newDataRows);

@@ -744,7 +744,7 @@ var global = function () {
         while (a.charAt(i) === b.charAt(i) && i < minLen) {
             i++;
         }
-        return (a.substr(0, i + 1)).localeCompare(b.substr(0, i + 1), "hu", {sensitivity: 'variant', caseFirst: 'upper'});
+        return (a.substr(0, i + 1)).localeCompare(b.substr(0, i + 1), String.locale, {numeric: true, sensitivity: 'variant', caseFirst: 'upper'});
     };
 
     /**
@@ -1016,7 +1016,8 @@ var global = function () {
             ['range:', 'V:'],
             ['poi:', 'W:'],
             ['mag:', 'X:'],
-            ['fromMag:', 'Y:'],
+            ['frommg:', 'Y:'],
+            ['shortbyvalue:', 'Sv:'],
             ['visiblePoi', 'Z:'],
             ['false', 'Ff'],
             ['true', 'Tt'],

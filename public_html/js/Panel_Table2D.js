@@ -14,10 +14,10 @@ function panel_table2d(init) {
     this.constructorName = "panel_table2d";
 
     // Inicializáló objektum beolvasása, feltöltése default értékekkel.
-    this.defaultInit = {group: 0, position: undefined, dimr: 0, dimc: 1, val: 0, multiplier: 1, ratio: false, mag: 1, fromMag: 1};
+    this.defaultInit = {group: 0, position: undefined, dimr: 0, dimc: 1, val: 0, multiplier: 1, ratio: false, mag: 1, frommg: 1, sortbyvalue: false};
     this.actualInit = global.combineObjects(that.defaultInit, init);
 
-    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], false, 0, 0); // A Panel konstruktorának meghívása.
+    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, false, 0, 0); // A Panel konstruktorának meghívása.
 
     this.valMultiplier = 1;							// A mutatott érték szorzója.
     this.fracMultiplier = 1;							// A mutatott érték szorzója.
@@ -395,19 +395,32 @@ panel_table2d.prototype.prepareData = function(oldPreparedData, newDataRows, dri
                 name: dimC.name.trim(),
                 parentId: dimC.parentId,
                 tooltip: that.getTooltip(undefined, dimC),
-                startOpacity: 0
+                startOpacity: 0,
+                sumValues: that.valueToShow(d)
             };
             dimCArray.push(dimCElement);
+        } else {
+            dimCArray[index].sumValues = dimCArray[index].sumValues + that.valueToShow(d);
         }
+        
     }
 
-    // Az oszlopok névsorba rendezése
-    dimCArray.sort(that.simpleCmp);
+    // Az oszlopok névsorba, vagy érték szerinti sorbarendezése
+    if (that.sortByValue) {
+        dimCArray.sort(function (a, b) {
+            if (a.sumValues < b.sumValues) return 1;
+            if (a.sumValues > b.sumValues) return -1;
+            return 0;
+        });
+    } else {
+        dimCArray.sort(that.simpleCmp);
+    }
+        
     for (var i = 0, iMax = dimCArray.length; i < iMax; i++) {
         dimCArray[i].index = i;
         dimCArray[i].oldColumnIndex = i;
     }
-
+    
     // Alapértékek beállítása.
     for (var i = 0; i < newDataRows.length; i++) {
         var d = newDataRows[i];
@@ -425,9 +438,12 @@ panel_table2d.prototype.prepareData = function(oldPreparedData, newDataRows, dri
                 name: dimR.name.trim(),
                 values: [],
                 tooltip: that.getTooltip(dimR),
-                startOpacity: 0
+                startOpacity: 0,
+                sumValues: that.valueToShow(d)
             };
             dataArray.push(element);
+        } else {
+            dataArray[dataArray.length - 1].sumValues = dataArray[dataArray.length - 1].sumValues + that.valueToShow(d);
         }
 
         var dimC = d.dims[that.dimC];
@@ -448,7 +464,17 @@ panel_table2d.prototype.prepareData = function(oldPreparedData, newDataRows, dri
         cellData.tooltip = that.getTooltip(dimR, cellData);
         element.values.push(cellData);
     }
-
+    
+    if (that.sortByValue) {
+        dataArray.sort(function (a, b) {
+            if (a.sumValues < b.sumValues) return 1;
+            if (a.sumValues > b.sumValues) return -1;
+            return 0;
+        });
+        for (var i = 0, iMax = dataArray.length; i < iMax; i++) {
+            dataArray[i].index = i;            
+        }
+    }
     // Honnan nyíljon ki az animáció?
     if (oldPreparedData && drill.dim === that.dimRToShow && drill.direction === -1) { // Ha sorba való lefúrás történt.
         var oldRowIndex = global.getFromArrayByProperty(oldPreparedData.dataArray, 'id', drill.toId).index;
@@ -537,7 +563,6 @@ panel_table2d.prototype.update = function(data, drill) {
             that.preparedData = undefined;
         } else {
             that.panic(false);
-
             // Fejlécek és cellák kirajzolása.
             that.drawRowHeaders(that.preparedData, trans);
             that.drawColumnHeaders(that.preparedData, trans);

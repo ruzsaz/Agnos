@@ -15,10 +15,10 @@ function panel_line2d(init) {
     this.constructorName = "panel_line2d";
 
     // Inicializáló objektum beolvasása, feltöltése default értékekkel.
-    this.defaultInit = {group: 0, position: undefined, dimx: 0, dimy: 1, val: 0, multiplier: 1, ratio: false, symbols: false, domain: [], domainr: [], mag: 1, fromMag: 1};
+    this.defaultInit = {group: 0, position: undefined, dimx: 0, dimy: 1, val: 0, multiplier: 1, ratio: false, symbols: false, domain: [], domainr: [], mag: 1, frommg: 1};
     this.actualInit = global.combineObjects(that.defaultInit, init);
 
-    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, global.numberOffset, 0); // A Panel konstruktorának meghívása.
+    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], false, true, global.numberOffset, 0); // A Panel konstruktorának meghívása.
 
     this.valToShow = that.actualInit.val;					// Az ennyiedik mutatót mutatja.
     this.valFraction = that.actualInit.ratio;				// Hányadost mutasson, vagy abszolútértéket?

@@ -15,11 +15,11 @@ function panel_map(init) {
     this.constructorName = "panel_map";
 
     // Inicializáló objektum beolvasása, feltöltése default értékekkel.
-    this.defaultInit = {group: 0, position: undefined, dim: 0, val: 0, ratio: false, domain: [], domainr: [], range: undefined, poi: false, visiblePoi: [], mag: 1, fromMag: 1};
+    this.defaultInit = {group: 0, position: undefined, dim: 0, val: 0, ratio: false, domain: [], domainr: [], range: undefined, poi: false, visiblePoi: [], mag: 1, frommg: 1};
     this.actualInit = global.combineObjects(that.defaultInit, init);
     this.isColorsLocked = (that.actualInit.range !== undefined);
 
-    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, 0, 0); // A Panel konstruktorának meghívása.
+    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], false, true, 0, 0); // A Panel konstruktorának meghívása.
     //
     // Ha a kért dimenzió nem ábrázolható, keresünk egy olyat, ami igen.
     if (that.localMeta.dimensions[that.actualInit.dim].is_territorial !== 1) {

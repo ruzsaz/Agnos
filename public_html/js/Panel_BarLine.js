@@ -15,7 +15,7 @@ function panel_barline(init) {
     this.constructorName = "panel_barline";
 
     // Inicializáló objektum beolvasása, feltöltése default értékekkel.
-    this.defaultInit = {group: 0, position: undefined, dim: 0, valbars: [0], vallines: [], valavglines: [], multiplier: 1, ratio: false, streched: false, symbols: false, domain: [], domainr: [], top10: false, mag: 1, fromMag: 1};
+    this.defaultInit = {group: 0, position: undefined, dim: 0, valbars: [0], vallines: [], valavglines: [], multiplier: 1, ratio: false, streched: false, symbols: false, domain: [], domainr: [], top10: false, mag: 1, frommg: 1, sortbyvalue: false};
     this.actualInit = global.combineObjects(that.defaultInit, init);
 
     // Ha széthúzottat kérnek, akkor vonalakat nem rajzolunk és kész.
@@ -29,9 +29,13 @@ function panel_barline(init) {
     this.valAvgToShow = that.actualInit.valavglines;	// Ezek pedig a vonallal ábrázolandó átlagok.
     this.isStretched = that.actualInit.streched;		// 100%-ra széthúzott diagram kell-e?    
     this.buildValueVectors();
+    
+    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], !that.isStretched, !that.singleValMode, global.numberOffset, that.avgTextHeight); // A Panel konstruktorának meghívása.
 
-    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], !that.singleValMode, global.numberOffset, that.avgTextHeight); // A Panel konstruktorának meghívása.
-
+    if (init.sortbyvalue !== false && this.actualInit.top10) {
+        this.sortByValue = true;
+    }    
+    
     this.dimToShow = that.actualInit.dim;				// Ennyiedik dimenzió a panel dimenziója.
     this.valFraction = that.actualInit.ratio;			// Hányadost mutasson?
     this.valBarMultipliers = [];// Ennyiszeresét kell mutatni az értékeknek.
@@ -314,6 +318,25 @@ panel_barline.prototype.sumValueToShow = function(d) {
         val = val + Math.abs(barVals[i].value);
     }
     return val;
+};
+
+/**
+ * Meghatározza a kért sorbarendezéshez szükséges comparator-függvényt.
+ * 
+ * @returns {Function} Az adatelemek sorbarendezéséhez szükséges comparator.
+ */
+panel_barline.prototype.getSortingComparator = function() {
+    var that = this;        
+    if (that.sortByValue) {
+        return function(a, b) {
+            const aValue = that.sumValueToShow(a);
+            const bValue = that.sumValueToShow(b);
+            if (aValue < bValue) return 1;
+            if (aValue > bValue) return -1;
+            return 0;
+        };
+    }
+    return that.cmp;
 };
 
 /**
@@ -646,9 +669,10 @@ panel_barline.prototype.prepareData = function(oldPreparedData, newDataRows, dri
     // Sorbarendezzük az adatokat, ha kell, a top10-et csak.
     if (that.actualInit.top10) {
         newDataRows = that.getTop10(newDataRows); // Első 10 adat kérése és rendezése
-    } else {
-        newDataRows.sort(that.cmp); // Adatok névsorba rendezése.
+        
     }
+    
+    newDataRows.sort(that.getSortingComparator()); // Adatok névsorba rendezése.
 
     // Vízszintes skála beállítása.
     that.xScale.domain([0, newDataRows.length]);
