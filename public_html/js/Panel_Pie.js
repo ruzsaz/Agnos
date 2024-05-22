@@ -15,8 +15,7 @@ function panel_pie(init) {
     this.constructorName = "panel_pie";
 
     // Inicializáló objektum beolvasása, feltöltése default értékekkel.
-    this.defaultInit = {group: 0, position: undefined, dim: 0, val: 0, ratio: false, mag: 1, fromg: 1, sortbyvalue: false};
-    console.log(init)
+    this.defaultInit = {group: 0, position: undefined, dim: 0, val: 0, ratio: false, mag: 1, frommg: 1, sortbyvalue: false};
     this.actualInit = global.combineObjects(that.defaultInit, init);
 
     Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, false, 0, 0); // A Panel konstruktorának meghívása.

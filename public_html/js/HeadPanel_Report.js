@@ -18,7 +18,7 @@ function HeadPanel_Report(init, reportMeta, startScale) {
     this.meta = reportMeta; // A report metája.
     this.localMeta; // A report metájának lefordított változata.
     var trans = d3.transition().duration(global.selfDuration);
-    this.dimLevelsSeparator = " > "; // A dimenzióelemek összefűzésére szolgáló sztring lefúráskor.
+    this.dimLevelsSeparator = " ➜ "; // A dimenzióelemek összefűzésére szolgáló sztring lefúráskor.
     this.dimLevelPlaceholder = "..."; // A túl hosszú dimenzióelemeket erre cseréljük megjelenítéskor.
 
     // Panel regisztrálása a nyilvántartóba.
@@ -422,7 +422,7 @@ HeadPanel_Report.prototype.prepareData = function (data) {
     // Tooltip hozzáadása a dimenzió tábla soraihoz.
     that.dimTable.selectAll(".row").data(dimData)
             .attr("tooltip", function (d, i) {
-                return "<html><h4>" + that.localMeta.dimensions[i].description + ": <em>" + d.text + "</em></h4></html>";
+                return "<html><h4>" + that.localMeta.dimensions[i].description + ": <em>" + d.text.replace(/[^➜]*➜ /, "") + "</em></h4></html>";
             });
 
     // Értékek aktuális értékeinek elkészítése.

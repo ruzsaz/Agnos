@@ -118,7 +118,7 @@ function panel_horizontalbar(init) {
             .attr("y1", 0)
             .attr("x2", 0)
             .attr("y2", that.height);
-    
+
     // Függőleges tengelyre a dimenzió ráírása.
     this.axisYCaption = that.svg.insert("svg:text", ".title_group")
             .attr("class", "dimensionLabel noEvents")

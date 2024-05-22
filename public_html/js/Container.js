@@ -591,7 +591,13 @@ Container.prototype.addPanel = function(side, panelType) {
                     break;                    
                 case 'markedline2panel':
                     new panel_line2d({group: side, position: firstFreeId, dimx: guessedDim, dimy: this.dataDirector[side].guessDimension(guessedDim), symbols: true});
-                    break;                                        
+                    break;
+                case 'sankey2panel':
+                    new panel_sankey({group: side, position: firstFreeId, dim: [0,1]});
+                    break;
+                case 'sankey3panel':
+                    new panel_sankey({group: side, position: firstFreeId, dim: [0,1,2]});
+                    break;
             }
         }
         global.mainToolbar_refreshState();

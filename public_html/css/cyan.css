@@ -436,6 +436,14 @@ mask path {
 .mapHolder.labels.opaque {
   opacity: 0.1;
 }
+/* Panel_Sankey */
+g.sankey_links .link {
+  stroke: cyan;
+  fill: none;
+}
+g.sankey_nodes_shadow .nodeShadow {
+  fill: #000000;
+}
 .gPoi.noText text {
   display: none;
   opacity: 0;

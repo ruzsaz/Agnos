@@ -7,6 +7,7 @@
  * 
  * @param {Object} panelInitString A panelt inicializáló objektum.
  * @param {Object} mediator A panel számára rendelkezésre álló mediátor.
+ * @param {Boolean} isShortingByValueEnabled Engedélyezett-e a sorbarendezés-váltó?
  * @param {Boolean} isLegendRequired Kell-e alul helyet kihagyni a jelkulcsnak?
  * @param {Number} leftOffset Bal oldali üresen hagyandó terület (margó) pixelben.
  * @param {Number} rightOffset Jobb oldali üresen hagyandó terület (margó) pixelben.
@@ -82,7 +83,7 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
                 .style("left", "0px")
                 .style("top", "0px")
                 .on("end", function() {
-                    that.actualInit.fromMag = 1;
+                    that.actualInit.frommg = 1;
                     d3.select(this)
                             .style("z-index", null);
                 });
@@ -448,10 +449,10 @@ Panel.prototype.magnifyPanel = function(panelId) {
         var origMag = that.actualInit.mag;
         if (origMag === 1) {
             that.actualInit.mag = that.doubleMultiplier;
-            that.actualInit.fromMag = 1;
+            that.actualInit.frommg = 1;
         } else {
             that.actualInit.mag = 1;
-            that.actualInit.fromMag = that.doubleMultiplier;
+            that.actualInit.frommg = that.doubleMultiplier;
         }
 
         // Elkészítjük a nagyított panel config-sztringjét, és beleírjuk a pozíciót is.

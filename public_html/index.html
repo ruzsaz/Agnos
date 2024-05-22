@@ -8,7 +8,7 @@
 
         <!-- A kezdő stílusfájl betöltése cookie-ból-->
         <script>
-            var fileName = "css/black.css?ver=3.11"; // default érték
+            var fileName = "css/black.css?ver=4.0.0"; // default érték
             var name = "css";
             name = name + "=";
             var decodedCookie = decodeURIComponent(document.cookie);
@@ -138,9 +138,9 @@
         <script>
             'use strict';
             var numberOfLoadedResources = 0;	// A már betöltött külső js-ek száma.
-            var numberOfResources = 34;			// Az összes betöltendő külső js-ek száma.
+            var numberOfResources = 36;			// Az összes betöltendő külső js-ek száma.
             var finalThreads = 3;				// Ennyi betöltési szálnak kell lefutnia az elinduláshoz.
-            var version = "4.2.0";
+            var version = "4.3.0";
             var min = "";           // "" vagy "min." attól függően, hogy a minify-s verziók kellenek-e?     
             var keycloak;
 
@@ -249,6 +249,7 @@
                     "js/libs/mediator-0.9.6/mediator.min.js",
                     "js/libs/topojson/topojson.min.js",
                     "js/libs/lz-string-1.3.0/lz-string." + min + "js",
+                    "js/libs/d3-sankey/d3-sankey." + min + "js",
                     "js/libs/saveassvg/saveSvgAsPng." + min + "js",
                 ], loadLevel2);
             }
@@ -297,7 +298,8 @@
                     "js/Panel_Table1D." + min + "js",
                     "js/Panel_Bar2D." + min + "js",
                     "js/Panel_Line2D." + min + "js",
-                    "js/Panel_Table2D." + min + "js"
+                    "js/Panel_Table2D." + min + "js",
+                    "js/Panel_Sankey." + min + "js",
                 ], loadLevelLast);
             }
 
@@ -791,6 +793,34 @@
             <line x1="1" y1="23" x2="31" y2="23" stroke-dasharray="6, 8, 2, 5, 2, 5, 2, 5"/>
             <line x1="1" y1="28" x2="31" y2="28" stroke-dasharray="6, 8, 2, 5, 2, 5, 2, 5"/>
             </g> 
+            
+            <g id="icon_panel_sankey_2d">
+            <rect y="4" x="1" height="4" width="4"/>
+            <rect y="11" x="1" height="4" width="4"/>
+            <rect y="18" x="1" height="9" width="4"/>   
+            <rect y="4" x="27" height="12" width="4"/>
+            <rect y="20" x="27" height="7" width="4"/>
+            <path d="M5,5 C16,5, 16,5, 27,5" opacity="0.3" stroke-width="4" stroke-linecap="butt"></path>
+            <path d="M5,8 C16,8, 16,20, 27,20" opacity="0.3" stroke-width="2" stroke-linecap="butt"></path>
+            <path d="M5,11 C16,11 ,16,8, 27,8" opacity="0.3" stroke-width="2" stroke-linecap="butt"></path>
+            <path d="M5,14 C16,14 ,16,23, 27,23" opacity="0.3" stroke-width="4" stroke-linecap="butt"></path>
+            <path d="M5,24 C16,24 ,16,13, 27,13" opacity="0.3" stroke-width="8" stroke-linecap="butt"></path>
+            <path d="M5,18.5 C16,18.5 ,16,26.5, 27,26.5" opacity="0.3" stroke-width="3" stroke-linecap="butt"></path>            
+            </g> 
+
+            <g id="icon_panel_sankey_3d">
+            <rect y="4" x="1" height="4" width="4"/>
+            <rect y="11" x="1" height="4" width="4"/>
+            <rect y="18" x="1" height="9" width="4"/> 
+            <rect y="4" x="27" height="12" width="4"/>
+            <rect y="20" x="27" height="7" width="4"/>
+            <rect y="5" x="14" height="21" width="4"/>
+            <path d="M5,6 C11,6, 11,7, 15,7" opacity="0.3" stroke-width="6" stroke-linecap="butt"></path>
+            <path d="M5,13 C11,13, 11,13, 15,13" opacity="0.3" stroke-width="6" stroke-linecap="butt"></path>            
+            <path d="M5,22.5 C11,22.5 ,11,21.5, 15,21.5" opacity="0.3" stroke-width="11" stroke-linecap="butt"></path>
+            <path d="M17,11 C22,11 ,22,10, 27,10" opacity="0.3" stroke-width="14" stroke-linecap="butt"></path>
+            <path d="M17,22.5 C22,22.5 ,22,23.5, 27,23.5" opacity="0.3" stroke-width="9" stroke-linecap="butt"></path>    
+            </g>                       
 
             <g id="icon_colorscheme_base">
             <path d="M 18.68,6.138 C 23.52,6.299 28.85,10.59 29.34,15.06 29.82,19.52 25.47,24.16 21.85,25.6 18.24,27.03 15.38,25.26 14.92,23.53 14.46,21.8 16.41,20.11 15.19,18.52 13.98,16.92 9.586,15.42 9.556,12.68 9.525,9.946 13.85,5.977 18.68,6.138 Z"/>

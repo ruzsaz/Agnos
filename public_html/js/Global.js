@@ -811,6 +811,24 @@ var global = function () {
         return text;
     };
 
+
+    
+    var sort_unique = function (arr, sortby){
+        var A1 = arr.slice();
+        A1 = (typeof sortby === 'function') ? A1.sort(sortby): A1.sort();
+
+        var last = A1.shift(), next, A2 = [last];
+        while (A1.length) {
+            next = A1.shift();
+            while (next === last) next = A1.shift();
+            if (next !== undefined){
+                A2[A2.length] = next;
+                last = next;
+            }
+        }
+        return A2;
+    };
+
     /**
      * Megkeresi egy tömb elemét a nyelvkód alapján. Ha adott nyelvkódú nincs, akkor a
      * "" nyelvkódut adja vissza. Ha az sincs, akkor a tömb első elemét.
@@ -868,7 +886,33 @@ var global = function () {
         }
         return returnIndex;
     };
-
+    
+    /**
+     * Megkeresi egy tömb elemének indexét az elem néhány property-je alapján.
+     * 
+     * @param {Array} array A tömb.
+     * @param {[String]} properties Az elemek property-jei, aminek az értékeit vizsgáljuk.
+     * @param {[Object]} values A keresett értékek tömbje.
+     * @returns {Integer} A tömb első eleme, amelynek .property -jei = value-k.
+     */
+    var positionInArrayByProperties = function (array, properties, values) {
+        const length = properties.length;
+        for (var i = 0, iMax = array.length; i < iMax; i++) {
+            var found = true;
+            for (var j = 0; j < length; j++) {
+                if (array[i][properties[j]] !== values[j]) {
+                    found = false;                    
+                    break;
+                }
+            }
+            if (found) {
+                return i;
+            }            
+        }
+        return -1;
+    };
+    
+    
     /**
      * Egy objektum-tömbből egy tömböt csinál, amely az objektumok egyik propertyeit tartalmazza.
      * 
@@ -992,6 +1036,7 @@ var global = function () {
             ['panel_map', 'PM'],
             ['panel_table1d', 'PT1'],
             ['panel_table2d', 'PT2'],
+            ['panel_sankey', 'PS'],
             ['group:', 'A:'],
             ['position:', 'B:'],
             ['dim:', 'C:'],
@@ -1482,6 +1527,7 @@ var global = function () {
         tooltip: undefined, // Épp aktuális tooltip törzse, html.
         maxEntriesIn1D: 350,
         maxEntriesIn2D: 10000,
+        maxEntriesIn3D: 20000,        
         niceX: 4, // A vízszintes skála kerekítési finomsága
         niceY: 3, // A függőleges skála kerekítési finomsága (ha csak 1 dim. van, ez használatos)
         captionDistance: 10, // A tengelyekre írandó dimenziónév függőleges távolsága a tengelytől
@@ -1503,8 +1549,10 @@ var global = function () {
         getFromArrayByLang: getFromArrayByLang, // Megkeresi egy tömb elemét a nyalvkód alapján.
         getFromArrayByProperty: getFromArrayByProperty, // Megkeresi egy tömb elemét az elem egyik property-je alapján.
         positionInArrayByProperty: positionInArrayByProperty, // Megkeresi egy tömb elemének indexét az elem egyik property-je alapján.
+        positionInArrayByProperties: positionInArrayByProperties, // Megkeresi egy tömb elemének indexét az elem néhány property-je alapján.
         positionInArray: positionInArray, // Megnézi, hogy a tömb hányadik eleme egy érték.
         getArrayFromObjectArrayByProperty: getArrayFromObjectArrayByProperty, // Egy objektum-tömbből egy tömböt csinál, amely az objektumok egyik propertyeit tartalmazza.
+        sort_unique: sort_unique,
         valueInRange: valueInRange, // Eldönti, hogy egy érték a [min, max) intervallumba esik-e?
         initGlobals: initGlobals, // Inicializálja a globális változókat a belépés után.
         readableColor: readableColor, //  Olvasható színt választ egy adott háttérszínhez.
