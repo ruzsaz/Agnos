@@ -35,12 +35,10 @@ function panel_sankey(init) {
     for (var i = 0, iMax = this.numberOfDims; i < iMax; i++) {        
         that.dims.push(modDim.indexOf(that.dimsToShow[i]));        
     }
-    
-    this.nodeWidth = 80;
-    this.linkOpacity = 0.3;
-    
+        
     // A sankey-elemeket létrehozó függvény
     this.sankey = d3.sankey()
+            .iterations(0)
             .nodeWidth(that.nodeWidth * that.actualInit.mag)
             .nodePadding(0)
             .nodeId(function (d) {        
@@ -50,6 +48,19 @@ function panel_sankey(init) {
                         return n.columnIndex;
                     })
             .size([that.width, that.height]);
+
+    // Az oszlopok árnyékához létrehozandó kamu-gráf
+    const nodes = [];
+    const links = [];
+    for (var j = 0, jMax = that.numberOfDims; j < jMax; j++) {
+        nodes.push({"uniqueId": j, "columnIndex": j});        
+        if (j > 0) {
+            links.push({"source": (j-1), "target": j, "value": 1});
+        }
+        
+    }    
+    this.shadowGraph = that.sankey({"nodes": nodes, "links": links});
+
 
     // Alaprétegek. Annyi, ahány dimenziós a sankey.
     for (let i = 0, iMax = this.numberOfDims; i < iMax; i++) {
@@ -74,18 +85,17 @@ function panel_sankey(init) {
     this.gLinks = that.svg.insert("svg:g", ".title_group")
             .attr("class", "sankey_links")
             .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");
-    this.gNodesShadow = that.svg.insert("svg:g", ".title_group")
-            .attr("class", "sankey_nodes_shadow")
-            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");        
-    this.gNodes = that.svg.insert("svg:g", ".title_group")
-            .attr("class", "sankey_nodes")
-            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");
-
+    this.gNodes = that.svg;
 
     // Feliratok rétege.
     this.gLabels = that.svg.insert("svg:g", ".title_group")
             .attr("class", "axisX axis noEvents")
             .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");
+    
+    // Oszlopok alá a dimenzió ráírása.
+    this.axisCaptions = that.svg.insert("svg:g", ".title_group")
+            .attr("class", "dimensionLabel noEvents")
+            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");    
 
 
     // Feliratkozás a mediátorokra.
@@ -104,7 +114,7 @@ function panel_sankey(init) {
     // Panel regisztrálása a nyilvántartóba.
     that.mediator.publish("register", that, that.panelId, that.dimsToShow, that.preUpdate, that.update, that.getConfig);
     
-    this.drawNodeShadows();
+//    this.drawNodeShadows();
 }
 
 //////////////////////////////////////////////////
@@ -113,6 +123,8 @@ function panel_sankey(init) {
 
 {
     panel_sankey.prototype = global.subclassOf(Panel); // A Panel metódusainak átvétele.    
+    panel_sankey.prototype.nodeWidth = 80;
+    panel_sankey.prototype.linkOpacity = 0.35;
 }
 
 //////////////////////////////////////////////////
@@ -147,10 +159,11 @@ panel_sankey.prototype.valueToShow = function (d) {
  * 
  * @returns {Function} Az adatelemek sorbarendezéséhez szükséges comparator.
  */
-panel_sankey.prototype.getSortingComparator = function() {
+panel_sankey.prototype.getNodeSortingComparator = function() {
     var that = this;            
     if (that.sortByValue) {        
-        return function(a, b) {            
+        return function(a, b) {
+            if (a.columnIndex !== b.columnIndex) return global.realCompare(a.columnIndex.toString(), b.columnIndex.toString());
             const aValue = a.value;
             const bValue = b.value;
             if (aValue < bValue) return 1;
@@ -159,29 +172,43 @@ panel_sankey.prototype.getSortingComparator = function() {
         };
     } else {
         return function(a, b) {
-            return global.realCompare(a.name, b.name);                                    
+            return global.realCompare(a.columnIndex + a.name, b.columnIndex + b.name);                                    
         };
     }        
 };
 
+panel_sankey.prototype.getLinkSortingComparator = function(nodeSortingComparator) {
+    return function(a, b) {
+        if (a.source.index === b.source.index) {
+            return nodeSortingComparator(a.target, b.target);
+        }
+        if (a.target.index === b.target.index) {
+            return nodeSortingComparator(a.source, b.source);
+        }
+        return 0;
+    };        
+};
+
+
 /**
  * Egy elemhez tartozó tooltipet legyártó függvény;
  * 
- * @param {Object} d Az elem.
+ * @param {Object} node Az elem.
  * @returns {String} A megjelenítendő tooltip.
  */
-panel_sankey.prototype.getTooltip = function (d) {
+panel_sankey.prototype.getTooltip = function (node) {
     var that = this;
-    var unitProperty = (d.value === 1) ? "unit" : "unitPlural";
+    console.log(node);
+    var unitProperty = (node.value === 1) ? "unit" : "unitPlural";
     return that.createTooltip(
             [{
-                    name: "that.localMeta.dimensions[that.dimsToShow].description",
-                    value: '(d.name) ? d.name : _("Nincs adat")'
+                    name: that.localMeta.dimensions[that.dimsToShow[node.columnIndex]].description,
+                    value: (node.name) ? node.name : _("Nincs adat")
                 }],
             [{
-                    name: 'that.localMeta.indicators[that.valToShow].description',
-                    value: d.originalValue,
-                    dimension: '((that.valFraction) ? that.localMeta.indicators[that.valToShow].fraction[unitProperty] : that.localMeta.indicators[that.valToShow].value[unitProperty])'
+                    name: that.localMeta.indicators[that.valToShow].description,
+                    value: node.value,
+                    dimension: ((that.valFraction) ? that.localMeta.indicators[that.valToShow].fraction[unitProperty] : that.localMeta.indicators[that.valToShow].value[unitProperty])
                 }]
             );
 };
@@ -243,14 +270,19 @@ panel_sankey.prototype.preUpdate = function (drill) {
  */
 panel_sankey.prototype.prepareData = function (oldData, newDataRows, drill) {
     var that = this;
-    
-    var inputGraph = that.grapFromDataRows(newDataRows);
-    that.sankey.nodeSort(this.getSortingComparator());
-               
-    return that.sankey(inputGraph);
+    console.log(newDataRows)
+    const nodeSortingComparator = that.getNodeSortingComparator();
+    const linkSortingComparator = that.getLinkSortingComparator(nodeSortingComparator);
+    that.sankey.nodeSort(nodeSortingComparator).linkSort(linkSortingComparator);
+        
+    const sankeyGraph = that.sankey(that.sankey(that.graphFromDataRows(newDataRows)));    
+    sankeyGraph.nodes.sort(nodeSortingComparator);
+    that.addGapsToGraph(sankeyGraph);
+    that.addTooltips(sankeyGraph);
+    return sankeyGraph;
 };
 
-panel_sankey.prototype.grapFromDataRows = function (dataRows) {
+panel_sankey.prototype.graphFromDataRows = function (dataRows) {
     const that = this;
     var nodes = [];
     for (var j = 0, jMax = that.numberOfDims; j < jMax; j++) {
@@ -273,7 +305,7 @@ panel_sankey.prototype.grapFromDataRows = function (dataRows) {
                     id: actualNode.id,
                     uniqueId: j + "N" + actualNode.id,
                     name: actualNode.name.trim(),
-                    tooltip: "<html>" + actualNode.name.trim() + "</html>"
+                    tooltip: undefined
                 };
                 nodes[j].push(nodeElement);
             }                        
@@ -304,6 +336,59 @@ panel_sankey.prototype.grapFromDataRows = function (dataRows) {
         unitedNodes = unitedNodes.concat(nodes[j]);
     }
     return {nodes: unitedNodes, links: links};
+};
+
+panel_sankey.prototype.addGapsToGraph = function (graph) {
+    const that = this;
+    const allGap = that.height / 15;
+    const contraction = (that.height - allGap) / that.height;
+
+    const nodes = graph.nodes;
+    var idx = -1;
+    var lastColIdx = -1;
+    var elementsInColumn = -1;
+    var nextStart = -1;
+    
+    for (var i = 0, iMax = nodes.length; i < iMax; i++) {
+        const node = nodes[i];
+        if (node.columnIndex !== lastColIdx) {
+            idx = -1;
+            lastColIdx = node.columnIndex;
+            elementsInColumn = 0;            
+            for (var j = i; j < iMax && nodes[j].columnIndex === lastColIdx; j++) {
+                elementsInColumn++;
+            }
+            nextStart = allGap / elementsInColumn / 2;
+        }
+        idx++;
+        const newHeight = (node.y1 - node.y0) * contraction;
+        const translation = node.y0 - nextStart;
+        const oldStart = node.y0;
+        node.y0 = nextStart;
+        node.y1 = node.y0 + newHeight;
+                
+        for (var j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
+            const link = node.sourceLinks[j];
+            const height = link.y1 - link.y0;
+            link.y0 = (link.y0 - oldStart) * contraction + nextStart;
+            link.width = link.width * contraction;                        
+        }
+        
+        for (var j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
+            const link = node.targetLinks[j];            
+            link.y1 = (link.y1 - oldStart) * contraction + nextStart;            
+        }
+        
+        nextStart = node.y1 + allGap / elementsInColumn;
+    }
+};
+
+panel_sankey.prototype.addTooltips = function (graph) {
+    var that = this;
+    for (var i = 0, iMax = graph.nodes.length; i < iMax; i++) {
+        const node = graph.nodes[i];
+        node.tooltip = that.getTooltip(node);
+    }    
 };
 
 
@@ -340,6 +425,7 @@ panel_sankey.prototype.update = function (data, drill) {
             var trans = d3.transition().duration(tweenDuration);
             that.drawSankey(that.preparedData, trans);
             that.drawLabels(that.preparedData, trans);
+            that.drawAxes(that.preparedData, trans);
         } else {
             that.panic(true, _("<html>A változó értéke<br />minden dimenzióban 0.</html>"));
             that.preparedData = undefined;
@@ -349,47 +435,6 @@ panel_sankey.prototype.update = function (data, drill) {
     that.titleBox.update(that.valToShow, titleMeta.caption, titleMeta.value.unitPlural, titleMeta.fraction.unitPlural, that.valFraction, tweenDuration);
 };
 
-
-/**
- * Kirajzolja az oszlopok helyét háttérszínnel, hogy eltakarja a
- * linkekből odakeveredő szemeteket. Csak 1x kell lefuttatni, nem bántjuk.
- * 
- * @returns {undefined}
- */
-panel_sankey.prototype.drawNodeShadows = function () {
-    var that = this;
-    const nodes = [];
-    const links = [];
-    for (var j = 0, jMax = that.numberOfDims; j < jMax; j++) {
-        nodes.push({"uniqueId": j, "columnIndex": j});
-        
-        if (j > 0) {
-            links.push({"source": (j-1), "target": j, "value": 1});
-        }
-        
-    }
-    
-    const shadowGraph = that.sankey({"nodes": nodes, "links": links});
-                
-    var gNodesShadow = this.gNodesShadow.selectAll("rect")
-            .data(shadowGraph.nodes, function (d) {
-                return d.uniqueId;
-            });
-            
-    gNodesShadow.exit()            
-            .remove();        
-            
-    gNodesShadow = gNodesShadow.enter().append("svg:rect")
-            .attr("class", "noEvents")
-            .merge(gNodesShadow);
-    
-    gNodesShadow
-            .attr("x", d => d.x0)
-            .attr("width", d => (d.x1 - d.x0))
-            .attr("y", d => d.y0)
-            .attr("height", d => (d.y1 - d.y0));
-    
-};
 
 /**
  * A körcikkek kirajzolása, animálása.
@@ -410,16 +455,23 @@ panel_sankey.prototype.drawSankey = function (graph, trans) {
             .on("click", null)
             .remove();
     
-    gNodes = gNodes.enter().append("svg:rect")
-            .attr("class", "node bar bordered darkenable listener")
+    gNodes = gNodes.enter().insert("svg:rect", ".sankey_links")            
+            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")")
             .attr("x", d => d.x0)
             .attr("width", d => (d.x1 - d.x0))
             .attr("y", d => d.y0)
             .attr("height", d => (d.y1 - d.y0))
             .merge(gNodes)
+            .attr("class", d => "node bar bordered darkenable listener legendControl" + d.index)
             .attr("fill", d => global.color(d.id))
             .on("click", function(d) {
                 that.drill(d.columnIndex, d);
+            })
+            .on("mouseover", function () {
+                d3.select(this).classed("triggered", true);
+            })
+            .on("mouseout", function () {
+                d3.select(this).classed("triggered", false);
             });
     
     gNodes.transition(trans)
@@ -447,21 +499,51 @@ panel_sankey.prototype.drawSankey = function (graph, trans) {
             .on("click", null)
             .remove();
     
-    gLinks = gLinks.enter().append("svg:path")
-            .attr("class", "link")
+    gLinks = gLinks.enter().append("svg:path")            
             .attr("d", d3.sankeyLinkHorizontal())
             .attr("opacity", 0)
-            //.attr("stroke", "white")
             .attr("stroke-width", function(d) { return d.width; })
-            //.attr("fill", "none")
-            .merge(gLinks);
+            .merge(gLinks)
+            .attr("class", d => "link controlled controlled" + d.source.index + " controlled" + d.target.index);
 
-    gLinks.transition(trans)
+    gLinks.transition(trans)            
             .attr("d", d3.sankeyLinkHorizontal())
             .attr("stroke-width", function(d) { return d.width; })
             .attr("opacity", that.linkOpacity);
     
 
+};
+
+/**
+ * A dimenzió feliratok kiírása.
+ * 
+ * @param {Object} graph A panel által megjelenítendő, feldolgozott adatok.
+ * @param {Object} trans Az animáció objektum, amelyhez csatlakozni fog.
+ * @returns {undefined}
+ */
+panel_sankey.prototype.drawAxes = function (graph, trans) { 
+    var that = this;
+    
+    var dimCaptions = [];    
+    for (let i = 0, iMax = this.numberOfDims; i < iMax; i++) {
+        dimCaptions.push(that.localMeta.dimensions[that.dimsToShow[i]].caption);
+    }
+    
+    var axisCaptions = that.axisCaptions.selectAll("text")
+            .data(dimCaptions);
+            
+    axisCaptions.exit()            
+            .remove();        
+            
+    axisCaptions = axisCaptions.enter().append("svg:text")
+            .attr("class", "noEvents")
+            .merge(axisCaptions);
+    
+    axisCaptions
+            .attr("x", (d, i) => this.shadowGraph.nodes[i].x0)            
+            .attr("y", 0)
+            .attr("dy", '-0.4ex')
+            .text(d => d);            
 };
 
 /**
@@ -516,10 +598,7 @@ panel_sankey.prototype.drawLabels = function (graph, trans) {
             });
 
     // A szövegek összenyomása, hogy elférjenek.    
-    global.cleverCompress(gLabels, that.sankey.nodeWidth(), 0.9, undefined, false, false, 80);
-    
-   
-
+    global.cleverCompress(gLabels, that.sankey.nodeWidth(), 0.9, undefined, false, false, 80);       
 };
 
 //////////////////////////////////////////////////

@@ -439,6 +439,7 @@ mask path {
 g.sankey_links .link {
   stroke: white;
   fill: none;
+  clip-path: border-box;
 }
 g.sankey_nodes_shadow .nodeShadow {
   fill: #343434;
@@ -895,459 +896,1212 @@ text {
 .darkenable:hover {
   opacity: 0.7;
 }
-/* Panel_BarLine, Bar2Panel, HoritzontalBarPanel */
+/* Panel_BarLine, Bar2Panel, HoritzontalBarPanel, SankeyPanel */
 .legendControl0.triggered ~ * .controlled:not(.controlled0) {
   opacity: 0.1;
+}
+.legendControl0.triggered ~ * .link.controlled:not(.controlled0) {
+  opacity: 0.04;
 }
 .legendControl1.triggered ~ * .controlled:not(.controlled1) {
   opacity: 0.1;
 }
+.legendControl1.triggered ~ * .link.controlled:not(.controlled1) {
+  opacity: 0.04;
+}
 .legendControl2.triggered ~ * .controlled:not(.controlled2) {
   opacity: 0.1;
+}
+.legendControl2.triggered ~ * .link.controlled:not(.controlled2) {
+  opacity: 0.04;
 }
 .legendControl3.triggered ~ * .controlled:not(.controlled3) {
   opacity: 0.1;
 }
+.legendControl3.triggered ~ * .link.controlled:not(.controlled3) {
+  opacity: 0.04;
+}
 .legendControl4.triggered ~ * .controlled:not(.controlled4) {
   opacity: 0.1;
+}
+.legendControl4.triggered ~ * .link.controlled:not(.controlled4) {
+  opacity: 0.04;
 }
 .legendControl5.triggered ~ * .controlled:not(.controlled5) {
   opacity: 0.1;
 }
+.legendControl5.triggered ~ * .link.controlled:not(.controlled5) {
+  opacity: 0.04;
+}
 .legendControl6.triggered ~ * .controlled:not(.controlled6) {
   opacity: 0.1;
+}
+.legendControl6.triggered ~ * .link.controlled:not(.controlled6) {
+  opacity: 0.04;
 }
 .legendControl7.triggered ~ * .controlled:not(.controlled7) {
   opacity: 0.1;
 }
+.legendControl7.triggered ~ * .link.controlled:not(.controlled7) {
+  opacity: 0.04;
+}
 .legendControl8.triggered ~ * .controlled:not(.controlled8) {
   opacity: 0.1;
+}
+.legendControl8.triggered ~ * .link.controlled:not(.controlled8) {
+  opacity: 0.04;
 }
 .legendControl9.triggered ~ * .controlled:not(.controlled9) {
   opacity: 0.1;
 }
+.legendControl9.triggered ~ * .link.controlled:not(.controlled9) {
+  opacity: 0.04;
+}
 .legendControl10.triggered ~ * .controlled:not(.controlled10) {
   opacity: 0.1;
+}
+.legendControl10.triggered ~ * .link.controlled:not(.controlled10) {
+  opacity: 0.04;
 }
 .legendControl11.triggered ~ * .controlled:not(.controlled11) {
   opacity: 0.1;
 }
+.legendControl11.triggered ~ * .link.controlled:not(.controlled11) {
+  opacity: 0.04;
+}
 .legendControl12.triggered ~ * .controlled:not(.controlled12) {
   opacity: 0.1;
+}
+.legendControl12.triggered ~ * .link.controlled:not(.controlled12) {
+  opacity: 0.04;
 }
 .legendControl13.triggered ~ * .controlled:not(.controlled13) {
   opacity: 0.1;
 }
+.legendControl13.triggered ~ * .link.controlled:not(.controlled13) {
+  opacity: 0.04;
+}
 .legendControl14.triggered ~ * .controlled:not(.controlled14) {
   opacity: 0.1;
+}
+.legendControl14.triggered ~ * .link.controlled:not(.controlled14) {
+  opacity: 0.04;
 }
 .legendControl15.triggered ~ * .controlled:not(.controlled15) {
   opacity: 0.1;
 }
+.legendControl15.triggered ~ * .link.controlled:not(.controlled15) {
+  opacity: 0.04;
+}
 .legendControl16.triggered ~ * .controlled:not(.controlled16) {
   opacity: 0.1;
+}
+.legendControl16.triggered ~ * .link.controlled:not(.controlled16) {
+  opacity: 0.04;
 }
 .legendControl17.triggered ~ * .controlled:not(.controlled17) {
   opacity: 0.1;
 }
+.legendControl17.triggered ~ * .link.controlled:not(.controlled17) {
+  opacity: 0.04;
+}
 .legendControl18.triggered ~ * .controlled:not(.controlled18) {
   opacity: 0.1;
+}
+.legendControl18.triggered ~ * .link.controlled:not(.controlled18) {
+  opacity: 0.04;
 }
 .legendControl19.triggered ~ * .controlled:not(.controlled19) {
   opacity: 0.1;
 }
+.legendControl19.triggered ~ * .link.controlled:not(.controlled19) {
+  opacity: 0.04;
+}
 .legendControl20.triggered ~ * .controlled:not(.controlled20) {
   opacity: 0.1;
+}
+.legendControl20.triggered ~ * .link.controlled:not(.controlled20) {
+  opacity: 0.04;
 }
 .legendControl21.triggered ~ * .controlled:not(.controlled21) {
   opacity: 0.1;
 }
+.legendControl21.triggered ~ * .link.controlled:not(.controlled21) {
+  opacity: 0.04;
+}
 .legendControl22.triggered ~ * .controlled:not(.controlled22) {
   opacity: 0.1;
+}
+.legendControl22.triggered ~ * .link.controlled:not(.controlled22) {
+  opacity: 0.04;
 }
 .legendControl23.triggered ~ * .controlled:not(.controlled23) {
   opacity: 0.1;
 }
+.legendControl23.triggered ~ * .link.controlled:not(.controlled23) {
+  opacity: 0.04;
+}
 .legendControl24.triggered ~ * .controlled:not(.controlled24) {
   opacity: 0.1;
+}
+.legendControl24.triggered ~ * .link.controlled:not(.controlled24) {
+  opacity: 0.04;
 }
 .legendControl25.triggered ~ * .controlled:not(.controlled25) {
   opacity: 0.1;
 }
+.legendControl25.triggered ~ * .link.controlled:not(.controlled25) {
+  opacity: 0.04;
+}
 .legendControl26.triggered ~ * .controlled:not(.controlled26) {
   opacity: 0.1;
+}
+.legendControl26.triggered ~ * .link.controlled:not(.controlled26) {
+  opacity: 0.04;
 }
 .legendControl27.triggered ~ * .controlled:not(.controlled27) {
   opacity: 0.1;
 }
+.legendControl27.triggered ~ * .link.controlled:not(.controlled27) {
+  opacity: 0.04;
+}
 .legendControl28.triggered ~ * .controlled:not(.controlled28) {
   opacity: 0.1;
+}
+.legendControl28.triggered ~ * .link.controlled:not(.controlled28) {
+  opacity: 0.04;
 }
 .legendControl29.triggered ~ * .controlled:not(.controlled29) {
   opacity: 0.1;
 }
+.legendControl29.triggered ~ * .link.controlled:not(.controlled29) {
+  opacity: 0.04;
+}
 .legendControl30.triggered ~ * .controlled:not(.controlled30) {
   opacity: 0.1;
+}
+.legendControl30.triggered ~ * .link.controlled:not(.controlled30) {
+  opacity: 0.04;
 }
 .legendControl31.triggered ~ * .controlled:not(.controlled31) {
   opacity: 0.1;
 }
+.legendControl31.triggered ~ * .link.controlled:not(.controlled31) {
+  opacity: 0.04;
+}
 .legendControl32.triggered ~ * .controlled:not(.controlled32) {
   opacity: 0.1;
+}
+.legendControl32.triggered ~ * .link.controlled:not(.controlled32) {
+  opacity: 0.04;
 }
 .legendControl33.triggered ~ * .controlled:not(.controlled33) {
   opacity: 0.1;
 }
+.legendControl33.triggered ~ * .link.controlled:not(.controlled33) {
+  opacity: 0.04;
+}
 .legendControl34.triggered ~ * .controlled:not(.controlled34) {
   opacity: 0.1;
+}
+.legendControl34.triggered ~ * .link.controlled:not(.controlled34) {
+  opacity: 0.04;
 }
 .legendControl35.triggered ~ * .controlled:not(.controlled35) {
   opacity: 0.1;
 }
+.legendControl35.triggered ~ * .link.controlled:not(.controlled35) {
+  opacity: 0.04;
+}
 .legendControl36.triggered ~ * .controlled:not(.controlled36) {
   opacity: 0.1;
+}
+.legendControl36.triggered ~ * .link.controlled:not(.controlled36) {
+  opacity: 0.04;
 }
 .legendControl37.triggered ~ * .controlled:not(.controlled37) {
   opacity: 0.1;
 }
+.legendControl37.triggered ~ * .link.controlled:not(.controlled37) {
+  opacity: 0.04;
+}
 .legendControl38.triggered ~ * .controlled:not(.controlled38) {
   opacity: 0.1;
+}
+.legendControl38.triggered ~ * .link.controlled:not(.controlled38) {
+  opacity: 0.04;
 }
 .legendControl39.triggered ~ * .controlled:not(.controlled39) {
   opacity: 0.1;
 }
+.legendControl39.triggered ~ * .link.controlled:not(.controlled39) {
+  opacity: 0.04;
+}
 .legendControl40.triggered ~ * .controlled:not(.controlled40) {
   opacity: 0.1;
+}
+.legendControl40.triggered ~ * .link.controlled:not(.controlled40) {
+  opacity: 0.04;
 }
 .legendControl41.triggered ~ * .controlled:not(.controlled41) {
   opacity: 0.1;
 }
+.legendControl41.triggered ~ * .link.controlled:not(.controlled41) {
+  opacity: 0.04;
+}
 .legendControl42.triggered ~ * .controlled:not(.controlled42) {
   opacity: 0.1;
+}
+.legendControl42.triggered ~ * .link.controlled:not(.controlled42) {
+  opacity: 0.04;
 }
 .legendControl43.triggered ~ * .controlled:not(.controlled43) {
   opacity: 0.1;
 }
+.legendControl43.triggered ~ * .link.controlled:not(.controlled43) {
+  opacity: 0.04;
+}
 .legendControl44.triggered ~ * .controlled:not(.controlled44) {
   opacity: 0.1;
+}
+.legendControl44.triggered ~ * .link.controlled:not(.controlled44) {
+  opacity: 0.04;
 }
 .legendControl45.triggered ~ * .controlled:not(.controlled45) {
   opacity: 0.1;
 }
+.legendControl45.triggered ~ * .link.controlled:not(.controlled45) {
+  opacity: 0.04;
+}
 .legendControl46.triggered ~ * .controlled:not(.controlled46) {
   opacity: 0.1;
+}
+.legendControl46.triggered ~ * .link.controlled:not(.controlled46) {
+  opacity: 0.04;
 }
 .legendControl47.triggered ~ * .controlled:not(.controlled47) {
   opacity: 0.1;
 }
+.legendControl47.triggered ~ * .link.controlled:not(.controlled47) {
+  opacity: 0.04;
+}
 .legendControl48.triggered ~ * .controlled:not(.controlled48) {
   opacity: 0.1;
+}
+.legendControl48.triggered ~ * .link.controlled:not(.controlled48) {
+  opacity: 0.04;
 }
 .legendControl49.triggered ~ * .controlled:not(.controlled49) {
   opacity: 0.1;
 }
+.legendControl49.triggered ~ * .link.controlled:not(.controlled49) {
+  opacity: 0.04;
+}
 .legendControl50.triggered ~ * .controlled:not(.controlled50) {
   opacity: 0.1;
+}
+.legendControl50.triggered ~ * .link.controlled:not(.controlled50) {
+  opacity: 0.04;
 }
 .legendControl51.triggered ~ * .controlled:not(.controlled51) {
   opacity: 0.1;
 }
+.legendControl51.triggered ~ * .link.controlled:not(.controlled51) {
+  opacity: 0.04;
+}
 .legendControl52.triggered ~ * .controlled:not(.controlled52) {
   opacity: 0.1;
+}
+.legendControl52.triggered ~ * .link.controlled:not(.controlled52) {
+  opacity: 0.04;
 }
 .legendControl53.triggered ~ * .controlled:not(.controlled53) {
   opacity: 0.1;
 }
+.legendControl53.triggered ~ * .link.controlled:not(.controlled53) {
+  opacity: 0.04;
+}
 .legendControl54.triggered ~ * .controlled:not(.controlled54) {
   opacity: 0.1;
+}
+.legendControl54.triggered ~ * .link.controlled:not(.controlled54) {
+  opacity: 0.04;
 }
 .legendControl55.triggered ~ * .controlled:not(.controlled55) {
   opacity: 0.1;
 }
+.legendControl55.triggered ~ * .link.controlled:not(.controlled55) {
+  opacity: 0.04;
+}
 .legendControl56.triggered ~ * .controlled:not(.controlled56) {
   opacity: 0.1;
+}
+.legendControl56.triggered ~ * .link.controlled:not(.controlled56) {
+  opacity: 0.04;
 }
 .legendControl57.triggered ~ * .controlled:not(.controlled57) {
   opacity: 0.1;
 }
+.legendControl57.triggered ~ * .link.controlled:not(.controlled57) {
+  opacity: 0.04;
+}
 .legendControl58.triggered ~ * .controlled:not(.controlled58) {
   opacity: 0.1;
+}
+.legendControl58.triggered ~ * .link.controlled:not(.controlled58) {
+  opacity: 0.04;
 }
 .legendControl59.triggered ~ * .controlled:not(.controlled59) {
   opacity: 0.1;
 }
+.legendControl59.triggered ~ * .link.controlled:not(.controlled59) {
+  opacity: 0.04;
+}
 .legendControl60.triggered ~ * .controlled:not(.controlled60) {
   opacity: 0.1;
+}
+.legendControl60.triggered ~ * .link.controlled:not(.controlled60) {
+  opacity: 0.04;
 }
 .legendControl61.triggered ~ * .controlled:not(.controlled61) {
   opacity: 0.1;
 }
+.legendControl61.triggered ~ * .link.controlled:not(.controlled61) {
+  opacity: 0.04;
+}
 .legendControl62.triggered ~ * .controlled:not(.controlled62) {
   opacity: 0.1;
+}
+.legendControl62.triggered ~ * .link.controlled:not(.controlled62) {
+  opacity: 0.04;
 }
 .legendControl63.triggered ~ * .controlled:not(.controlled63) {
   opacity: 0.1;
 }
+.legendControl63.triggered ~ * .link.controlled:not(.controlled63) {
+  opacity: 0.04;
+}
 .legendControl64.triggered ~ * .controlled:not(.controlled64) {
   opacity: 0.1;
+}
+.legendControl64.triggered ~ * .link.controlled:not(.controlled64) {
+  opacity: 0.04;
 }
 .legendControl65.triggered ~ * .controlled:not(.controlled65) {
   opacity: 0.1;
 }
+.legendControl65.triggered ~ * .link.controlled:not(.controlled65) {
+  opacity: 0.04;
+}
 .legendControl66.triggered ~ * .controlled:not(.controlled66) {
   opacity: 0.1;
+}
+.legendControl66.triggered ~ * .link.controlled:not(.controlled66) {
+  opacity: 0.04;
 }
 .legendControl67.triggered ~ * .controlled:not(.controlled67) {
   opacity: 0.1;
 }
+.legendControl67.triggered ~ * .link.controlled:not(.controlled67) {
+  opacity: 0.04;
+}
 .legendControl68.triggered ~ * .controlled:not(.controlled68) {
   opacity: 0.1;
+}
+.legendControl68.triggered ~ * .link.controlled:not(.controlled68) {
+  opacity: 0.04;
 }
 .legendControl69.triggered ~ * .controlled:not(.controlled69) {
   opacity: 0.1;
 }
+.legendControl69.triggered ~ * .link.controlled:not(.controlled69) {
+  opacity: 0.04;
+}
 .legendControl70.triggered ~ * .controlled:not(.controlled70) {
   opacity: 0.1;
+}
+.legendControl70.triggered ~ * .link.controlled:not(.controlled70) {
+  opacity: 0.04;
 }
 .legendControl71.triggered ~ * .controlled:not(.controlled71) {
   opacity: 0.1;
 }
+.legendControl71.triggered ~ * .link.controlled:not(.controlled71) {
+  opacity: 0.04;
+}
 .legendControl72.triggered ~ * .controlled:not(.controlled72) {
   opacity: 0.1;
+}
+.legendControl72.triggered ~ * .link.controlled:not(.controlled72) {
+  opacity: 0.04;
 }
 .legendControl73.triggered ~ * .controlled:not(.controlled73) {
   opacity: 0.1;
 }
+.legendControl73.triggered ~ * .link.controlled:not(.controlled73) {
+  opacity: 0.04;
+}
 .legendControl74.triggered ~ * .controlled:not(.controlled74) {
   opacity: 0.1;
+}
+.legendControl74.triggered ~ * .link.controlled:not(.controlled74) {
+  opacity: 0.04;
 }
 .legendControl75.triggered ~ * .controlled:not(.controlled75) {
   opacity: 0.1;
 }
+.legendControl75.triggered ~ * .link.controlled:not(.controlled75) {
+  opacity: 0.04;
+}
 .legendControl76.triggered ~ * .controlled:not(.controlled76) {
   opacity: 0.1;
+}
+.legendControl76.triggered ~ * .link.controlled:not(.controlled76) {
+  opacity: 0.04;
 }
 .legendControl77.triggered ~ * .controlled:not(.controlled77) {
   opacity: 0.1;
 }
+.legendControl77.triggered ~ * .link.controlled:not(.controlled77) {
+  opacity: 0.04;
+}
 .legendControl78.triggered ~ * .controlled:not(.controlled78) {
   opacity: 0.1;
+}
+.legendControl78.triggered ~ * .link.controlled:not(.controlled78) {
+  opacity: 0.04;
 }
 .legendControl79.triggered ~ * .controlled:not(.controlled79) {
   opacity: 0.1;
 }
+.legendControl79.triggered ~ * .link.controlled:not(.controlled79) {
+  opacity: 0.04;
+}
 .legendControl80.triggered ~ * .controlled:not(.controlled80) {
   opacity: 0.1;
+}
+.legendControl80.triggered ~ * .link.controlled:not(.controlled80) {
+  opacity: 0.04;
 }
 .legendControl81.triggered ~ * .controlled:not(.controlled81) {
   opacity: 0.1;
 }
+.legendControl81.triggered ~ * .link.controlled:not(.controlled81) {
+  opacity: 0.04;
+}
 .legendControl82.triggered ~ * .controlled:not(.controlled82) {
   opacity: 0.1;
+}
+.legendControl82.triggered ~ * .link.controlled:not(.controlled82) {
+  opacity: 0.04;
 }
 .legendControl83.triggered ~ * .controlled:not(.controlled83) {
   opacity: 0.1;
 }
+.legendControl83.triggered ~ * .link.controlled:not(.controlled83) {
+  opacity: 0.04;
+}
 .legendControl84.triggered ~ * .controlled:not(.controlled84) {
   opacity: 0.1;
+}
+.legendControl84.triggered ~ * .link.controlled:not(.controlled84) {
+  opacity: 0.04;
 }
 .legendControl85.triggered ~ * .controlled:not(.controlled85) {
   opacity: 0.1;
 }
+.legendControl85.triggered ~ * .link.controlled:not(.controlled85) {
+  opacity: 0.04;
+}
 .legendControl86.triggered ~ * .controlled:not(.controlled86) {
   opacity: 0.1;
+}
+.legendControl86.triggered ~ * .link.controlled:not(.controlled86) {
+  opacity: 0.04;
 }
 .legendControl87.triggered ~ * .controlled:not(.controlled87) {
   opacity: 0.1;
 }
+.legendControl87.triggered ~ * .link.controlled:not(.controlled87) {
+  opacity: 0.04;
+}
 .legendControl88.triggered ~ * .controlled:not(.controlled88) {
   opacity: 0.1;
+}
+.legendControl88.triggered ~ * .link.controlled:not(.controlled88) {
+  opacity: 0.04;
 }
 .legendControl89.triggered ~ * .controlled:not(.controlled89) {
   opacity: 0.1;
 }
+.legendControl89.triggered ~ * .link.controlled:not(.controlled89) {
+  opacity: 0.04;
+}
 .legendControl90.triggered ~ * .controlled:not(.controlled90) {
   opacity: 0.1;
+}
+.legendControl90.triggered ~ * .link.controlled:not(.controlled90) {
+  opacity: 0.04;
 }
 .legendControl91.triggered ~ * .controlled:not(.controlled91) {
   opacity: 0.1;
 }
+.legendControl91.triggered ~ * .link.controlled:not(.controlled91) {
+  opacity: 0.04;
+}
 .legendControl92.triggered ~ * .controlled:not(.controlled92) {
   opacity: 0.1;
+}
+.legendControl92.triggered ~ * .link.controlled:not(.controlled92) {
+  opacity: 0.04;
 }
 .legendControl93.triggered ~ * .controlled:not(.controlled93) {
   opacity: 0.1;
 }
+.legendControl93.triggered ~ * .link.controlled:not(.controlled93) {
+  opacity: 0.04;
+}
 .legendControl94.triggered ~ * .controlled:not(.controlled94) {
   opacity: 0.1;
+}
+.legendControl94.triggered ~ * .link.controlled:not(.controlled94) {
+  opacity: 0.04;
 }
 .legendControl95.triggered ~ * .controlled:not(.controlled95) {
   opacity: 0.1;
 }
+.legendControl95.triggered ~ * .link.controlled:not(.controlled95) {
+  opacity: 0.04;
+}
 .legendControl96.triggered ~ * .controlled:not(.controlled96) {
   opacity: 0.1;
+}
+.legendControl96.triggered ~ * .link.controlled:not(.controlled96) {
+  opacity: 0.04;
 }
 .legendControl97.triggered ~ * .controlled:not(.controlled97) {
   opacity: 0.1;
 }
+.legendControl97.triggered ~ * .link.controlled:not(.controlled97) {
+  opacity: 0.04;
+}
 .legendControl98.triggered ~ * .controlled:not(.controlled98) {
   opacity: 0.1;
+}
+.legendControl98.triggered ~ * .link.controlled:not(.controlled98) {
+  opacity: 0.04;
 }
 .legendControl99.triggered ~ * .controlled:not(.controlled99) {
   opacity: 0.1;
 }
+.legendControl99.triggered ~ * .link.controlled:not(.controlled99) {
+  opacity: 0.04;
+}
 .legendControl100.triggered ~ * .controlled:not(.controlled100) {
   opacity: 0.1;
+}
+.legendControl100.triggered ~ * .link.controlled:not(.controlled100) {
+  opacity: 0.04;
 }
 .legendControl101.triggered ~ * .controlled:not(.controlled101) {
   opacity: 0.1;
 }
+.legendControl101.triggered ~ * .link.controlled:not(.controlled101) {
+  opacity: 0.04;
+}
 .legendControl102.triggered ~ * .controlled:not(.controlled102) {
   opacity: 0.1;
+}
+.legendControl102.triggered ~ * .link.controlled:not(.controlled102) {
+  opacity: 0.04;
 }
 .legendControl103.triggered ~ * .controlled:not(.controlled103) {
   opacity: 0.1;
 }
+.legendControl103.triggered ~ * .link.controlled:not(.controlled103) {
+  opacity: 0.04;
+}
 .legendControl104.triggered ~ * .controlled:not(.controlled104) {
   opacity: 0.1;
+}
+.legendControl104.triggered ~ * .link.controlled:not(.controlled104) {
+  opacity: 0.04;
 }
 .legendControl105.triggered ~ * .controlled:not(.controlled105) {
   opacity: 0.1;
 }
+.legendControl105.triggered ~ * .link.controlled:not(.controlled105) {
+  opacity: 0.04;
+}
 .legendControl106.triggered ~ * .controlled:not(.controlled106) {
   opacity: 0.1;
+}
+.legendControl106.triggered ~ * .link.controlled:not(.controlled106) {
+  opacity: 0.04;
 }
 .legendControl107.triggered ~ * .controlled:not(.controlled107) {
   opacity: 0.1;
 }
+.legendControl107.triggered ~ * .link.controlled:not(.controlled107) {
+  opacity: 0.04;
+}
 .legendControl108.triggered ~ * .controlled:not(.controlled108) {
   opacity: 0.1;
+}
+.legendControl108.triggered ~ * .link.controlled:not(.controlled108) {
+  opacity: 0.04;
 }
 .legendControl109.triggered ~ * .controlled:not(.controlled109) {
   opacity: 0.1;
 }
+.legendControl109.triggered ~ * .link.controlled:not(.controlled109) {
+  opacity: 0.04;
+}
 .legendControl110.triggered ~ * .controlled:not(.controlled110) {
   opacity: 0.1;
+}
+.legendControl110.triggered ~ * .link.controlled:not(.controlled110) {
+  opacity: 0.04;
 }
 .legendControl111.triggered ~ * .controlled:not(.controlled111) {
   opacity: 0.1;
 }
+.legendControl111.triggered ~ * .link.controlled:not(.controlled111) {
+  opacity: 0.04;
+}
 .legendControl112.triggered ~ * .controlled:not(.controlled112) {
   opacity: 0.1;
+}
+.legendControl112.triggered ~ * .link.controlled:not(.controlled112) {
+  opacity: 0.04;
 }
 .legendControl113.triggered ~ * .controlled:not(.controlled113) {
   opacity: 0.1;
 }
+.legendControl113.triggered ~ * .link.controlled:not(.controlled113) {
+  opacity: 0.04;
+}
 .legendControl114.triggered ~ * .controlled:not(.controlled114) {
   opacity: 0.1;
+}
+.legendControl114.triggered ~ * .link.controlled:not(.controlled114) {
+  opacity: 0.04;
 }
 .legendControl115.triggered ~ * .controlled:not(.controlled115) {
   opacity: 0.1;
 }
+.legendControl115.triggered ~ * .link.controlled:not(.controlled115) {
+  opacity: 0.04;
+}
 .legendControl116.triggered ~ * .controlled:not(.controlled116) {
   opacity: 0.1;
+}
+.legendControl116.triggered ~ * .link.controlled:not(.controlled116) {
+  opacity: 0.04;
 }
 .legendControl117.triggered ~ * .controlled:not(.controlled117) {
   opacity: 0.1;
 }
+.legendControl117.triggered ~ * .link.controlled:not(.controlled117) {
+  opacity: 0.04;
+}
 .legendControl118.triggered ~ * .controlled:not(.controlled118) {
   opacity: 0.1;
+}
+.legendControl118.triggered ~ * .link.controlled:not(.controlled118) {
+  opacity: 0.04;
 }
 .legendControl119.triggered ~ * .controlled:not(.controlled119) {
   opacity: 0.1;
 }
+.legendControl119.triggered ~ * .link.controlled:not(.controlled119) {
+  opacity: 0.04;
+}
 .legendControl120.triggered ~ * .controlled:not(.controlled120) {
   opacity: 0.1;
+}
+.legendControl120.triggered ~ * .link.controlled:not(.controlled120) {
+  opacity: 0.04;
 }
 .legendControl121.triggered ~ * .controlled:not(.controlled121) {
   opacity: 0.1;
 }
+.legendControl121.triggered ~ * .link.controlled:not(.controlled121) {
+  opacity: 0.04;
+}
 .legendControl122.triggered ~ * .controlled:not(.controlled122) {
   opacity: 0.1;
+}
+.legendControl122.triggered ~ * .link.controlled:not(.controlled122) {
+  opacity: 0.04;
 }
 .legendControl123.triggered ~ * .controlled:not(.controlled123) {
   opacity: 0.1;
 }
+.legendControl123.triggered ~ * .link.controlled:not(.controlled123) {
+  opacity: 0.04;
+}
 .legendControl124.triggered ~ * .controlled:not(.controlled124) {
   opacity: 0.1;
+}
+.legendControl124.triggered ~ * .link.controlled:not(.controlled124) {
+  opacity: 0.04;
 }
 .legendControl125.triggered ~ * .controlled:not(.controlled125) {
   opacity: 0.1;
 }
+.legendControl125.triggered ~ * .link.controlled:not(.controlled125) {
+  opacity: 0.04;
+}
 .legendControl126.triggered ~ * .controlled:not(.controlled126) {
   opacity: 0.1;
+}
+.legendControl126.triggered ~ * .link.controlled:not(.controlled126) {
+  opacity: 0.04;
 }
 .legendControl127.triggered ~ * .controlled:not(.controlled127) {
   opacity: 0.1;
 }
+.legendControl127.triggered ~ * .link.controlled:not(.controlled127) {
+  opacity: 0.04;
+}
 .legendControl128.triggered ~ * .controlled:not(.controlled128) {
   opacity: 0.1;
+}
+.legendControl128.triggered ~ * .link.controlled:not(.controlled128) {
+  opacity: 0.04;
 }
 .legendControl129.triggered ~ * .controlled:not(.controlled129) {
   opacity: 0.1;
 }
+.legendControl129.triggered ~ * .link.controlled:not(.controlled129) {
+  opacity: 0.04;
+}
 .legendControl130.triggered ~ * .controlled:not(.controlled130) {
   opacity: 0.1;
+}
+.legendControl130.triggered ~ * .link.controlled:not(.controlled130) {
+  opacity: 0.04;
 }
 .legendControl131.triggered ~ * .controlled:not(.controlled131) {
   opacity: 0.1;
 }
+.legendControl131.triggered ~ * .link.controlled:not(.controlled131) {
+  opacity: 0.04;
+}
 .legendControl132.triggered ~ * .controlled:not(.controlled132) {
   opacity: 0.1;
+}
+.legendControl132.triggered ~ * .link.controlled:not(.controlled132) {
+  opacity: 0.04;
 }
 .legendControl133.triggered ~ * .controlled:not(.controlled133) {
   opacity: 0.1;
 }
+.legendControl133.triggered ~ * .link.controlled:not(.controlled133) {
+  opacity: 0.04;
+}
 .legendControl134.triggered ~ * .controlled:not(.controlled134) {
   opacity: 0.1;
+}
+.legendControl134.triggered ~ * .link.controlled:not(.controlled134) {
+  opacity: 0.04;
 }
 .legendControl135.triggered ~ * .controlled:not(.controlled135) {
   opacity: 0.1;
 }
+.legendControl135.triggered ~ * .link.controlled:not(.controlled135) {
+  opacity: 0.04;
+}
 .legendControl136.triggered ~ * .controlled:not(.controlled136) {
   opacity: 0.1;
+}
+.legendControl136.triggered ~ * .link.controlled:not(.controlled136) {
+  opacity: 0.04;
 }
 .legendControl137.triggered ~ * .controlled:not(.controlled137) {
   opacity: 0.1;
 }
+.legendControl137.triggered ~ * .link.controlled:not(.controlled137) {
+  opacity: 0.04;
+}
 .legendControl138.triggered ~ * .controlled:not(.controlled138) {
   opacity: 0.1;
+}
+.legendControl138.triggered ~ * .link.controlled:not(.controlled138) {
+  opacity: 0.04;
 }
 .legendControl139.triggered ~ * .controlled:not(.controlled139) {
   opacity: 0.1;
 }
+.legendControl139.triggered ~ * .link.controlled:not(.controlled139) {
+  opacity: 0.04;
+}
 .legendControl140.triggered ~ * .controlled:not(.controlled140) {
   opacity: 0.1;
+}
+.legendControl140.triggered ~ * .link.controlled:not(.controlled140) {
+  opacity: 0.04;
 }
 .legendControl141.triggered ~ * .controlled:not(.controlled141) {
   opacity: 0.1;
 }
+.legendControl141.triggered ~ * .link.controlled:not(.controlled141) {
+  opacity: 0.04;
+}
 .legendControl142.triggered ~ * .controlled:not(.controlled142) {
   opacity: 0.1;
+}
+.legendControl142.triggered ~ * .link.controlled:not(.controlled142) {
+  opacity: 0.04;
 }
 .legendControl143.triggered ~ * .controlled:not(.controlled143) {
   opacity: 0.1;
 }
+.legendControl143.triggered ~ * .link.controlled:not(.controlled143) {
+  opacity: 0.04;
+}
 .legendControl144.triggered ~ * .controlled:not(.controlled144) {
   opacity: 0.1;
+}
+.legendControl144.triggered ~ * .link.controlled:not(.controlled144) {
+  opacity: 0.04;
 }
 .legendControl145.triggered ~ * .controlled:not(.controlled145) {
   opacity: 0.1;
 }
+.legendControl145.triggered ~ * .link.controlled:not(.controlled145) {
+  opacity: 0.04;
+}
 .legendControl146.triggered ~ * .controlled:not(.controlled146) {
   opacity: 0.1;
+}
+.legendControl146.triggered ~ * .link.controlled:not(.controlled146) {
+  opacity: 0.04;
 }
 .legendControl147.triggered ~ * .controlled:not(.controlled147) {
   opacity: 0.1;
 }
+.legendControl147.triggered ~ * .link.controlled:not(.controlled147) {
+  opacity: 0.04;
+}
 .legendControl148.triggered ~ * .controlled:not(.controlled148) {
   opacity: 0.1;
+}
+.legendControl148.triggered ~ * .link.controlled:not(.controlled148) {
+  opacity: 0.04;
 }
 .legendControl149.triggered ~ * .controlled:not(.controlled149) {
   opacity: 0.1;
 }
+.legendControl149.triggered ~ * .link.controlled:not(.controlled149) {
+  opacity: 0.04;
+}
 .legendControl150.triggered ~ * .controlled:not(.controlled150) {
   opacity: 0.1;
+}
+.legendControl150.triggered ~ * .link.controlled:not(.controlled150) {
+  opacity: 0.04;
+}
+.legendControl151.triggered ~ * .controlled:not(.controlled151) {
+  opacity: 0.1;
+}
+.legendControl151.triggered ~ * .link.controlled:not(.controlled151) {
+  opacity: 0.04;
+}
+.legendControl152.triggered ~ * .controlled:not(.controlled152) {
+  opacity: 0.1;
+}
+.legendControl152.triggered ~ * .link.controlled:not(.controlled152) {
+  opacity: 0.04;
+}
+.legendControl153.triggered ~ * .controlled:not(.controlled153) {
+  opacity: 0.1;
+}
+.legendControl153.triggered ~ * .link.controlled:not(.controlled153) {
+  opacity: 0.04;
+}
+.legendControl154.triggered ~ * .controlled:not(.controlled154) {
+  opacity: 0.1;
+}
+.legendControl154.triggered ~ * .link.controlled:not(.controlled154) {
+  opacity: 0.04;
+}
+.legendControl155.triggered ~ * .controlled:not(.controlled155) {
+  opacity: 0.1;
+}
+.legendControl155.triggered ~ * .link.controlled:not(.controlled155) {
+  opacity: 0.04;
+}
+.legendControl156.triggered ~ * .controlled:not(.controlled156) {
+  opacity: 0.1;
+}
+.legendControl156.triggered ~ * .link.controlled:not(.controlled156) {
+  opacity: 0.04;
+}
+.legendControl157.triggered ~ * .controlled:not(.controlled157) {
+  opacity: 0.1;
+}
+.legendControl157.triggered ~ * .link.controlled:not(.controlled157) {
+  opacity: 0.04;
+}
+.legendControl158.triggered ~ * .controlled:not(.controlled158) {
+  opacity: 0.1;
+}
+.legendControl158.triggered ~ * .link.controlled:not(.controlled158) {
+  opacity: 0.04;
+}
+.legendControl159.triggered ~ * .controlled:not(.controlled159) {
+  opacity: 0.1;
+}
+.legendControl159.triggered ~ * .link.controlled:not(.controlled159) {
+  opacity: 0.04;
+}
+.legendControl160.triggered ~ * .controlled:not(.controlled160) {
+  opacity: 0.1;
+}
+.legendControl160.triggered ~ * .link.controlled:not(.controlled160) {
+  opacity: 0.04;
+}
+.legendControl161.triggered ~ * .controlled:not(.controlled161) {
+  opacity: 0.1;
+}
+.legendControl161.triggered ~ * .link.controlled:not(.controlled161) {
+  opacity: 0.04;
+}
+.legendControl162.triggered ~ * .controlled:not(.controlled162) {
+  opacity: 0.1;
+}
+.legendControl162.triggered ~ * .link.controlled:not(.controlled162) {
+  opacity: 0.04;
+}
+.legendControl163.triggered ~ * .controlled:not(.controlled163) {
+  opacity: 0.1;
+}
+.legendControl163.triggered ~ * .link.controlled:not(.controlled163) {
+  opacity: 0.04;
+}
+.legendControl164.triggered ~ * .controlled:not(.controlled164) {
+  opacity: 0.1;
+}
+.legendControl164.triggered ~ * .link.controlled:not(.controlled164) {
+  opacity: 0.04;
+}
+.legendControl165.triggered ~ * .controlled:not(.controlled165) {
+  opacity: 0.1;
+}
+.legendControl165.triggered ~ * .link.controlled:not(.controlled165) {
+  opacity: 0.04;
+}
+.legendControl166.triggered ~ * .controlled:not(.controlled166) {
+  opacity: 0.1;
+}
+.legendControl166.triggered ~ * .link.controlled:not(.controlled166) {
+  opacity: 0.04;
+}
+.legendControl167.triggered ~ * .controlled:not(.controlled167) {
+  opacity: 0.1;
+}
+.legendControl167.triggered ~ * .link.controlled:not(.controlled167) {
+  opacity: 0.04;
+}
+.legendControl168.triggered ~ * .controlled:not(.controlled168) {
+  opacity: 0.1;
+}
+.legendControl168.triggered ~ * .link.controlled:not(.controlled168) {
+  opacity: 0.04;
+}
+.legendControl169.triggered ~ * .controlled:not(.controlled169) {
+  opacity: 0.1;
+}
+.legendControl169.triggered ~ * .link.controlled:not(.controlled169) {
+  opacity: 0.04;
+}
+.legendControl170.triggered ~ * .controlled:not(.controlled170) {
+  opacity: 0.1;
+}
+.legendControl170.triggered ~ * .link.controlled:not(.controlled170) {
+  opacity: 0.04;
+}
+.legendControl171.triggered ~ * .controlled:not(.controlled171) {
+  opacity: 0.1;
+}
+.legendControl171.triggered ~ * .link.controlled:not(.controlled171) {
+  opacity: 0.04;
+}
+.legendControl172.triggered ~ * .controlled:not(.controlled172) {
+  opacity: 0.1;
+}
+.legendControl172.triggered ~ * .link.controlled:not(.controlled172) {
+  opacity: 0.04;
+}
+.legendControl173.triggered ~ * .controlled:not(.controlled173) {
+  opacity: 0.1;
+}
+.legendControl173.triggered ~ * .link.controlled:not(.controlled173) {
+  opacity: 0.04;
+}
+.legendControl174.triggered ~ * .controlled:not(.controlled174) {
+  opacity: 0.1;
+}
+.legendControl174.triggered ~ * .link.controlled:not(.controlled174) {
+  opacity: 0.04;
+}
+.legendControl175.triggered ~ * .controlled:not(.controlled175) {
+  opacity: 0.1;
+}
+.legendControl175.triggered ~ * .link.controlled:not(.controlled175) {
+  opacity: 0.04;
+}
+.legendControl176.triggered ~ * .controlled:not(.controlled176) {
+  opacity: 0.1;
+}
+.legendControl176.triggered ~ * .link.controlled:not(.controlled176) {
+  opacity: 0.04;
+}
+.legendControl177.triggered ~ * .controlled:not(.controlled177) {
+  opacity: 0.1;
+}
+.legendControl177.triggered ~ * .link.controlled:not(.controlled177) {
+  opacity: 0.04;
+}
+.legendControl178.triggered ~ * .controlled:not(.controlled178) {
+  opacity: 0.1;
+}
+.legendControl178.triggered ~ * .link.controlled:not(.controlled178) {
+  opacity: 0.04;
+}
+.legendControl179.triggered ~ * .controlled:not(.controlled179) {
+  opacity: 0.1;
+}
+.legendControl179.triggered ~ * .link.controlled:not(.controlled179) {
+  opacity: 0.04;
+}
+.legendControl180.triggered ~ * .controlled:not(.controlled180) {
+  opacity: 0.1;
+}
+.legendControl180.triggered ~ * .link.controlled:not(.controlled180) {
+  opacity: 0.04;
+}
+.legendControl181.triggered ~ * .controlled:not(.controlled181) {
+  opacity: 0.1;
+}
+.legendControl181.triggered ~ * .link.controlled:not(.controlled181) {
+  opacity: 0.04;
+}
+.legendControl182.triggered ~ * .controlled:not(.controlled182) {
+  opacity: 0.1;
+}
+.legendControl182.triggered ~ * .link.controlled:not(.controlled182) {
+  opacity: 0.04;
+}
+.legendControl183.triggered ~ * .controlled:not(.controlled183) {
+  opacity: 0.1;
+}
+.legendControl183.triggered ~ * .link.controlled:not(.controlled183) {
+  opacity: 0.04;
+}
+.legendControl184.triggered ~ * .controlled:not(.controlled184) {
+  opacity: 0.1;
+}
+.legendControl184.triggered ~ * .link.controlled:not(.controlled184) {
+  opacity: 0.04;
+}
+.legendControl185.triggered ~ * .controlled:not(.controlled185) {
+  opacity: 0.1;
+}
+.legendControl185.triggered ~ * .link.controlled:not(.controlled185) {
+  opacity: 0.04;
+}
+.legendControl186.triggered ~ * .controlled:not(.controlled186) {
+  opacity: 0.1;
+}
+.legendControl186.triggered ~ * .link.controlled:not(.controlled186) {
+  opacity: 0.04;
+}
+.legendControl187.triggered ~ * .controlled:not(.controlled187) {
+  opacity: 0.1;
+}
+.legendControl187.triggered ~ * .link.controlled:not(.controlled187) {
+  opacity: 0.04;
+}
+.legendControl188.triggered ~ * .controlled:not(.controlled188) {
+  opacity: 0.1;
+}
+.legendControl188.triggered ~ * .link.controlled:not(.controlled188) {
+  opacity: 0.04;
+}
+.legendControl189.triggered ~ * .controlled:not(.controlled189) {
+  opacity: 0.1;
+}
+.legendControl189.triggered ~ * .link.controlled:not(.controlled189) {
+  opacity: 0.04;
+}
+.legendControl190.triggered ~ * .controlled:not(.controlled190) {
+  opacity: 0.1;
+}
+.legendControl190.triggered ~ * .link.controlled:not(.controlled190) {
+  opacity: 0.04;
+}
+.legendControl191.triggered ~ * .controlled:not(.controlled191) {
+  opacity: 0.1;
+}
+.legendControl191.triggered ~ * .link.controlled:not(.controlled191) {
+  opacity: 0.04;
+}
+.legendControl192.triggered ~ * .controlled:not(.controlled192) {
+  opacity: 0.1;
+}
+.legendControl192.triggered ~ * .link.controlled:not(.controlled192) {
+  opacity: 0.04;
+}
+.legendControl193.triggered ~ * .controlled:not(.controlled193) {
+  opacity: 0.1;
+}
+.legendControl193.triggered ~ * .link.controlled:not(.controlled193) {
+  opacity: 0.04;
+}
+.legendControl194.triggered ~ * .controlled:not(.controlled194) {
+  opacity: 0.1;
+}
+.legendControl194.triggered ~ * .link.controlled:not(.controlled194) {
+  opacity: 0.04;
+}
+.legendControl195.triggered ~ * .controlled:not(.controlled195) {
+  opacity: 0.1;
+}
+.legendControl195.triggered ~ * .link.controlled:not(.controlled195) {
+  opacity: 0.04;
+}
+.legendControl196.triggered ~ * .controlled:not(.controlled196) {
+  opacity: 0.1;
+}
+.legendControl196.triggered ~ * .link.controlled:not(.controlled196) {
+  opacity: 0.04;
+}
+.legendControl197.triggered ~ * .controlled:not(.controlled197) {
+  opacity: 0.1;
+}
+.legendControl197.triggered ~ * .link.controlled:not(.controlled197) {
+  opacity: 0.04;
+}
+.legendControl198.triggered ~ * .controlled:not(.controlled198) {
+  opacity: 0.1;
+}
+.legendControl198.triggered ~ * .link.controlled:not(.controlled198) {
+  opacity: 0.04;
+}
+.legendControl199.triggered ~ * .controlled:not(.controlled199) {
+  opacity: 0.1;
+}
+.legendControl199.triggered ~ * .link.controlled:not(.controlled199) {
+  opacity: 0.04;
+}
+.legendControl200.triggered ~ * .controlled:not(.controlled200) {
+  opacity: 0.1;
+}
+.legendControl200.triggered ~ * .link.controlled:not(.controlled200) {
+  opacity: 0.04;
 }
 /* DragDrop */
 .hoveredDropTarget {

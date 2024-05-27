@@ -126,7 +126,7 @@
 @appearDuration: 0.2s;
 
 /* Ennyi bejegyzés lehet a legend-ben. */
-@maximalLegendElement: 150;
+@maximalLegendElement: 200;
 
 @tooltipTextColor: white;
 @tooltipValueColor: @panelWriteValueColor;
@@ -481,6 +481,7 @@ mask path {
 g.sankey_links .link {
     stroke: @panelWriteColor;
     fill: none;
+    clip-path: border-box;
 }
 
 g.sankey_nodes_shadow .nodeShadow {
@@ -1005,10 +1006,13 @@ text {
 }
 
 
-/* Panel_BarLine, Bar2Panel, HoritzontalBarPanel */
+/* Panel_BarLine, Bar2Panel, HoritzontalBarPanel, SankeyPanel */
 .generate-legend(@n, @i: 0) when (@i =< @n) {
     .legendControl@{i}.triggered ~ * .controlled:not(.controlled@{i}) {
         opacity: 0.1;
+    }
+    .legendControl@{i}.triggered ~ * .link.controlled:not(.controlled@{i}) {
+        opacity: 0.04;
     }	
     .generate-legend(@n, (@i + 1));
 }
