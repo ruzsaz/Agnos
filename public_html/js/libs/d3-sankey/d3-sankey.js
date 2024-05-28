@@ -446,6 +446,7 @@ exports.sankeyCenter = center;
 exports.sankeyJustify = justify;
 exports.sankeyLeft = left;
 exports.sankeyLinkHorizontal = sankeyLinkHorizontal;
+exports.linkHorizontal = d3Shape.linkHorizontal;
 exports.sankeyRight = right;
 
 Object.defineProperty(exports, '__esModule', { value: true });

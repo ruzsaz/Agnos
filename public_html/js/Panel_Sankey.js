@@ -60,8 +60,7 @@ function panel_sankey(init) {
         
     }    
     this.shadowGraph = that.sankey({"nodes": nodes, "links": links});
-
-
+    
     // Alaprétegek. Annyi, ahány dimenziós a sankey.
     for (let i = 0, iMax = this.numberOfDims; i < iMax; i++) {
         that.svg.insert("svg:g", ".title_group")
@@ -198,7 +197,6 @@ panel_sankey.prototype.getLinkSortingComparator = function(nodeSortingComparator
  */
 panel_sankey.prototype.getTooltip = function (node) {
     var that = this;
-    console.log(node);
     var unitProperty = (node.value === 1) ? "unit" : "unitPlural";
     return that.createTooltip(
             [{
@@ -227,37 +225,40 @@ panel_sankey.prototype.getTooltip = function (node) {
 panel_sankey.prototype.preUpdate = function (drill) {
     var that = this;
 
-/*
     if (drill.direction === -1) { // Lefúrás esetén.
-
-        // Mindent, kivéve amibe fúrunk, letörlünk.
-        that.arc_group.selectAll("path").filter(function (d) {
-            return (d.id !== drill.toId);
-        })
+        
+        // Minden, azonos oszlopbeli node törlése, kivéve, amibe fúrunk (a szövegük is törlődik)
+        that.gNodes.selectAll(".node")
+                .filter(function(d) {
+                    return (that.dimsToShow[d.columnIndex] === drill.dim && d.id !== drill.toId);
+                })
                 .on("click", null)
+                .on("mouseover", null)
+                .on("mouseout", null)
                 .remove();
-
-        that.label_group.selectAll("line, .gPieTick").filter(function (d) {
-            return (d.id !== drill.toId);
-        }).remove();
-
+        
+        // Minden nem érintett link törlése
+        that.gLinks.selectAll(".link")
+                .filter(function(d) {
+                    return ((that.dimsToShow[d.source.columnIndex] === drill.dim || that.dimsToShow[d.target.columnIndex] === drill.dim)
+                            && d.source.id !== drill.toId
+                            && d.target.id !== drill.toId);
+                })
+                .remove();
+                   
     } else if (drill.direction === 1) { // Felfúrás esetén
-
-        // Mindent letörlünk.
-        that.arc_group.selectAll("path")
-                .on("click", null)
-                .remove();
-
-        that.label_group.selectAll("line, .gPieTick").remove();
-
-        // Kirajzolunk egy teljes kört a szülő színével.
-        that.arc_group.selectAll("path").data([1], false)
-                .enter().append("svg:path")
-                .attr("class", "bar bordered darkenable")
-                .attr("fill", global.color(drill.fromId))
-                .attr("d", that.arc({startAngle: 0, endAngle: 2 * Math.PI}));
+        
+        // Mindent a szülő színére színezünk a kifúrás oszlopában.        
+        that.gNodes.selectAll(".node")
+                .filter(function(d) {
+                    return (that.dimsToShow[d.columnIndex] === drill.dim);
+                })
+                .on("click", null)                
+                .on("mouseover", null)
+                .on("mouseout", null)
+                .attr("fill", global.color(drill.fromId));       
     }
-    */
+    
 };
 
 /**
@@ -270,20 +271,108 @@ panel_sankey.prototype.preUpdate = function (drill) {
  */
 panel_sankey.prototype.prepareData = function (oldData, newDataRows, drill) {
     var that = this;
-    console.log(newDataRows)
+    //console.log(newDataRows)
     const nodeSortingComparator = that.getNodeSortingComparator();
     const linkSortingComparator = that.getLinkSortingComparator(nodeSortingComparator);
     that.sankey.nodeSort(nodeSortingComparator).linkSort(linkSortingComparator);
         
-    const sankeyGraph = that.sankey(that.sankey(that.graphFromDataRows(newDataRows)));    
+    const sankeyGraph = that.sankey(that.sankey(that.graphFromDataRows(oldData, newDataRows, drill)));    
     sankeyGraph.nodes.sort(nodeSortingComparator);
     that.addGapsToGraph(sankeyGraph);
+    that.setStartPositions(oldData, sankeyGraph, drill);
     that.addTooltips(sankeyGraph);
+    
+    
+    
     return sankeyGraph;
 };
 
-panel_sankey.prototype.graphFromDataRows = function (dataRows) {
+
+panel_sankey.prototype.setStartPositions = function (oldGraph, sankeyGraph, drill) {
     const that = this;
+    
+    const openFromElement = (drill.direction === -1 && oldGraph !== undefined) ? global.getFromArrayByProperty(oldGraph.nodes, 'id', drill.toId) : null; // Ebből a régi elemből kell kinyitni mindent.
+    const openFromElementHeightRatio = (openFromElement) ? (openFromElement.y1 - openFromElement.y0) / (that.shadowGraph.nodes[0].y1 - that.shadowGraph.nodes[0].y0) : 1;
+    
+    var parentFound = [false, false, false, false, false];
+    var after = 0;
+    const startY0 = that.shadowGraph.nodes[0].y0;
+    const startY1 = that.shadowGraph.nodes[0].y1;
+    const fullHeight = startY1 - startY0;
+    var before = 0;
+    
+    for (var i = 0, iMax = sankeyGraph.nodes.length; i < iMax; i++) {
+        const node = sankeyGraph.nodes[i];
+        if (openFromElement && that.dimsToShow[node.columnIndex] === drill.dim) { // Ha az adott dimenzióban befúrás történik            
+            node.startY0 = openFromElement.y0 + node.y0 * openFromElementHeightRatio;
+            node.startY1 = openFromElement.y0 + node.y1 * openFromElementHeightRatio;
+            node.startOpacity = 1;
+            node.startTextOpacity = 0;
+            for (var j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
+                node.sourceLinks[j].startY0 = node.startY0 + (node.sourceLinks[j].y0 - node.y0) * (node.startY1 - node.startY0) / (node.y1 - node.y0);            
+            }
+            for (var j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
+                node.targetLinks[j].startY1 = node.startY0 + (node.targetLinks[j].y1 - node.y0) * (node.startY1 - node.startY0) / (node.y1 - node.y0);    ;
+            }  
+        } else if (drill.direction === 1 && that.dimsToShow[node.columnIndex] === drill.dim) { // Ha az adott dimenzióban kifúrás történik
+            
+            if (!parentFound[node.columnIndex] && node.id === drill.fromId) {                
+                node.startY0 = startY0;
+                node.startY1 = startY1;
+                parentFound[node.columnIndex] = true;
+                after = 1;
+                node.startOpacity = 1;
+                node.startTextOpacity = 1;
+                for (var j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
+                    node.sourceLinks[j].startY0 = (node.startY0 + node.startY1)/2;            
+                }
+                for (var j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
+                    node.targetLinks[j].startY1 = (node.startY0 + node.startY1)/2;
+                }
+                
+                for (var b = 1; b < before + 1; b++) {
+                    const node = sankeyGraph.nodes[i - b];
+                    node.startY0 = -5 - startY1 * b;
+                    node.startY1 = node.startY0 + fullHeight;
+                    node.startOpacity = 0;
+                    node.startTextOpacity = 0;
+                    for (var j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
+                        node.sourceLinks[j].startY0 = node.startY0 + (node.sourceLinks[j].y0 - node.y0) * fullHeight / (node.y1 - node.y0);            
+                    }
+                    for (var j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
+                        node.targetLinks[j].startY1 = node.startY0 + (node.targetLinks[j].y1 - node.y0) * fullHeight / (node.y1 - node.y0);    ;
+                    }                                        
+                }
+                before = 0;
+            } else if (!parentFound[node.columnIndex]) {
+                before++;
+            } else {                
+                node.startY0 = 5 + startY1 * after;
+                node.startY1 = node.startY0 + fullHeight; 
+                node.startOpacity = 0;
+                node.startTextOpacity = 0;
+                for (var j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
+                    node.sourceLinks[j].startY0 = node.startY0 + (node.sourceLinks[j].y0 - node.y0) * fullHeight / (node.y1 - node.y0);           
+                }
+                for (var j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
+                    node.targetLinks[j].startY1 = node.startY0 + (node.targetLinks[j].y1 - node.y0) * fullHeight / (node.y1 - node.y0);
+                }
+                after++;
+            }
+        } else { // Ha az adott dimenzióban semmi se történik
+            node.startY0 = node.y0;
+            node.startY1 = node.y1;
+            node.startOpacity = 0;
+            node.startTextOpacity = 0;
+        }
+
+    }
+     
+};
+
+panel_sankey.prototype.graphFromDataRows = function (oldGraph, dataRows, drill) {
+    const that = this;
+        
     var nodes = [];
     for (var j = 0, jMax = that.numberOfDims; j < jMax; j++) {
         nodes.push([]);
@@ -446,32 +535,29 @@ panel_sankey.prototype.update = function (data, drill) {
 panel_sankey.prototype.drawSankey = function (graph, trans) {
     var that = this;
     
-    var gNodes = that.gNodes.selectAll(".node")
+    var gNodes = that.gNodes.selectAll("rect.node")
             .data(graph.nodes, function (d) {
                 return d.uniqueId;
             });
     
     gNodes.exit()
             .on("click", null)
+            .on("mouseover", null)
+            .on("mouseout", null)
             .remove();
     
     gNodes = gNodes.enter().insert("svg:rect", ".sankey_links")            
             .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")")
             .attr("x", d => d.x0)
             .attr("width", d => (d.x1 - d.x0))
-            .attr("y", d => d.y0)
-            .attr("height", d => (d.y1 - d.y0))
+            .attr("y", d => d.startY0)
+            .attr("height", d => (d.startY1 - d.startY0))
+            .attr("opacity", d => d.startOpacity)
             .merge(gNodes)
             .attr("class", d => "node bar bordered darkenable listener legendControl" + d.index)
-            .attr("fill", d => global.color(d.id))
+            .attr("fill", d => global.color(d.id))            
             .on("click", function(d) {
                 that.drill(d.columnIndex, d);
-            })
-            .on("mouseover", function () {
-                d3.select(this).classed("triggered", true);
-            })
-            .on("mouseout", function () {
-                d3.select(this).classed("triggered", false);
             });
     
     gNodes.transition(trans)
@@ -486,8 +572,17 @@ panel_sankey.prototype.drawSankey = function (graph, trans) {
             })
             .attr("height", function (d) {
                 return (d.y1 - d.y0);
+            })
+            .attr("opacity", 1)
+            .on("end", function (d) {
+                d3.select(this)
+                .on("mouseover", function () {
+                    d3.select(this).classed("triggered", true);
+                })
+                .on("mouseout", function () {
+                    d3.select(this).classed("triggered", false);
+                });
             });
-
 
 
     var gLinks = that.gLinks.selectAll(".link")
@@ -500,7 +595,9 @@ panel_sankey.prototype.drawSankey = function (graph, trans) {
             .remove();
     
     gLinks = gLinks.enter().append("svg:path")            
-            .attr("d", d3.sankeyLinkHorizontal())
+            .attr("d", d3.linkHorizontal()
+                    .source(d => [d.source.x1, (d.startY0 === undefined) ? d.y0 : d.startY0])
+                    .target(d => [d.target.x0, (d.startY1 === undefined) ? d.y1 : d.startY1]))
             .attr("opacity", 0)
             .attr("stroke-width", function(d) { return d.width; })
             .merge(gLinks)
@@ -511,7 +608,6 @@ panel_sankey.prototype.drawSankey = function (graph, trans) {
             .attr("stroke-width", function(d) { return d.width; })
             .attr("opacity", that.linkOpacity);
     
-
 };
 
 /**
@@ -556,7 +652,7 @@ panel_sankey.prototype.drawAxes = function (graph, trans) {
 panel_sankey.prototype.drawLabels = function (graph, trans) {    
     var that = this;
     
-    const fontSize = 16;
+    //const fontSize = 16;
 
     var gLabels = that.gLabels.selectAll("text")
             .data(graph.nodes, function (d) {
@@ -564,17 +660,17 @@ panel_sankey.prototype.drawLabels = function (graph, trans) {
             });
     
     gLabels.exit()
-            .transition(trans).attr("opacity", 0)
+            //.transition(trans).attr("opacity", 0)
             .remove();
     
     gLabels = gLabels.enter().append("svg:text")            
             .attr("class", "node legend noEvents")
-            .attr("opacity", 0)
-            .attr("x", function (d) {
+            .attr("opacity", d => d.startTextOpacity)
+            .attr("x", function (d) {                
                 return (d.x0 + d.x1) / 2;
             })
             .attr("y", function (d) {
-                return (d.y0 + d.y1) / 2;
+                return (d.startY0 + d.startY1) / 2;
             })
             .attr("dy", "0.35em")
             .attr("text-anchor", "middle")
