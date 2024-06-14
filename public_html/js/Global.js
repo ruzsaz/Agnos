@@ -1,4 +1,4 @@
-/* global d3, LZString, parseFloat, agnosConfig */
+/* global d3, LZString, parseFloat, agnosConfig, stringOrdering */
 
 'use strict'; // TODO: nyelv
 
@@ -360,7 +360,7 @@ var global = function () {
                 global.mediators[1].publish("drill", {dim: -1, direction: 0});
             }
         }
-        
+        localizedSortArray = global.getFromArrayByLang(stringOrdering, String.locale).ordering;
     };
 
     /**
@@ -731,20 +731,37 @@ var global = function () {
     };
 
     /**
-     * Összehasonlít két sztringet lexikografikusan.
-     * Azért kell, mert a localeCompare rosszul működik: A előbb van mint a, de A2 később van mint a1.
+     * Összehasonlít két sztringet lexikografikusan, illetve numerikusan, ha számok.
      * 
-     * @param {String} a
-     * @param {String} b
+     * @param {String} aString
+     * @param {String} bString
      * @returns {-1 ha a van előrébb, 1 ha b, 0 ha azonosak}
      */
-    var realCompare = function (a, b) {
-        var minLen = Math.min(a.length, b.length);
-        var i = 0;
-        while (a.charAt(i) === b.charAt(i) && i < minLen) {
-            i++;
+    var realCompare = function (aString, bString) {
+        const indexA = localizedSortArray.indexOf(aString.toLocaleLowerCase());
+        const indexB = localizedSortArray.indexOf(bString.toLocaleLowerCase());
+        if (indexA === -1 && indexB === -1) {
+            let result = 0;
+            try {
+                result = aString.localeCompare(bString, String.locale, {numeric: true, sensitivity: 'variant', caseFirst: 'upper'});
+            } catch (error) {
+                result = aString.localeCompare(bString);
+            }
+            return result;
         }
-        return (a.substr(0, i + 1)).localeCompare(b.substr(0, i + 1), String.locale, {numeric: true, sensitivity: 'variant', caseFirst: 'upper'});
+        if (indexA === -1) {
+            return 1;
+        }
+        if (indexB === -1) {
+            return -1;
+        }
+        if (indexA < indexB) {
+            return -1;
+        }
+        if (indexA > indexB) {
+            return 1;
+        }
+        return 0;    
     };
 
     /**
@@ -1413,6 +1430,7 @@ var global = function () {
 
     var changeCSSInProgress = false;
     var preferredUsername = undefined;
+    var localizedSortArray = undefined;
     if (keycloak !== undefined && keycloak.userInfo !== undefined) {
         preferredUsername = keycloak.userInfo.preferred_username;
     }
@@ -1532,6 +1550,7 @@ var global = function () {
         niceY: 3, // A függőleges skála kerekítési finomsága (ha csak 1 dim. van, ez használatos)
         captionDistance: 10, // A tengelyekre írandó dimenziónév függőleges távolsága a tengelytől
         preferredUsername: preferredUsername,
+        localizedSortArray: localizedSortArray,
         // Globálisan elérendő függvények.
         logout: logout, // Logs the current user out from the identity provider
         login: login, // Starts the login method of the identity provider

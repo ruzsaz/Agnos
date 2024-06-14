@@ -317,34 +317,7 @@ Panel.prototype.classedDarkenable = function() {
  * @returns {Boolean} Az összehasonlítás eredménye.
  */
 Panel.prototype.cmp = function(a, b) {
-    const locale = String.locale;
-    const sortArray = global.getFromArrayByLang(stringOrdering, locale).ordering;
-    const aString = a.dims[0].name;
-    const bString = b.dims[0].name;
-    const indexA = sortArray.indexOf(aString.toLocaleLowerCase());
-    const indexB = sortArray.indexOf(bString.toLocaleLowerCase());
-    if (indexA === -1 && indexB === -1) {
-        let result = 0;
-        try {
-            result = aString.localeCompare(bString, locale, {numeric: true});
-        } catch (error) {
-            result = aString.localeCompare(bString);
-        }
-        return result;
-    }
-    if (indexA === -1) {
-        return 1;
-    }
-    if (indexB === -1) {
-        return -1;
-    }
-    if (indexA < indexB) {
-        return -1;
-    }
-    if (indexA > indexB) {
-        return 1;
-    }
-    return 0;        
+    return global.realCompare(a.dims[0].name, b.dims[0].name);       
 };
 
 /**
