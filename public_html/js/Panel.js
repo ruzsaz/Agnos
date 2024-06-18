@@ -122,7 +122,7 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     that.mediatorIds.push({"channel": "magnifyPanel", "id": med.id});
 
     // Sorbarendezés váltó
-    if (that.isShortingByValueEnabled) {    
+    if (that.isShortingByValueEnabled && !global.isEmbedded) {    
         var sortSwitcher = that.svg.insert("svg:g")
                 .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
                 .attr("transform", "translate(0, " + (that.h - 30) +")")
@@ -135,33 +135,36 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     }
 
     // A nagyító fül
-    var duplicator = that.svg.append("svg:g")
-            .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
-            .attr("transform", "translate(" + (that.w - 30)  + ", " + (that.h - 30) +")")
-            .on('click', function() {
-                if (global.panelNumberOnScreen !== 1) {
-                    that.mediator.publish("magnifyPanel", that.panelId);
-                }
-            });
-
+    if (!global.isEmbedded) {
+        var duplicator = that.svg.append("svg:g")
+                .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
+                .attr("transform", "translate(" + (that.w - 30)  + ", " + (that.h - 30) +")")
+                .on('click', function() {
+                    if (global.panelNumberOnScreen !== 1) {
+                        that.mediator.publish("magnifyPanel", that.panelId);
+                    }
+                });    
     
-    duplicator.append("svg:g")
+        duplicator.append("svg:g")
             .html('<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#magnify_panel_button"></use>');
-            
-    // A becsukó gomb fül
-    var closeButton = that.svg.append("svg:g")
-            .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
-            .attr("transform", "translate(" + (that.w - 24)  + ", 0)")
-            .on('click', function() {
-                if (global.panelNumberOnScreen !== 1) {
-                    that.mediator.publish("killPanel", that.panelId);
-                }
-            });
-
+    }
     
-    closeButton.append("svg:g")
-            .html('<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close_panel_button"></use>');
-        
+    
+    // A becsukó gomb fül
+    if (!global.isEmbedded) {
+        var closeButton = that.svg.append("svg:g")
+                .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
+                .attr("transform", "translate(" + (that.w - 24)  + ", 0)")
+                .on('click', function() {
+                    if (global.panelNumberOnScreen !== 1) {
+                        that.mediator.publish("killPanel", that.panelId);
+                    }
+                });
+
+
+        closeButton.append("svg:g")
+                .html('<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close_panel_button"></use>');
+    }
 
     // Fejléc.
     this.titleBox = new TitleBox(that.svg, that.panelId, that.mediator, that.magLevel);
@@ -185,11 +188,13 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
      * @returns {undefined}
      */
     var dragStarted = function() {
-        var coords = d3.mouse(that.container.nodes()[0]);
-        that.dragStartX = coords[0];
-        that.dragStartY = coords[1];
-        that.panelDiv.classed("dragging", true)
-                .style("z-index", 10000);
+        if (!global.isEmbedded) {
+            var coords = d3.mouse(that.container.nodes()[0]);
+            that.dragStartX = coords[0];
+            that.dragStartY = coords[1];
+            that.panelDiv.classed("dragging", true)
+                    .style("z-index", 10000);
+        }
     };
 
     /**

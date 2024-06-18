@@ -46,7 +46,9 @@ function TitleBox(parentSVG, panelId, mediator, magLevel) {
             .attr("y", global.legendOffsetY)
             .attr("opacity", 0)
             .on("click", function () {
-                that.mediator.publish("changeValue", that.panelId, -1, undefined);
+                if (!global.isEmbedded) {
+                    that.mediator.publish("changeValue", that.panelId, -1, undefined);
+                }
             });
 
     // A jobb oldali láthatatlan hányadosváltó fejléc-gomb.
@@ -59,8 +61,10 @@ function TitleBox(parentSVG, panelId, mediator, magLevel) {
             .attr("y", global.legendOffsetY)
             .attr("opacity", 0)
             .on("click", function () {
-                that.mediator.publish("changeValue", that.panelId, undefined, -1);
-            });
+                if (!global.isEmbedded) {
+                    that.mediator.publish("changeValue", that.panelId, undefined, -1);
+                }
+            });            
 
 }
 

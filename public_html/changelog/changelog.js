@@ -5,6 +5,7 @@ var changelog = [
     {
         "language": "hu",
         "history": [
+            {"entity": "Agnos", "date": "2024-06-18", "change": "Beágyazott Agnos működés."},
             {"entity": "Agnos", "date": "2024-05-28", "change": "Új diagram: szalagdiagram."},
             {"entity": "Agnos", "date": "2024-05-14", "change": "A panelek diagramjai sorbarendezhetőek az értékek szerint is."},
             {"entity": "Agnos", "date": "2024-05-08", "change": "Dimenzió kiírás a paneleken; dimenzió útvonal a fejlécben."},
@@ -29,11 +30,12 @@ var changelog = [
             {"entity": "AgnosCSVImporter", "date": "2017-10-24", "change": "Rögzített formájú .xls és .xlsx fájlok automatikus betöltése."},
             {"entity": "Agnos", "date": "2017-11-02", "change": "Panelek képként mentése elérhető."}
         ],
-        "updated": "2024-05-28"
+        "updated": "2024-06-18"
     },
     {
         "language": "en",
         "history": [
+            {"entity": "Agnos", "date": "2024-06-18", "change": "Embedded Agnos mechanism introduced."},
             {"entity": "Agnos", "date": "2024-05-28", "change": "New diagram: sankey."},
             {"entity": "Agnos", "date": "2024-05-14", "change": "Diagrams can be sorted by the shown values."},
             {"entity": "Agnos", "date": "2024-05-08", "change": "Display of dimensions on the panels, dimension path on the top panel."},
@@ -59,6 +61,6 @@ var changelog = [
             {"entity": "Agnos", "date": "2017-11-02", "change": "Save panels as pictures."}
             
         ],
-        "updated": "2024-05-28"
+        "updated": "2024-06-18"
     }
 ];

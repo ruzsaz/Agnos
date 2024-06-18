@@ -20,6 +20,9 @@ function HeadPanel(init, mediator, additionalClass, startScale, duration) {
     this.mediatorIds = [];		// A mediátorok id-jeit tartalmazó tömb.
     this.panelDiv = d3.select("#headPanelP" + this.panelSide);
     that.panelDiv.style("width", (((parseInt(d3.select("#topdiv").style("width"))) / startScale) - global.panelMargin * 2) + "px");
+    if (global.isEmbedded) {
+        // that.panelDiv.style("height", "0px");
+    }
     this.panelId = "#panel" + that.panelSide + "P-1";
     this.divTableBase = undefined;
     this.init(additionalClass, duration);
@@ -141,6 +144,12 @@ HeadPanel.prototype.reset = function(additionalClass, duration) {
 
     that.divTableBase.transition().duration(duration)
             .style("opacity", 1);
+
+    if (global.isEmbedded) {
+        d3.select("body").transition().duration(duration)
+                .style("opacity", 1);
+    }
+   
 };
 
 /**

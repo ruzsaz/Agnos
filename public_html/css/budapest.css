@@ -2423,6 +2423,32 @@ svg.switchButtonHelp {
 #loginReadyPercentage {
   font-size: 40px;
 }
+/*******************************/
+/* Embedded mode style changes */
+/*******************************/
+body.embedded {
+  background-color: #ff000000;
+}
+body.embedded #mainToolbar nav {
+  display: none;
+}
+body.embedded #toolbarShadow {
+  display: none;
+}
+body.embedded #scrollPaneP0,
+body.embedded #scrollPaneP1 {
+  top: 0px;
+  height: 100%;
+}
+body.embedded #headPanelP0,
+body.embedded #headPanelP0 {
+  height: 0px;
+  box-shadow: none;
+}
+body.embedded .titleButton0:hover ~ .titleText0,
+body.embedded .titleButton1:hover ~ .titleText1 {
+  fill: black;
+}
 /*
 To change this license header, choose License Headers in Project Properties.
 To change this template file, choose Tools | Templates

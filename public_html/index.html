@@ -1,37 +1,90 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
     <head>
         <title class="loc">Agnos</title>
 
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-
-        <!-- A kezdő stílusfájl betöltése cookie-ból-->
+        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+        <meta http-equiv="Pragma" content="no-cache"/>
+        <meta http-equiv="Expires" content="0"/>
+        
+        <!-- A kezdő stílusfájl betöltése: url-ből, ha nincs cookie-ból, ha nincs default -->
+        <script src="js/libs/lz-string-1.3.0/lz-string.min.js"></script>
         <script>
-            var fileName = "css/black.css?ver=4.3.3"; // default érték
-            var name = "css";
-            name = name + "=";
-            var decodedCookie = decodeURIComponent(document.cookie);
-            var ca = decodedCookie.split(';');
-            for (var i = 0; i < ca.length; i++) {
-                var c = ca[i];
-                while (c.charAt(0) === ' ') {
-                    c = c.substring(1);
-                }
-                if (c.indexOf(name) === 0) {
-                    fileName = c.substring(name.length, c.length);
+            
+            const defaultCss = "css/black.css?ver=4.4.0"; // default érték
+    
+            let isEmbedded = false;
+            
+            /**
+             * Ha ?q=... query paraméterként van kódolva a kezdőpont, akkor kiszedi,
+             * és átalakítja hash-á, és újratölti az új url-el az oldalt.
+             * Ha már eleve hash, akkor továbbmegy a többi komponens betöltésére.
+             * 
+             */
+            function reloadWithQueryAsHashtag() {
+                if (window.location.search.length > 0) {
+                    var baseUrl = window.location.href.replace(/\?.*/g, '');
+                    var newHash = window.location.search.replace(/.*=/g, '').replace(/#.*/g, '');                    
+                    window.location = baseUrl + "#" + newHash;                    
                 }
             }
+            reloadWithQueryAsHashtag();
 
-            var link = document.createElement("link");
-            link.href = fileName;
-            link.id = "cssLink";
-            link.type = "text/css";
-            link.rel = "stylesheet";
-            link.media = "screen,print";
-
-            document.getElementsByTagName("head")[0].appendChild(link);
-
+            /**
+             * Injektál egy css-fájlt a dokumentumba.
+             * 
+             * @param {type} fileName Az injektálandó css fájl.
+             * @returns {undefined}
+             */
+            function applyCssFile(fileName) {
+                var link = document.createElement("link");
+                link.href = fileName;
+                link.id = "cssLink";
+                link.type = "text/css";
+                link.rel = "stylesheet";
+                link.media = "screen,print";
+                document.getElementsByTagName("head")[0].appendChild(link);
+            }
+    
+            /**
+             * Meghatározza az alkalmazandó css fájlt, az alábbi sorrendben:
+             *  - embedded mód esetén a query paraméterből
+             *  - normál mód esetén cookie-ból
+             *  - ha nincs más, az alapértelmezett.
+             * 
+             * @param {type} defaultCssFile Alapértelmezett css fájl.
+             * @returns {.JSON@call;parse.s}
+             */
+            function determineCssFileToApply(defaultCssFile) {
+                const startString = window.location.href.replace(/.*#/g, '');
+                var startObject = JSON.parse(LZString.decompressFromEncodedURIComponent(startString));
+            
+                // Css kiolvasása a queryparam-ból, ha van ott
+                if (startObject && startObject.e && startObject.s) {
+                    isEmbedded = true;
+                    return startObject.s || defaultCssFile;
+                }
+                
+                // Css kiolvasása cookie-ból, ha van ott
+                const cssPrefix = "css=";
+                var decodedCookie = decodeURIComponent(document.cookie);
+                var ca = decodedCookie.split(';');
+                for (var i = 0; i < ca.length; i++) {
+                    var c = ca[i];
+                    while (c.charAt(0) === ' ') {
+                        c = c.substring(1);
+                    }
+                    if (c.indexOf(cssPrefix) === 0) {
+                        return c.substring(cssPrefix.length, c.length);
+                    }
+                }
+                // Ha sehol nem találtunk, akkor a default
+                return defaultCssFile;
+            }
+                
+            applyCssFile(determineCssFileToApply(defaultCss));                        
         </script>
 
         <!--
@@ -138,11 +191,11 @@
         <script>
             'use strict';
             var numberOfLoadedResources = 0;	// A már betöltött külső js-ek száma.
-            var numberOfResources = 36;			// Az összes betöltendő külső js-ek száma.
+            var numberOfResources = 35;			// Az összes betöltendő külső js-ek száma.
             var finalThreads = 3;				// Ennyi betöltési szálnak kell lefutnia az elinduláshoz.
-            var version = "4.3.3";
+            var version = "";
             var min = "";           // "" vagy "min." attól függően, hogy a minify-s verziók kellenek-e?     
-            var keycloak;
+            var keycloak;            
 
             /**
              * A betöltöttséget jelző panel betöltöttségi szintjét beállítja a kért értékre.
@@ -190,7 +243,7 @@
                 var isReady = false;
                 var scriptElement = document.createElement('script');
                 scriptElement.type = 'text/javascript';
-                scriptElement.src = source + "?ver=" + version;
+                scriptElement.src = version + source;
                 scriptElement.onload = scriptElement.onreadystatechange = function () {
                     if (!isReady && (!this.readyState || this.readyState === 'complete')) {
                         isReady = true;
@@ -247,8 +300,7 @@
                 loadResourcesAsync([
                     "js/libs/d3-4.12.0/d3.min.js",
                     "js/libs/mediator-0.9.6/mediator.min.js",
-                    "js/libs/topojson/topojson.min.js",
-                    "js/libs/lz-string-1.3.0/lz-string." + min + "js",
+                    "js/libs/topojson/topojson.min.js",                    
                     "js/libs/d3-sankey/d3-sankey." + min + "js",
                     "js/libs/saveassvg/saveSvgAsPng." + min + "js",
                 ], loadLevel2);
@@ -379,7 +431,7 @@
              * 
              * @returns {Boolean}
              */
-            function login() {
+            function login() {                
                 new Container();
                 return false;
             }
@@ -408,29 +460,13 @@
                 return k;
             }
 
-            /**
-             * Ha ?q=... query paraméterként van kódolva a kezdőpont, akkor kiszedi,
-             * és átalakítja hash-á, és újratölti az új url-el az oldalt.
-             * Ha már eleve hash, akkor továbbmegy a többi komponens betöltésére.
-             * 
-             */
-            function extractQuery() {
-                if (window.location.search.length > 0) {
-                    var baseUrl = window.location.href.replace(/\?.*/g, '');
-                    var newHash = window.location.search.replace(/.*=/g, '').replace(/#.*/g, '');
-                    window.location = baseUrl + "#" + newHash;
-                } else {
-                    loadKeycloak();
-                    //loadResources();
-                }
-            }
-
+            
         </script>
 
     </head>
 
 
-    <body onload="extractQuery();">
+    <body onload="document.body.style.opacity = (isEmbedded) ? 0 : 1; loadKeycloak();" style="opacity: 0" >
 
         <!-- Az ejtőcélpont vonalkázásához szükséges svg-minta. -->
         <div id="svgDefs">

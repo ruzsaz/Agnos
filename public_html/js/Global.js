@@ -4,6 +4,7 @@
 
 console.log("Az épp aktuális panelkonfiguráció kiíratása: global.getConfig();");
 console.log("A fordítás segítéséhez: global.getUntranslated('lang');");
+console.log("Embedded link: global.getEmbeddedUrl();");
 // A bookmark-lehetőség kiiktatásához a "location.hash"-t tartalmazó sort kell kikommentelni.
 
 
@@ -38,7 +39,9 @@ var global = function () {
 //////////////////////////////////////////////////
 
     var changeCSS = function (cssFile) {
-        setCookie("css", cssFile, 730);
+        if (!global.isEmbedded) {
+            setCookie("css", cssFile, 730);
+        }
         clearTimeout(global.cssChangeTimer);
         global.changeCSSInProgress = true;
 
@@ -332,7 +335,9 @@ var global = function () {
         String.locale = lang;
 
         // Cookie-ban tárolás.
-        setCookie("language", lang, 730);
+        if (!global.isEmbedded) {
+            setCookie("language", lang, 730);
+        }
 
         // Statikus szövegek átírása.
         localizeAll();
@@ -419,13 +424,28 @@ var global = function () {
     };
 
     /**
+     * Embedded módra vált, hogy a bookmark beilleszthető legyen.
+     * 
+     * @returns {undefined}
+     */
+    var getEmbeddedUrl = function() {
+        global.isEmbedded = true;
+        getConfigToHash(true);
+        global.isEmbedded = false;
+    };
+
+
+    /**
      * Kiegészíti a böngésző URL-jét egy hash-al, ami bookmarkolhatóan
      * tartalmazza a panelek állapotát, a reportokat, és a lefúrási szinteket.
      * 
      * @returns {undefined}
      */
-    var getConfigToHash = function () {
+    var getConfigToHash = function(onlyForDisplay) {
         var startObject = {}; // A bookmarkban tárolandó objektum.
+        startObject.e = global.isEmbedded;  // Embedded mód érvényessége.
+        startObject.l = String.locale;
+        startObject.s = getCookie("css");
         startObject.p = []; // A betöltendő oldalak inicializációs objektumai.
         var panelsToWaitFor = 2;
 
@@ -451,17 +471,20 @@ var global = function () {
                 // A képernyőn egy sorba kiférő panelek száma.
                 startObject.n = global.panelNumberOnScreen;
 
+                const newUrl = location.origin + location.pathname + "?q=" + LZString.compressToEncodedURIComponent(JSON.stringify(startObject));
+                
                 // Tényleges URL-be írás. Ha nem kell, kikommentelendő.
-                if (global.saveToBookmarkRequired) {
-                    const newUrl = location.origin + location.pathname + "?q=" + LZString.compressToEncodedURIComponent(JSON.stringify(startObject));
+                if (global.saveToBookmarkRequired && !onlyForDisplay) {
                     window.history.replaceState({id: "100"}, "Page 3", newUrl);
-                }
+                } else {
+                    console.log(newUrl);
+                }                
             }
         };
 
         // Kérés kiküldése a két oldal dataDirector-ja számára.
         global.mediators[0].publish("getConfig", receiveConfig);
-        global.mediators[1].publish("getConfig", receiveConfig);
+        global.mediators[1].publish("getConfig", receiveConfig);        
     };
 
 
@@ -1090,7 +1113,7 @@ var global = function () {
         var to = (isBack) ? 0 : 1;
         for (var i = 0, iMax = dictionary.length; i < iMax; i++) {
             initString = initString.replace(new RegExp(dictionary[i][from], "g"), dictionary[i][to]);
-        }
+        }        
         return initString;
     };
 
@@ -1429,6 +1452,7 @@ var global = function () {
 //////////////////////////////////////////////////
 
     var changeCSSInProgress = false;
+    var isEmbedded = false;
     var preferredUsername = undefined;
     var localizedSortArray = undefined;
     if (keycloak !== undefined && keycloak.userInfo !== undefined) {
@@ -1530,6 +1554,7 @@ var global = function () {
         facts: [], // Az adatokat tartalmazó 2 elemű tömb.
         maxPanelCount: 6, // Egy oldalon levő panelek maximális száma.		
         panelNumberOnScreen: undefined, // Megjelenítendő panelszám soronként.
+        isEmbedded: isEmbedded,     // Beágyazott üzemmód van-e?
         mediators: [], // Az oldalak mediátorát tartalmazó 2 elemű tömb.
         baseLevels: [[], []], // A két oldal aktuális lefúrási szintjeit tartalmazó tömb.
         superMeta: undefined, // SuperMeta: az összes riport adatait tartalmazó leírás.
@@ -1589,6 +1614,7 @@ var global = function () {
         mainToolbar_refreshState: mainToolbar_refreshState, // Frissíti az ikonok láthatóságát.
         getConfig: getConfig, // Kiírja a pillanatnyilag meglevő panelek konfigurációját a konzolra.
         getUntranslated: getUntranslated, // Kiírja a még lefordítatlan szövegeket a konzolra.
+        getEmbeddedUrl: getEmbeddedUrl, // Embedded módra vált
         getConfig2: getConfigToHash, // A böngésző URL-jébe írja boomarkolhatóan hash-ként az állapotot.
         minifyInits: minifyInits, // Minifyol egy init-stringet, hogy az URL-kódolt verzió kisebb legyen.
         setDialog: setDialog, // Dialógusablak beállítása/levétele.
