@@ -475,9 +475,7 @@ var global = function () {
                 // Tényleges URL-be írás. Ha nem kell, kikommentelendő.
                 if (global.saveToBookmarkRequired && !onlyForDisplay && !global.isEmbedded) {
                     window.history.replaceState({id: "100"}, "Page 3", newUrl);
-                } else {
-                    console.log(newUrl);
-                }                
+                }
             }
         };
 
