@@ -171,7 +171,7 @@ panel_sankey.prototype.getNodeSortingComparator = function() {
         };
     } else {
         return function(a, b) {
-            return global.realCompare(a.columnIndex + a.name, b.columnIndex + b.name);                                    
+            return global.realCompare2d(a.columnIndex.toString(), a.name, b.columnIndex.toString(), b.name);                                    
         };
     }        
 };
@@ -187,7 +187,6 @@ panel_sankey.prototype.getLinkSortingComparator = function(nodeSortingComparator
         return 0;
     };        
 };
-
 
 /**
  * Egy elemhez tartozó tooltipet legyártó függvény;
@@ -271,7 +270,6 @@ panel_sankey.prototype.preUpdate = function (drill) {
  */
 panel_sankey.prototype.prepareData = function (oldData, newDataRows, drill) {
     var that = this;
-    //console.log(newDataRows)
     const nodeSortingComparator = that.getNodeSortingComparator();
     const linkSortingComparator = that.getLinkSortingComparator(nodeSortingComparator);
     that.sankey.nodeSort(nodeSortingComparator).linkSort(linkSortingComparator);
@@ -281,9 +279,7 @@ panel_sankey.prototype.prepareData = function (oldData, newDataRows, drill) {
     that.addGapsToGraph(sankeyGraph);
     that.setStartPositions(oldData, sankeyGraph, drill);
     that.addTooltips(sankeyGraph);
-    
-    
-    
+
     return sankeyGraph;
 };
 
@@ -437,6 +433,7 @@ panel_sankey.prototype.addGapsToGraph = function (graph) {
     var lastColIdx = -1;
     var elementsInColumn = -1;
     var nextStart = -1;
+    
     
     for (var i = 0, iMax = nodes.length; i < iMax; i++) {
         const node = nodes[i];

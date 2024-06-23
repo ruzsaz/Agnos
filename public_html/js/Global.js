@@ -1,11 +1,8 @@
 /* global d3, LZString, parseFloat, agnosConfig, stringOrdering */
 
-'use strict'; // TODO: nyelv
+'use strict';
 
-console.log("Az épp aktuális panelkonfiguráció kiíratása: global.getConfig();");
-console.log("A fordítás segítéséhez: global.getUntranslated('lang');");
-console.log("Embedded link: global.getEmbeddedUrl();");
-// A bookmark-lehetőség kiiktatásához a "location.hash"-t tartalmazó sort kell kikommentelni.
+
 
 
 /**
@@ -429,9 +426,11 @@ var global = function () {
      * @returns {undefined}
      */
     var getEmbeddedUrl = function() {
-        global.isEmbedded = true;
-        getConfigToHash(true);
-        global.isEmbedded = false;
+        if (global.isEmbedded === false) {
+            global.isEmbedded = true;
+            getConfigToHash(true);
+            global.isEmbedded = false;
+        }
     };
 
 
@@ -474,7 +473,7 @@ var global = function () {
                 const newUrl = location.origin + location.pathname + "?q=" + LZString.compressToEncodedURIComponent(JSON.stringify(startObject));
                 
                 // Tényleges URL-be írás. Ha nem kell, kikommentelendő.
-                if (global.saveToBookmarkRequired && !onlyForDisplay) {
+                if (global.saveToBookmarkRequired && !onlyForDisplay && !global.isEmbedded) {
                     window.history.replaceState({id: "100"}, "Page 3", newUrl);
                 } else {
                     console.log(newUrl);
@@ -755,6 +754,8 @@ var global = function () {
 
     /**
      * Összehasonlít két sztringet lexikografikusan, illetve numerikusan, ha számok.
+     * Figyelembe veszi, hogyha az egyik, vagy mindkét sztring szerepel a speciális
+     * sorbarendezési tömbben: ekkor ezeket veszi előre, az ottani sorrendjükben.
      * 
      * @param {String} aString
      * @param {String} bString
@@ -763,6 +764,7 @@ var global = function () {
     var realCompare = function (aString, bString) {
         const indexA = localizedSortArray.indexOf(aString.toLocaleLowerCase());
         const indexB = localizedSortArray.indexOf(bString.toLocaleLowerCase());
+        //console.log(indexA, indexB)
         if (indexA === -1 && indexB === -1) {
             let result = 0;
             try {
@@ -785,6 +787,22 @@ var global = function () {
             return 1;
         }
         return 0;    
+    };
+
+    /**
+     * Összehasonlít két két részből álló sztringet lexikografikusan,
+     * numerikusan, vagy a sorbarendezési lista alapján.
+     * Ha a két sztring az első felükben eltér, az alapján, ha azonosak,
+     * a második felük alapján.
+     * 
+     * @param {String} a0String Az első szting első fele
+     * @param {String} a1String Az első sztring másofik fele
+     * @param {String} b0String A második sztring első fele
+     * @param {String} b1String A második sztring másofik fele
+     * @returns {-1 ha a van előrébb, 1 ha b, 0 ha azonosak}
+     */
+    var realCompare2d = function (a0String, a1String, b0String, b1String) {
+        return (a0String !== b0String) ? realCompare(a0String, b0String) : realCompare(a1String, b1String);
     };
 
     /**
@@ -1626,6 +1644,7 @@ var global = function () {
         cleverRound3: cleverRound3, // Szám rövid kijelzése kiíráshoz, max 3 számkarakterrel. (pl. 3.51 Mrd.)
         cleverRound5: cleverRound5, // Szám rövid kijelzése kiíráshoz, max 5 számkarakterrel. (pl. 34514 M.)
         realCompare: realCompare, // Pótlás a picit hibásan működő localeCompare helyett.
+        realCompare2d: realCompare2d, // 2 részből álló sztringpárt összehasonlít.
         cleverCompress: cleverCompress, // Betömörít kiírt feliratokat a megadott helyre.
         rectanglePath: rectanglePath, // Egy SVG téglalapot kirajzoló path-t generál, opcionálisan lekerekített sarkokkal.
         colorValue: colorValue, // Megadja egy érték kijelzésének színét.
@@ -1639,3 +1658,9 @@ var global = function () {
 }();
 
 global.initValuesFromCss();
+
+if (!global.isEmbedded) {
+    console.log("Az épp aktuális panelkonfiguráció kiíratása: global.getConfig();");
+    console.log("A fordítás segítéséhez: global.getUntranslated('lang');");
+    console.log("Embedded link: global.getEmbeddedUrl();");
+}

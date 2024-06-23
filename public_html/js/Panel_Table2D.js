@@ -263,7 +263,7 @@ panel_table2d.prototype.getTooltip = function(rElement, cElement) {
 panel_table2d.prototype.getCmpFunction = function() {
     var that = this;
     return function(a, b) {
-        return global.realCompare(a.dims[that.dimR].name + ":" + a.dims[that.dimC].name, b.dims[that.dimR].name + ":" + b.dims[that.dimC].name);
+        return global.realCompare2d(a.dims[that.dimR].name, a.dims[that.dimC].name, b.dims[that.dimR].name, b.dims[that.dimC].name);
     };
 };
 

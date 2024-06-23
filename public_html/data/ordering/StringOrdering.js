@@ -1,6 +1,6 @@
 'use strict';
 
-// Poi-k
+// Sztringek speciális sorbarendezési sorrendje. Csupa kisbetűvel kell írni!
 var stringOrdering = [
     {
         "lang": "hu",
@@ -50,7 +50,7 @@ var stringOrdering = [
             "september",
             "october",
             "november",
-            "december"
+            "december"            
         ]
     }
 

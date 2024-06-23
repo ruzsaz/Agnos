@@ -741,6 +741,7 @@ panel_map.prototype.drawLabels = function (currentFeatures, trans) {
                 return d.name;
             })
             .style("font-size", (that.mapLabelSize / currentFeatures.scale) + "px")
+            .merge(labels)
             .transition(trans)
             .attr("opacity", that.mapLabelOpacity);
 };

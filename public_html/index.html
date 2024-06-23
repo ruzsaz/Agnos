@@ -27,7 +27,7 @@
                 if (window.location.search.length > 0) {
                     var baseUrl = window.location.href.replace(/\?.*/g, '');
                     var newHash = window.location.search.replace(/.*=/g, '').replace(/#.*/g, '');                    
-                    window.location = baseUrl + "#" + newHash;                    
+                    window.location = baseUrl + "#" + newHash;
                 }
             }
             reloadWithQueryAsHashtag();
@@ -64,7 +64,7 @@
                 // Css kiolvasása a queryparam-ból, ha van ott
                 if (startObject && startObject.e && startObject.s) {
                     isEmbedded = true;
-                    return startObject.s || defaultCssFile;
+                    return startObject.s;
                 }
                 
                 // Css kiolvasása cookie-ból, ha van ott
@@ -330,7 +330,7 @@
                 loadResourcesAsync([
                     "js/HeadPanel." + min + "js",
                     "js/Panel." + min + "js",
-                    "js/TitleBox." + min + "js",                    
+                    "js/TitleBox." + min + "js"
                 ], loadLevel4);
             }
 
