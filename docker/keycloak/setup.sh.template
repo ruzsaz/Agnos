@@ -14,13 +14,26 @@ do
     sleep 2
 done
 
+# Create the realm
+./kcadm.sh create realms -s realm="${KEYCLOAK_REALM}" -s enabled=true
+
+# Set agnos' login theme
+./kcadm.sh update "realms/${KEYCLOAK_REALM}" -s "loginTheme=agnos"
+
+# Create the agnosAdmin role
+./kcadm.sh create roles -r "${KEYCLOAK_REALM}" -s name=agnosAdmin -s 'description=Admin role for editing reports and reading the access log'
+
+# Create the agnos client
+./kcadm.sh create clients -r "${KEYCLOAK_REALM}" -f ../agnos.json
+
 # Extract the agnos client's id
 CL_ID=$(./kcadm.sh get clients -r "${KEYCLOAK_REALM}" --fields id,clientId | grep -B 1 "${KEYCLOAK_CLIENT}" | head -n 1 | sed 's/.*: "//g;s/".*//g')
 
 # Set redirect uris
 ./kcadm.sh update "clients/${CL_ID_PLACEHOLDER}" -r "${KEYCLOAK_REALM}" \
     -s 'redirectUris=[${REDIRECT_URIS}]' \
-    -s "rootUrl=\"${AGNOS_PUBLIC_IP}\""
+    -s "rootUrl=\"${AGNOS_PUBLIC_IP}\"" \
+    -s 'webOrigins=["+"]'
 
 # Sleep forever
 while true; do sleep 1; done

@@ -10,6 +10,7 @@ COPY ./envsubst /usr/bin/envsubst
 WORKDIR /
 COPY themes/ /opt/keycloak/themes/
 COPY setup.sh.template /opt/keycloak/setup.sh.template
+COPY ./agnos.json /opt/keycloak/agnos.json
 
 # On start: make the env variable substitution in the localSettings.js file, and start the server
 ENTRYPOINT /usr/bin/envsubst < /opt/keycloak/setup.sh.template > /opt/keycloak/setup.sh \
