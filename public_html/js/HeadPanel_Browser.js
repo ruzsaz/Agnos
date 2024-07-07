@@ -17,7 +17,7 @@ function HeadPanel_Browser(init, superMeta, startScale, duration) {
     this.superMeta = superMeta;
 
     HeadPanel.call(this, init, global.mediators[init.group], "HeadPanel_Browser", startScale, duration);
-    
+
     // Felhasználó köszöntése rész
     this.top = that.divTableBase.append("html:div")
             .attr("id", "greetingBadge");    

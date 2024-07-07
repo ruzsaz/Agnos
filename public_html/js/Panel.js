@@ -558,7 +558,7 @@ Panel.prototype.sortSwitch = function() {
     global.tooltip.kill();       
     that.sortByValue = !that.sortByValue;
     that.update();    
-    that.actualInit.sortByValue = that.sortByValue;
+    that.actualInit.sortbyvalue = that.sortByValue;
     global.getConfig2();
 };
 

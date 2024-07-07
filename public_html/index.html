@@ -5,15 +5,25 @@
 
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
         <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-        <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+        <meta http-equiv="Cache-Control" content="no-store"/>
         <meta http-equiv="Pragma" content="no-cache"/>
-        <meta http-equiv="Expires" content="0"/>
+        <meta http-equiv="Expires" content="-1"/>
+
+        <!-- Ha nem sikerült a rendes átirányítás ../agnos/  -ra, csak ../agnos  lett,
+        akkor átirányít a jó helyre, hogy stimmeljenek a relatív linkek -->
+        <script>
+            const loc = window.location;
+            if (!loc.pathname.endsWith("html") && !loc.pathname.endsWith("/")) {
+                window.location.pathname = loc.pathname + "/";
+            }                        
+        </script>
+        
         
         <!-- A kezdő stílusfájl betöltése: url-ből, ha nincs cookie-ból, ha nincs default -->
         <script src="js/libs/lz-string-1.3.0/lz-string.min.js"></script>
-        <script>
-            
-            const defaultCss = "css/black.css?ver=4.4.0"; // default érték
+        <script>                                                
+            var version = "";
+            const defaultCss = version + "css/black.css"; // default érték
     
             let isEmbedded = false;
             
@@ -39,8 +49,8 @@
              * @returns {undefined}
              */
             function applyCssFile(fileName) {
-                var link = document.createElement("link");
-                link.href = fileName;
+                var link = document.createElement("link");                
+                link.href = version + fileName.substr(fileName.indexOf("css/"));
                 link.id = "cssLink";
                 link.type = "text/css";
                 link.rel = "stylesheet";
@@ -58,38 +68,42 @@
              * @returns {.JSON@call;parse.s}
              */
             function determineCssFileToApply(defaultCssFile) {
-                const startString = window.location.href.replace(/.*#/g, '');
-                var startObject = JSON.parse(LZString.decompressFromEncodedURIComponent(startString));
-            
-                // Css kiolvasása a queryparam-ból, ha van ott
-                if (startObject && startObject.e && startObject.s) {
-                    isEmbedded = true;
-                    return startObject.s;
-                }
                 
+                // Css kiolvasása a queryparam-ból, ha van ott
+                try {
+                    const startString = window.location.href.replace(/.*#/g, '');
+                    var startObject = JSON.parse(LZString.decompressFromEncodedURIComponent(startString));
+                                
+                    if (startObject && startObject.e && startObject.s) {
+                        isEmbedded = true;
+                        return startObject.s;
+                    }
+                } catch (error) { }
+                
+                                
                 // Css kiolvasása cookie-ból, ha van ott
-                const cssPrefix = "css=";
-                var decodedCookie = decodeURIComponent(document.cookie);
-                var ca = decodedCookie.split(';');
-                for (var i = 0; i < ca.length; i++) {
-                    var c = ca[i];
-                    while (c.charAt(0) === ' ') {
-                        c = c.substring(1);
+                try {
+                    const cssPrefix = "css=";
+                    var decodedCookie = decodeURIComponent(document.cookie);
+                    var ca = decodedCookie.split(';');
+                    for (var i = 0; i < ca.length; i++) {
+                        var c = ca[i];
+                        while (c.charAt(0) === ' ') {
+                            c = c.substring(1);
+                        }
+                        if (c.indexOf(cssPrefix) === 0) {
+                            return c.substring(cssPrefix.length, c.length);
+                        }
                     }
-                    if (c.indexOf(cssPrefix) === 0) {
-                        return c.substring(cssPrefix.length, c.length);
-                    }
-                }
+                } catch (error) { } 
+                
                 // Ha sehol nem találtunk, akkor a default
                 return defaultCssFile;
             }
-                
+            
             applyCssFile(determineCssFileToApply(defaultCss));                        
         </script>
 
-        <!--
-                <link id="cssLink" rel="stylesheet" type="text/css" href="css/white.css?ver=3.1"/>
-        -->
         <link rel="localization" hreflang="en" href="data/languages/en.json" type="application/vnd.oftn.l10n+json"/>
         <link rel="localization" hreflang="hu" href="data/languages/hu.json" type="application/vnd.oftn.l10n+json"/>        
 
@@ -100,92 +114,6 @@
         <link rel="manifest" href="manifest.json">
         <link rel="mask-icon" href="safari-pinned-tab.svg" color="#40bddf">
         <meta name="theme-color" content="#ffffff">
-
-        <!-- Azok a stílus-definíciók, amelyek a less elindulása előtt is szükségesek már. -->
-        <!--
-        <style>
-            #svgDefs {
-                height: 0px;
-            }
-            body {
-                font-family: arial, sans-serif;
-                margin: 0px;
-                background: #000000;
-                color: #ffffff;
-                overflow-x: hidden;
-                overflow-y: hidden;
-            }
-            #dialogPanel {
-                left: 50vw;
-                top: 50vh;
-                overflow: hidden;
-                position: relative;
-                /*margin: -124px 0px 0px -175px;*/
-                -ms-transform: translateX(-50%) translateY(-50%);
-                -webkit-transform: translateX(-50%) translateY(-50%);
-                transform: translateX(-50%) translateY(-50%);
-                padding: 20px 20px 20px;
-                width: 310px;
-                min-height: 208px;
-                border-radius: 10px;
-                background: #343434;
-            }
-            #dialogPanel h1 {
-                margin: -20px -20px 21px;
-                height: 40px;
-                line-height: 40px;
-                font-size: 16px;
-                color: #ffffff;
-                fill: #ffffff;
-                stroke-width: 0px;
-                text-align: center;
-                background: #555555;
-                border-radius: 10px 10px 0 0;
-            }
-            #dialogButtonHolder {
-                margin-top: 26px;
-            }
-            #dialogMessage {
-                margin: 5px;
-                min-height: 102px;
-            }
-            .loginStaticText {
-                text-align: center;
-            }
-            .loginVariableText {
-                text-align: center;
-                padding: 25px 0px;
-            }
-
-            #dialogSecondButton {
-                padding: 0 18px;
-                height: 29px;
-                font-size: 16px;
-                color: white;
-                background: #555555;
-                border: 0px solid;
-                border-radius: 10px;
-                box-shadow: none;
-                margin-left: 10px;
-                margin-right: 5px;
-                margin-bottom: 5px;
-                width: 137px;
-            }
-
-            #dialogSecondButton:not(.disabled):focus {
-                background: white;
-                outline: none;
-                box-shadow: 0 0 10px white;
-            }
-
-            #dialogSecondButton.disabled {
-                color: #6d6d6d;
-            }
-            #loginReadyPercentage {
-                font-size: 40px;
-            }
-        </style>
-        -->
 
         <!-- A betöltést és a beléptetést végző függvények. -->
         <script>
@@ -302,7 +230,7 @@
                     "js/libs/mediator-0.9.6/mediator.min.js",
                     "js/libs/topojson/topojson.min.js",                    
                     "js/libs/d3-sankey/d3-sankey." + min + "js",
-                    "js/libs/saveassvg/saveSvgAsPng." + min + "js",
+                    "js/libs/saveassvg/saveSvgAsPng." + min + "js"
                 ], loadLevel2);
             }
 
@@ -351,7 +279,7 @@
                     "js/Panel_Bar2D." + min + "js",
                     "js/Panel_Line2D." + min + "js",
                     "js/Panel_Table2D." + min + "js",
-                    "js/Panel_Sankey." + min + "js",
+                    "js/Panel_Sankey." + min + "js"
                 ], loadLevelLast);
             }
 
@@ -394,7 +322,7 @@
             function loadLevelLast() {
                 finalThreads--;
                 if (finalThreads <= 0) {
-                    $("#helpPanel").load("help.html?=ver" + version); // help.html betöltése.
+                    $("#helpPanel").load(version + "help.html"); // help.html betöltése.
                     loadResourcesAsync([
                         "js/Panel_Map." + min + "js"
 
@@ -445,16 +373,12 @@
 
             async function initKeycloak() {
                 keycloak = new Keycloak(agnosConfig.keycloakSettings);
-//                const k = await keycloak.init({onLoad: 'login-required'});
                 const k = await keycloak.init({onLoad: 'check-sso'});
-                //                const k = await keycloak.init({onLoad: 'check-sso', silentCheckSsoRedirectUri: `${location.href}/silent-check-sso.html`});
-
                 if (k) {
                     await keycloak.loadUserInfo();                    
                 } else {
                     
                 }
-                
                 
                 loadResources();
                 return k;
@@ -1045,7 +969,6 @@
                     <path d="m 0,0 -11.75781,0 -1.85547,5.3125 -7.55859,0 10.80078,-29.16016 8.96484,0 10.80079,29.16016 -7.5586,0 -1.83594,-5.3125 z m -9.88281,-5.41016 7.98828,0 -3.98437,-11.60156 -4.00391,11.60156 z" />
                     <path d="m 39.45313,3.14453 q -2.8125,1.36719 -5.83984,2.05078 -3.02735,0.68359 -6.25,0.68359 -7.28516,0 -11.54297,-4.0625 -4.25782,-4.08203 -4.25782,-11.05468 0,-7.05078 4.33594,-11.09375 4.33594,-4.04297 11.875,-4.04297 2.91016,0 5.56641,0.54687 2.67578,0.54688 5.03906,1.6211 l 0,6.03515 q -2.44141,-1.38672 -4.86328,-2.07031 -2.40234,-0.68359 -4.82422,-0.68359 -4.49219,0 -6.93359,2.51953 -2.42188,2.5 -2.42188,7.16797 0,4.6289 2.34375,7.14843 2.34375,2.51954 6.66016,2.51954 1.17187,0 2.16797,-0.13672 1.01562,-0.15625 1.8164,-0.46875 l 0,-5.66407 -4.58984,0 0,-5.03906 11.71875,0 0,14.02344 z" />
                     <path d="m 46.05469,-23.84766 8.39844,0 10.60547,20 0,-20 7.1289,0 0,29.16016 -8.39843,0 -10.60547,-20 0,20 -7.12891,0 0,-29.16016 z" />
-                    <!-- <path d="m 92.89063,-18.92578 q -3.4375,0 -5.33203,2.53906 -1.89453,2.53906 -1.89453,7.14844 0,4.58984 1.89453,7.1289 1.89453,2.53907 5.33203,2.53907 3.45703,0 5.35156,-2.53907 1.89453,-2.53906 1.89453,-7.1289 0,-4.60938 -1.89453,-7.14844 -1.89453,-2.53906 -5.35156,-2.53906 z m 0,-5.44922 q 7.03125,0 11.01562,4.02344 3.98438,4.02343 3.98438,11.11328 0,7.07031 -3.98438,11.09375 -3.98437,4.02343 -11.01562,4.02343 -7.01172,0 -11.01563,-4.02343 -3.98437,-4.02344 -3.98437,-11.09375 0,-7.08985 3.98437,-11.11328 4.00391,-4.02344 11.01563,-4.02344 z" /> -->
                     <path d="m 133.84766,-22.92969 0,6.17188 q -2.40234,-1.07422 -4.6875,-1.6211 -2.28516,-0.54687 -4.31641,-0.54687 -2.69531,0 -3.98437,0.74218 -1.28906,0.74219 -1.28906,2.30469 0,1.17188 0.85937,1.83594 0.87891,0.64453 3.16406,1.11328 l 3.20313,0.64453 q 4.86328,0.97656 6.91406,2.96875 2.05078,1.99219 2.05078,5.66406 0,4.82422 -2.87109,7.1875 -2.85156,2.34375 -8.73047,2.34375 -2.77344,0 -5.56641,-0.52734 -2.79296,-0.52734 -5.58593,-1.5625 l 0,-6.34766 q 2.79297,1.48438 5.39062,2.2461 2.61719,0.74219 5.03906,0.74219 2.46094,0 3.76954,-0.82032 1.30859,-0.82031 1.30859,-2.34375 0,-1.36718 -0.89844,-2.10937 -0.8789,-0.74219 -3.53515,-1.32813 l -2.91016,-0.64453 q -4.375,-0.9375 -6.40625,-2.98828 -2.01172,-2.05078 -2.01172,-5.52734 0,-4.35547 2.8125,-6.69922 2.8125,-2.34375 8.08594,-2.34375 2.40234,0 4.9414,0.37109 2.53907,0.35156 5.25391,1.07422 z" />
                     <g transform="translate(98.61,0)">
                     <use xlink:href="#logo_agnos" />
@@ -1054,59 +977,6 @@
 
                     </svg>	
 
-                    <!-- PULZUS logo
-                    <svg version="1.1" x="0px" y="0px" width="350px" height="40px" xmlns="http://www.w3.org/2000/svg" viewBox="-140 -0.5 350 32">
-                    <use xlink:href="#logo_pulzus" />
-                    </svg>
-                    -->
-
-                    <!-- AEEK tollaslogo
-                    <svg version="1.1" x="0px" y="50px" width="350px" height="40px" xmlns="http://www.w3.org/2000/svg" viewBox="0 -10 51 80">
-                    <g style="fill:#ffaaaa;stroke:none" transform="translate(-80,0) translate(0,0)" >
-                    <use xlink:href="#logo_aeek_a" />
-                    </g>
-                    <g style="fill:#eeeeee;stroke:none" transform="translate(-30,0) translate(6,0) rotate(-90, 0, 8) scale(-1, 1) " >
-                    <use xlink:href="#logo_aeek_a" />
-                    </g>
-                    <g style="fill:#eeeeee;stroke:none" transform="translate(28,0) translate(6,0) rotate(-90, 0, 8) scale(-1, 1) " >
-                    <use xlink:href="#logo_aeek_a" />
-                    </g>					
-                    <g style="fill:#aaffaa;stroke:none" transform="translate(85,0) translate(49,60) scale(-1, -1)" >
-                    <use xlink:href="#logo_aeek_a" />
-                    </g>
-                    -->
-
-
-
-                    <!-- Agnos szöveg, Tlwg Mono, Bold
-                    <svg version="1.1" x="0px" y="0px" width="350px" height="40px" xmlns="http://www.w3.org/2000/svg" viewBox="0 -10 51 80">
-          
-                    <g
-                        id="text3340"
-                        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:40px;line-height:125%;font-family:'Tlwg Mono';-inkscape-font-specification:'Tlwg Mono, Bold';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1">
-                    <path
-                        id="path3345"
-                        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:50px;line-height:125%;font-family:'Tlwg Mono';-inkscape-font-specification:'Tlwg Mono, Bold';text-align:start;writing-mode:lr-tb;text-anchor:start"
-                        d="m 118.78479,483.64633 q -3.3,0 -3.3,-2.5 0,-2.5 3.3,-2.5 l 1.15,0 -1.15,-2.9 -11.9,0 -1.15,2.9 1.15,0 q 3.3,0 3.3,2.5 0,2.5 -3.3,2.5 l -6.65,0 q -3.299995,0 -3.299995,-2.5 0,-2.5 3.349995,-2.5 l 7.75,-19.15 -3.15,0 q -3.35,0 -3.35,-2.5 0,-2.5 3.35,-2.5 l 10.8,0 9.95,24.15 q 3.4,0 3.4,2.5 0,2.5 -3.3,2.5 l -6.95,0 z m -2.05,-12.9 -3.9,-9.6 -3.95,9.6 7.85,0 z" />
-                    <path
-                        id="path3347"
-                        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:50px;line-height:125%;font-family:'Tlwg Mono';-inkscape-font-specification:'Tlwg Mono, Bold';text-align:start;writing-mode:lr-tb;text-anchor:start"
-                        d="m 143.86526,458.79633 q -2.6,0 -4.55,0.95 -1.9,0.9 -2.9,2.35 -0.95,1.45 -1.4,2.9 -0.4,1.4 -0.4,2.8 l 0,3.2 q 0,8.35 9.6,8.35 3.45,0 6.25,-1.25 l 0,-3.45 -5,0 q -3.3,0 -3.3,-2.5 0,-2.5 3.3,-2.5 l 8.75,0 q 3.35,0 3.35,2.5 0,1.9 -2.1,2.5 l 0,6.6 q -3.35,1.75 -5.7,2.4 -2.35,0.7 -5.25,0.7 -6.85,0 -10.9,-3.3 -4,-3.35 -4,-9.7 l 0,-3.55 q 0,-2.4 0.85,-4.8 0.9,-2.4 2.55,-4.5 1.65,-2.1 4.45,-3.4 2.85,-1.3 6.35,-1.3 4.05,0 7.25,1.6 0.8,-1.6 2.05,-1.6 1.15,0 1.75,0.75 0.6,0.7 0.6,2.55 l 0,3.9 q 0,3.3 -2.5,3.3 -0.5,0 -0.9,-0.15 -0.4,-0.2 -0.65,-0.4 -0.25,-0.2 -0.45,-0.55 -0.15,-0.4 -0.25,-0.6 -0.05,-0.25 -0.15,-0.55 -0.05,-0.35 -0.05,-0.4 -0.4,-1.3 -2.15,-2.05 -1.75,-0.8 -4.5,-0.8 z" />
-                    <path
-                        id="path3349"
-                        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:50px;line-height:125%;font-family:'Tlwg Mono';-inkscape-font-specification:'Tlwg Mono, Bold';text-align:start;writing-mode:lr-tb;text-anchor:start"
-                        d="m 166.59573,463.94633 0,14.7 1.75,0 q 3.3,0 3.3,2.5 0,2.5 -3.3,2.5 l -6.45,0 q -3.35,0 -3.35,-2.5 0,-2.5 3.05,-2.5 l 0,-19.15 -0.75,0 q -3.3,0 -3.3,-2.5 0,-2.5 3.3,-2.5 l 5.75,0 12.9,19.6 0,-14.6 -1.75,0 q -3.3,0 -3.3,-2.5 0,-2.5 3.3,-2.5 l 6.5,0 q 3.3,0 3.3,2.5 0,2.5 -3.05,2.5 l 0,24.15 -4.95,0 -12.95,-19.7 z" />
-                    <path
-                        id="path3351"
-                        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:50px;line-height:125%;font-family:'Tlwg Mono';-inkscape-font-specification:'Tlwg Mono, Bold';text-align:start;writing-mode:lr-tb;text-anchor:start"
-                        d="m 202.9262,453.79633 q 2.35,0 4.75,1 2.4,0.95 4.45,2.8 2.1,1.8 3.4,4.9 1.35,3.05 1.35,6.8 0,6.15 -4.15,10.6 -4.1,4.45 -9.8,4.45 -5.8,0 -9.9,-4.45 -4.05,-4.5 -4.05,-10.85 0,-6.3 4.1,-10.75 4.1,-4.5 9.85,-4.5 z m 0,5 q -3.65,0 -6.3,3.05 -2.65,3 -2.65,7.2 0,4.25 2.6,7.3 2.65,3 6.35,3 3.65,0 6.3,-3 2.65,-3 2.65,-7.15 0,-4.3 -2.65,-7.35 -2.6,-3.05 -6.3,-3.05 z" />
-                    <path
-                        id="path3353"
-                        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:50px;line-height:125%;font-family:'Tlwg Mono';-inkscape-font-specification:'Tlwg Mono, Bold';text-align:start;writing-mode:lr-tb;text-anchor:start"
-                        d="m 243.75667,457.09633 0,4.4 q 0,3.35 -2.45,3.35 -0.55,0 -1,-0.15 -0.4,-0.2 -0.65,-0.4 -0.2,-0.2 -0.4,-0.55 -0.2,-0.4 -0.25,-0.6 -0.05,-0.2 -0.15,-0.55 -0.05,-0.4 -0.05,-0.45 -0.35,-1.5 -2,-2.4 -1.6,-0.95 -3.95,-0.95 -2.35,0 -4,1.1 -1.65,1.1 -1.65,2.7 0,1 0.5,1.75 0.55,0.7 1.7,1.15 1.15,0.4 1.85,0.6 0.75,0.2 2.2,0.45 1.9,0.35 3.3,0.75 1.45,0.35 3.05,1.05 1.6,0.7 2.6,1.65 1.05,0.9 1.7,2.35 0.7,1.45 0.7,3.3 0,3.9 -3.15,6.3 -3.15,2.4 -8.3,2.4 -4.15,0 -7.8,-1.95 -1,1.2 -2,1.2 -2.55,0 -2.55,-3.3 l 0,-3.3 q 0,-3.3 2.5,-3.3 0.35,0 0.65,0.1 0.3,0.05 0.55,0.2 0.25,0.1 0.4,0.25 0.2,0.1 0.3,0.35 0.15,0.2 0.25,0.35 0.1,0.15 0.15,0.35 0.1,0.2 0.1,0.35 0.05,0.1 0.1,0.3 l 0.05,0.15 q 0.35,1.35 2.4,2.3 2.05,0.95 4.55,0.95 2.8,0 4.7,-1.1 1.9,-1.1 1.9,-2.7 0,-1.25 -1.1,-2.05 -1.05,-0.85 -2.1,-1.1 -1.05,-0.3 -3.45,-0.75 -0.35,-0.05 -0.5,-0.1 -2.3,-0.45 -3.95,-0.95 -1.6,-0.55 -3.25,-1.5 -1.6,-1 -2.45,-2.6 -0.8,-1.65 -0.8,-3.85 0,-3.8 3.1,-6.3 3.1,-2.55 7.75,-2.55 3.9,0 6.5,1.65 0.4,-0.95 0.8,-1.3 0.4,-0.35 1.15,-0.35 2.45,0 2.45,3.3 z" />
-                    </g>          
-                    </svg>	  
-                    -->
                 </h1>
                 <div id="dialogMessage">
 

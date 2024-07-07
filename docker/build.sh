@@ -23,6 +23,7 @@ cp -r "${GIT_ROOT_DIR}/public_html" ./public_html
 # Change version to the current date in the index.html file
 DATE=$(date +%Y.%m.%dT%H.%M).
 sed -i "s/var version = .*;/var version = \"${DATE}\";/" ./public_html/index.html
+sed -i "s/href=\"data/href=\"${DATE}data/" ./public_html/index.html
 
 # Create symlinks to prevent caching
 for file in ./public_html/*

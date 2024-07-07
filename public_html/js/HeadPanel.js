@@ -4,7 +4,7 @@
 
 /**
  * A fejléc panelek közös szülője.
- * 
+ *
  * @param {Object} init Inicializáló objektum. Valójában csak az oldal érdekel belőle.
  * @param {Object} mediator A rendelkezésre álló mediátor.
  * @param {String} additionalClass A html objektumhoz adandó további class-nevek.

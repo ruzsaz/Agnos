@@ -476,6 +476,10 @@ var global = function () {
                 if (global.saveToBookmarkRequired && !onlyForDisplay && !global.isEmbedded) {
                     window.history.replaceState({id: "100"}, "Page 3", newUrl);
                 }
+                
+                if (onlyForDisplay) {
+                    console.log(newUrl);
+                }
             }
         };
 
