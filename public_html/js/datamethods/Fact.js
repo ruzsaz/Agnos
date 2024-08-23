@@ -81,6 +81,7 @@ Fact.prototype.getLocalMeta = function() {
         const localLabel = global.getFromArrayByLang(this.reportMeta.labels, language);
         this.localMeta.caption = localLabel.caption;
         this.localMeta.cube_unique_name = this.reportMeta.name;
+        this.localMeta.saveAllowed = this.reportMeta.saveAllowed;
         this.localMeta.datasource = localLabel.datasource;
         this.localMeta.description = localLabel.description;
         

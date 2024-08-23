@@ -1352,6 +1352,11 @@ var global = function () {
                 d3.selectAll("#mainToolbar .save, #mainToolbar #mainCloseButton").classed("inactive", true);
             }
 
+            // Ha nincs megengedve az adatok mentése, akkor a mentrés gomb legyen inaktív.
+            if (!(isContainsReport && global.facts[side] && global.facts[side].localMeta && global.facts[side].localMeta.saveAllowed)) {
+                d3.selectAll("#mainToolbar .saveAsCsv").classed("inactive", true);
+            }
+
             // Ha nincs területi dimenzió, a mappanel letiltása.
             if (global.facts[side]) {
                 var isHaveTerritorial = false;
