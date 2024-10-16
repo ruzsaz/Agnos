@@ -37,8 +37,8 @@ function HeadPanel(init, mediator, additionalClass, startScale, duration) {
     });
     that.mediatorIds.push({"channel": "killListeners", "id": med.id});
 
-    med = this.mediator.subscribe("resize", function(duration, panelNumberPerRow, scaleRatio) {
-        that.resize(duration, panelNumberPerRow);
+    med = this.mediator.subscribe("resize", function(duration, panelNumberPerRow, scaleRatio, immediate) {
+        that.resize(immediate ? 0 : duration, panelNumberPerRow);
     });
     that.mediatorIds.push({"channel": "resize", "id": med.id});
 
@@ -94,6 +94,7 @@ HeadPanel.prototype.init = function(additionalClass, duration) {
  */
 HeadPanel.prototype.resize = function(duration, panelNumberPerRow) {
     var that = this;
+    
     var width = panelNumberPerRow * (global.panelWidth + 2 * this.panelMargin) - 2 * this.panelMargin;
     if (panelNumberPerRow === 1) {
         that.panelDiv.selectAll(".halfHead")

@@ -15,15 +15,19 @@ function DataDirector(side, mediator) {
     this.side = side;
     this.mediator = mediator;
     this.panelRoster = [];
-    this.drillLock = false; // Ha true, nem lehet fúrni. 
+    this.drillLock = false; // Ha true, nem lehet fúrni.    
 
     // Feliratkozás a regisztráló, és a fúró mediátorra.
     that.mediator.subscribe("register", function(context, panelId, dimsToShow, preUpdateFunction, updateFunction, getConfigFunction) {
         that.register(context, panelId, dimsToShow, preUpdateFunction, updateFunction, getConfigFunction);
     });
     that.mediator.subscribe("drill", function(drill) {
-        that.drill(drill);
+        if (!that.drillLock || drill.onlyFor !== undefined) {
+            that.drillLock = true;
+            that.drill(drill);            
+        }
     });
+    
     // Feliratkozás a panel konfigurációját elkérő mediátorra.
     that.mediator.subscribe("getConfig", function(callback) {
         that.getConfigs(callback);
@@ -140,7 +144,7 @@ DataDirector.prototype.drill = function(drill) {
             drill.fromId = (baseDim.length === 0) ? null : (baseDim[baseDim.length - 1]).id;
             baseDim.push({id: drill.toId, name: drill.toName});
         }
-    } else if (drill.direction === 1) {
+    } else if (drill.direction === 1) {        
         if (baseDim.length > 0) {
             isSuccessful = true;
             drill.fromId = (baseDim[baseDim.length - 1]).id;
@@ -152,8 +156,10 @@ DataDirector.prototype.drill = function(drill) {
     }
     if (isSuccessful) {
         that.requestNewData(drill);
-        that.initiatePreUpdates(drill);
-    }
+        that.initiatePreUpdates(drill);                
+    } else {
+        that.drillLock = false;
+    }   
 };
 
 /**
@@ -217,6 +223,7 @@ DataDirector.prototype.requestNewData = function(drill) {
     // A letöltés élesben.
     global.get(global.url.fact, encodedQuery, function(result) {
         that.processNewData(drill, result);
+        that.drillLock = false;
     });
 };
 

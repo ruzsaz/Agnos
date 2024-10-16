@@ -15,7 +15,7 @@ function Tooltip() {
 	this.status = -2; // 2: látható, 1: előtűnő, -1: fakuló, -2: nem látható.
 	this.element = undefined; // Az épp mutatott elem.
 	this.currentWidth = 0;  // Az épp kijelzett tooltip szélessége pixelben.
-	this.currentHeight = 0; // Az épp kijelzett tooltip magassága pixelben.
+	this.currentHeight = 0; // Az épp kijelzett tooltip magassága pixelben.        
 
 	this.tooltip = d3.select("body").append("html:div")
 			.attr("class", "tooltip")
@@ -56,6 +56,15 @@ function Tooltip() {
 					.style("top", posTop + "px");
 		}
 	});
+        
+        d3.select("body").on("touchmove", function() {
+            that.kill();
+        });
+        
+        d3.select("body").on("touchend", function() {
+            setTimeout(function() {that.kill()}, 50);
+        });        
+        
 }
 
 // Osztályáltozók.
@@ -63,7 +72,7 @@ function Tooltip() {
 	Tooltip.prototype.tooltipOffsetX = 16;
 	Tooltip.prototype.tooltipOffsetY = 18;
 	Tooltip.prototype.tooltipOpacity = 0.9;
-	Tooltip.prototype.appearDelay = 1000;
+	//Tooltip.prototype.appearDelay = global.hasTouchScreen ? 300 : 1000;
 }
 
 /**
@@ -100,6 +109,7 @@ Tooltip.prototype.hide = function() {
  * @returns {undefined}
  */
 Tooltip.prototype.show = function(html) {
+        const appearDelay = global.hasTouchScreen ? 100 : 1000;
 	var that = this;
 	that.screenSizeX = parseInt($(window).width());  // Újra lemérjük, hátha megváltozott.
 	that.screenSizeY = parseInt($(window).height()); // Újra lemérjük, hátha megváltozott.
@@ -107,7 +117,7 @@ Tooltip.prototype.show = function(html) {
 	if (that.status < 0) {
 		that.tooltip.transition().duration(0);
 		that.tooltip.transition()
-				.delay((that.status === -1) ? 0 : that.appearDelay)
+				.delay((that.status === -1) ? 0 : appearDelay)
 				.duration(global.selfDuration / 2)
 				.style("opacity", that.tooltipOpacity)
 				.on("end", function() {

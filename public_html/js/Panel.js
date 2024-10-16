@@ -122,6 +122,7 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     that.mediatorIds.push({"channel": "magnifyPanel", "id": med.id});
 
     // Sorbarendezés váltó
+    // TODO: mobil esetén duplájára nagyítani
     if (that.isShortingByValueEnabled && !global.isEmbedded) {    
         var sortSwitcher = that.svg.insert("svg:g")
                 .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
@@ -135,6 +136,7 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     }
 
     // A nagyító fül
+    // TODO: 1 oszlopos mód esetén levenni
     if (!global.isEmbedded) {
         var duplicator = that.svg.append("svg:g")
                 .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
@@ -151,12 +153,13 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     
     
     // A becsukó gomb fül
+    // TODO: mobil esetén duplájára nagyítani
     if (!global.isEmbedded) {
         var closeButton = that.svg.append("svg:g")
                 .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
                 .attr("transform", "translate(" + (that.w - 24)  + ", 0)")
                 .on('click', function() {
-                    if (global.panelNumberOnScreen !== 1) {
+                    if (global.panelNumberOnScreen !== 0) {
                         that.mediator.publish("killPanel", that.panelId);
                     }
                 });
@@ -175,7 +178,8 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
             })
             .on('mouseout', function() {
                 that.hoverOff();
-            });
+            })
+    ;
 
     // Panel áthúzásához a segédobjektumok.
     this.dragging = false;
@@ -188,12 +192,13 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
      * @returns {undefined}
      */
     var dragStarted = function() {
+        
         if (!global.isEmbedded) {
-            var coords = d3.mouse(that.container.nodes()[0]);
-            that.dragStartX = coords[0];
-            that.dragStartY = coords[1];
-            that.panelDiv.classed("dragging", true)
-                    .style("z-index", 10000);
+                var coords = d3.mouse(that.container.nodes()[0]);
+                that.dragStartX = coords[0];
+                that.dragStartY = coords[1];
+                that.panelDiv.classed("dragging", true)
+                        .style("z-index", 10000);
         }
     };
 
@@ -288,7 +293,9 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
             .on("end", dragEnd)
             .clickDistance(that.dragTreshold);
 
-    this.svg.call(this.drag);
+    if (!global.hasTouchScreen) {
+        this.svg.call(this.drag);
+    }
 }
 
 //////////////////////////////////////////////////
@@ -421,7 +428,6 @@ Panel.prototype.killPanel = function(panelId, duration, fromStyle, toStyle, dont
  */
 Panel.prototype.magnifyPanel = function(panelId) {
     var that = this;
-
     if (panelId === that.panelId || that.magLevel !== 1) {
         // Belerakjuk a kezdő és végnagyítottságot a panel init-stringjébe.
         var origMag = that.actualInit.mag;
@@ -434,14 +440,14 @@ Panel.prototype.magnifyPanel = function(panelId) {
         }
 
         // Elkészítjük a nagyított panel config-sztringjét, és beleírjuk a pozíciót is.
-        var position = that.panelId.slice(-1);
+        var position = that.panelId.slice(-1);        
         var config = this.getConfig();
         config = config.substr(0, config.length - 2);
         if (config.slice(-1) !== "{") {
             config = config + ", ";
         }
         config = config + "position: " + position + "})";
-
+        
         var newPanelId = that.panelId;
         that.panelId = that.panelId + "dying";
         this.panelDiv.attr("id", that.panelId.substring(1));
@@ -594,13 +600,14 @@ Panel.prototype.hoverOn = function(gHovered, targetId) {
         var rectObj = d3.select(gHovered).select("rect"); // A g-ben levő ELSŐ téglalap kiválasztása.
         var transform = (rectObj.attr("transform") !== null) ? rectObj.attr("transform") : d3.select(gHovered).attr("transform");
         var that = this;
-        global.dragDropManager.targetObject = gHovered;//.parentNode;
+        global.dragDropManager.targetObject = gHovered;
         global.dragDropManager.targetPanelId = that.panelId;
         global.dragDropManager.targetId = targetId;// || 0;
         global.dragDropManager.targetSide = parseInt(that.panelId.replace(/(^.+\D)(\d+)(\D.+$)/i, '$2'));
 
         // Ha ejthető a dolog, akkor bevonalkázza a célpontot.
         if (global.dragDropManager.draggedMatchesTarget()) {
+            that.svg.selectAll(".hoveredDropTarget").remove();
             that.svg.append("svg:rect")
                     .attr("class", "hoveredDropTarget")
                     .attr("width", rectObj.attr("width"))

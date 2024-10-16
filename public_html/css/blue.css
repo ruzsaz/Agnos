@@ -177,6 +177,10 @@ and open the template in the editor.
   user-select: none;
   font-family: arial, sans-serif;
   background-size: cover;
+  -webkit-tap-highlight-color: transparent;
+}
+body.mobile .hideForMobile {
+  display: none !important;
 }
 /* Safarihoz bugfix */
 input[type=text],
@@ -191,6 +195,7 @@ root {
   display: block;
 }
 body {
+  font-size: 32px;
   margin: 0px;
   padding: 0px;
   overflow-x: hidden;
@@ -235,8 +240,9 @@ svg {
 #scrollPaneP0,
 #scrollPaneP1 {
   position: absolute;
-  height: calc(100% -  32px);
-  top: 32px;
+  /*#height: calc(~"100% - " @mainToolbarHeight);*/
+  height: calc(100% - 1em);
+  top: 1em;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -254,7 +260,8 @@ svg {
 #cutter0,
 #cutter1 {
   position: relative;
-  height: calc(100vh -  32px);
+  /*height: calc(~"100vh - " @mainToolbarHeight);*/
+  height: calc(100vh - 1em);
   overflow: hidden;
 }
 .panel {
@@ -623,6 +630,7 @@ g.sankey_nodes_shadow .nodeShadow {
   text-align: end;
   color: #000;
   cursor: pointer;
+  font-size: 28px;
 }
 .HeadPanel_Browser #greetingBadge #logoutLink:hover {
   color: #78bbdf;
@@ -723,17 +731,17 @@ g.sankey_nodes_shadow .nodeShadow {
   color: #ffe;
 }
 .hoverable text {
-  transition: color 0.1s linear;
-  -webkit-transition: color 0.1s linear;
-  -moz-transition: color 0.1s linear;
-  -ms-transition: color 0.1s linear;
-  -o-transition: color 0.1s linear;
+  transition: color 0.01s linear;
+  -webkit-transition: color 0.01s linear;
+  -moz-transition: color 0.01s linear;
+  -ms-transition: color 0.01s linear;
+  -o-transition: color 0.01s linear;
 }
 /* Cointainer, drag réteg */
 .dragCircle {
   background: lightGrey;
   border-radius: 5px;
-  border: 1px solid black;
+  border: 2px solid #fdfdfd;
   z-index: 900;
   position: absolute;
   display: none;
@@ -748,6 +756,8 @@ g.sankey_nodes_shadow .nodeShadow {
   font-size: 16px;
   pointer-events: none;
   color: red;
+  width: 400px;
+  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.55);
 }
 .button {
   display: inline-block;
@@ -780,11 +790,11 @@ g.sankey_nodes_shadow .nodeShadow {
   text-anchor: middle;
   pointer-events: none;
   opacity: 0;
-  transition: fill 0.1s linear;
-  -webkit-transition: fill 0.1s linear;
-  -moz-transition: fill 0.1s linear;
-  -ms-transition: fill 0.1s linear;
-  -o-transition: fill 0.1s linear;
+  transition: fill 0.01s linear;
+  -webkit-transition: fill 0.01s linear;
+  -moz-transition: fill 0.01s linear;
+  -ms-transition: fill 0.01s linear;
+  -o-transition: fill 0.01s linear;
 }
 body {
   -ms-scrollbar-face-color: #3b91e8;
@@ -1820,16 +1830,17 @@ text {
   overflow-x: hidden;
   overflow-y: hidden;
   z-index: 100;
+  /*font-size: @mainToolbarHeight;*/
 }
 #mainToolbar * {
   overflow-x: visible;
   overflow-y: visible;
   z-index: 100;
-  transition: visibility 0.1s linear, color 0.1s linear, opacity 0.1s linear, fill 0.1s linear, stroke 0.1s linear;
-  -webkit-transition: visibility 0.1s linear, color 0.1s linear, opacity 0.1s linear, fill 0.1s linear, stroke 0.1s linear;
-  -moz-transition: visibility 0.1s linear, color 0.1s linear, opacity 0.1s linear, fill 0.1s linear, stroke 0.1s linear;
-  -ms-transition: visibility 0.1s linear, color 0.1s linear, opacity 0.1s linear, fill 0.1s linear, stroke 0.1s linear;
-  -o-transition: visibility 0.1s linear, color 0.1s linear, opacity 0.1s linear, fill 0.1s linear, stroke 0.1s linear;
+  transition: visibility 0.01s linear, color 0.01s linear, opacity 0.01s linear, fill 0.01s linear, stroke 0.01s linear;
+  -webkit-transition: visibility 0.01s linear, color 0.01s linear, opacity 0.01s linear, fill 0.01s linear, stroke 0.01s linear;
+  -moz-transition: visibility 0.01s linear, color 0.01s linear, opacity 0.01s linear, fill 0.01s linear, stroke 0.01s linear;
+  -ms-transition: visibility 0.01s linear, color 0.01s linear, opacity 0.01s linear, fill 0.01s linear, stroke 0.01s linear;
+  -o-transition: visibility 0.01s linear, color 0.01s linear, opacity 0.01s linear, fill 0.01s linear, stroke 0.01s linear;
 }
 /* mainToolbar */
 #mainToolbar nav ul ul {
@@ -1844,13 +1855,16 @@ text {
   -webkit-box-shadow: inset 0px -24px 24px -12px rgba(0, 0, 0, 0.2), 3px 3px 9px rgba(0, 0, 0, 0.75);
   -moz-box-shadow: inset 0px -24px 24px -12px rgba(0, 0, 0, 0.2), 3px 3px 9px rgba(0, 0, 0, 0.75);
 }
+body.mobile #mainToolbar nav ul ul {
+  right: -0.6em;
+}
 #mainToolbar nav ul {
   background: #3b91e8;
   padding: 0 20px;
   margin-top: 0px;
 }
 #mainToolbar > nav > ul {
-  height: 32px;
+  height: 1em;
   width: 100vw;
   padding: 0px;
   border-bottom-left-radius: 5px;
@@ -1858,7 +1872,7 @@ text {
 }
 #mainToolbar nav ul li {
   float: left;
-  min-width: 60px;
+  min-width: 1.2em;
   max-width: 160px;
   width: 7%;
   position: relative;
@@ -1872,24 +1886,24 @@ text {
 }
 #mainToolbar > nav > ul > li#mainPlusButton,
 svg.plusButtonHelp {
-  min-width: 32px;
-  max-width: 44px;
+  min-width: 1em;
+  max-width: 1.375em;
   width: 5%;
   border-bottom-left-radius: 5px;
   background: #003f61;
 }
 #mainToolbar > nav > ul > li#mainMinusButton,
 svg.minusButtonHelp {
-  min-width: 32px;
-  max-width: 44px;
+  min-width: 1em;
+  max-width: 1.375em;
   width: 5%;
   background: #005481;
 }
 #mainToolbar > nav > ul > li#mainCloseButton,
 svg.closeButtonHelp {
   float: right;
-  min-width: 32px;
-  max-width: 44px;
+  min-width: 1em;
+  max-width: 1.375em;
   width: 5%;
   border-bottom-right-radius: 5px;
   background: #003f61;
@@ -1897,8 +1911,8 @@ svg.closeButtonHelp {
 #mainToolbar > nav > ul > li#mainSwitchButton,
 svg.switchButtonHelp {
   float: right;
-  min-width: 32px;
-  max-width: 44px;
+  min-width: 1em;
+  max-width: 1.375em;
   width: 5%;
   background: #005481;
 }
@@ -1907,7 +1921,7 @@ svg.switchButtonHelp {
   float: right;
 }
 #mainToolbar > nav > ul {
-  height: 32px;
+  height: 1em;
   width: 100vw;
   padding: 0px;
   border-bottom-left-radius: 5px;
@@ -1955,8 +1969,8 @@ svg.switchButtonHelp {
   color: #90e0ef;
   text-decoration: none;
   text-align: center;
-  height: 32px;
-  line-height: 32px;
+  height: 1em;
+  line-height: 1em;
   margin: auto;
 }
 #mainToolbar nav ul ul li {
@@ -1988,9 +2002,9 @@ svg.switchButtonHelp {
   fill: #fff;
   color: #fff;
 }
-#mainToolbar nav ul li.switch span {
+#mainToolbar nav ul li.switch ul span {
   margin: 0px;
-  font-size: larger;
+  font-size: 28px;
 }
 #mainToolbar nav ul ul li:first-child {
   background: top, #3b91e8 0%, #3b91e8 50%;
@@ -2043,7 +2057,7 @@ svg.switchButtonHelp {
   position: absolute;
   top: 0px;
   width: 100vw;
-  height: 32px;
+  height: 1em;
   background: rgba(0, 0, 0, 0);
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
@@ -2056,23 +2070,34 @@ svg.switchButtonHelp {
   z-index: 101;
 }
 /* Nagyító-fül. */
-.magnifyPanelButton:not(:hover) > g {
+.magnifyPanelButton * {
   stroke: #aaa;
 }
 /* Nagyító-fül, ha fölötte van az egér */
-.magnifyPanelButton:hover > g {
-  stroke: #90e0ef;
+@media (pointer: fine) {
+  .magnifyPanelButton:hover * {
+    stroke: #90e0ef;
+  }
 }
 .magnifyPanelButton * {
+  pointer-events: bounding-box;
   stroke-width: 2;
   stroke-linecap: round;
   fill: red;
   fill-opacity: 0;
-  transition: stroke 0.1s linear;
-  -webkit-transition: stroke 0.1s linear;
-  -moz-transition: stroke 0.1s linear;
-  -ms-transition: stroke 0.1s linear;
-  -o-transition: stroke 0.1s linear;
+  transition: stroke 0.01s linear;
+  -webkit-transition: stroke 0.01s linear;
+  -moz-transition: stroke 0.01s linear;
+  -ms-transition: stroke 0.01s linear;
+  -o-transition: stroke 0.01s linear;
+}
+.magnifyPanelButton:active * {
+  transition: stroke 0s linear !important;
+  -webkit-transition: stroke 0s linear !important;
+  -moz-transition: stroke 0s linear !important;
+  -ms-transition: stroke 0s linear !important;
+  -o-transition: stroke 0s linear !important;
+  stroke: #90e0ef !important;
 }
 .svgScrollbarG {
   opacity: 0;
@@ -2114,6 +2139,7 @@ svg.switchButtonHelp {
   margin-bottom: 0px;
 }
 #dialogPanel {
+  font-size: 28px;
   left: 50vw;
   top: 35vh;
   overflow: hidden;
@@ -2220,6 +2246,7 @@ svg.switchButtonHelp {
   margin-top: 26px;
 }
 #helpPanel {
+  font-size: 16px;
   display: block;
   position: absolute;
   z-index: 150;
@@ -2289,6 +2316,11 @@ svg.switchButtonHelp {
   margin: 0px;
   color: #ffffff;
 }
+@media (pointer: coarse) {
+  #helpControl {
+    display: none;
+  }
+}
 #helpControl {
   white-space: nowrap;
   overflow: auto;
@@ -2307,11 +2339,11 @@ svg.switchButtonHelp {
   float: left;
 }
 #helpControl * {
-  transition: color 0.1s linear, opacity 0.1s linear;
-  -webkit-transition: color 0.1s linear, opacity 0.1s linear;
-  -moz-transition: color 0.1s linear, opacity 0.1s linear;
-  -ms-transition: color 0.1s linear, opacity 0.1s linear;
-  -o-transition: color 0.1s linear, opacity 0.1s linear;
+  transition: color 0.01s linear, opacity 0.01s linear;
+  -webkit-transition: color 0.01s linear, opacity 0.01s linear;
+  -moz-transition: color 0.01s linear, opacity 0.01s linear;
+  -ms-transition: color 0.01s linear, opacity 0.01s linear;
+  -o-transition: color 0.01s linear, opacity 0.01s linear;
 }
 #helpControl nav {
   height: 100%;
@@ -2324,11 +2356,13 @@ svg.switchButtonHelp {
   position: relative;
   padding: 0px;
 }
+/*
 #helpControl > nav > ul > li:last-child {
-  position: absolute;
-  bottom: 0px;
-  width: 100%;
+    position: absolute;
+    bottom: 0px;
+    width: 100%;
 }
+*/
 #helpControl nav li {
   padding: 0 0px;
   list-style: none;

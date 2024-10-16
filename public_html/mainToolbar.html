@@ -5,14 +5,14 @@
             <ul class="dropdown">
                 <li id="mainPlusButton">
                     <span class="tloc" tooltip="<h4>Nagyítás</h4>" onclick="global.mainToolbar_magnify(-1);">
-                        <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                        <svg class="magnifiable" version="1.1" x="0px" y="0px" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                         <use xlink:href="#icon_plus" />						
                         </svg>
                     </span>
                 </li>
                 <li id="mainMinusButton">
                     <span class="tloc" tooltip="<h4>Kicsinyítés</h4>" onclick="global.mainToolbar_magnify(1)">
-                        <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                        <svg class="magnifiable" version="1.1" x="0px" y="0px" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                         <use xlink:href="#icon_minus" />	
                         </svg>
                     </span>
@@ -20,7 +20,7 @@
 
                 <li class="inactive onlyforreport newpanel">
                     <span class="tloc" tooltip="<h4>Új panel</h4>">
-                        <svg version="1.1" x="0px" y="0px" width="40px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
+                        <svg version="1.1" x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
                         <use xlink:href="#icon_newpanel" />	
                         </svg>
                     </span>
@@ -143,17 +143,17 @@
                     </ul>
                 </li>
 
-                <li class="inactive onlyforreport save saveAsCsv">
+                <li class="inactive onlyforreport hideForMobile save saveAsCsv">
                     <span class="tloc" tooltip='<h4>Adatok mentése</h4>' onclick="global.mainToolbar_save();">
-                        <svg version="1.1" x="0px" y="0px" width="40px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
+                        <svg version="1.1" x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
                         <use xlink:href="#icon_save" />
                         </svg>
                     </span>
                 </li>
 
-                <li class="inactive onlyforreport save">
+                <li class="inactive onlyforreport hideForMobile save">
                     <span class="tloc" tooltip='<h4>Panelek mentése képként</h4>' onclick="global.mainToolbar_saveAllImages();">
-                        <svg version="1.1" x="0px" y="0px" width="40px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
+                        <svg version="1.1" x="0px" y="0px" width="1.25em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
                         <use xlink:href="#icon_save_png" />
                         </svg>
                     </span>
@@ -161,7 +161,7 @@
 
                 <li>
                     <span class="tloc" tooltip='<h4>Használati segédlet</h4>' onclick="global.mainToolbar_help(null);">
-                        <svg version="1.1" x="0px" y="0px" width="40px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
+                        <svg version="1.1" x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
                         <use xlink:href="#icon_help" />
                         </svg>
                     </span>
@@ -170,15 +170,15 @@
                 <li class="inactive onlyforreport" id="mainCloseButton">
                     <span class="tloc" tooltip='<h4>Jelentés bezárása</h4>' onclick="if (this.parentNode.className.indexOf('inactive') === -1)
                                 global.mainToolbar_closeSide();">
-                        <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                        <svg version="1.1" x="0px" y="0px" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                         <use xlink:href="#icon_close" />
                         </svg>
                     </span>
                 </li>	
 
-                <li id="mainSwitchButton">
+                <li class="hideForMobile" id="mainSwitchButton">
                     <span class="tloc" tooltip='<h4>1/2 oldal váltás</h4>' onclick="global.mainToolbar_switchSide();">
-                        <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                        <svg version="1.1" x="0px" y="0px" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                         <use xlink:href="#icon_switch" />
                         </svg>						
                     </span>
@@ -186,7 +186,7 @@
 
                 <li class="languageSwitch switch" style="display: none;">
                     <span class="tloc" tooltip="<h4>Nyelv választás</h4>">
-                        <svg version="1.1" x="0px" y="0px" width="40px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
+                        <svg version="1.1" x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
                         <use xlink:href="#icon_flag" />	
                         </svg>
                     </span>
@@ -208,7 +208,7 @@
 
                 <li class="cssSwitch switch">
                     <span class="tloc" tooltip="<h4>Színsémák</h4>">
-                        <svg version="1.1" x="0px" y="0px" width="40px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
+                        <svg version="1.1" x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
                         <use xlink:href="#icon_palette" />	
                         </svg>
                     </span>

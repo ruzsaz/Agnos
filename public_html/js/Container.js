@@ -3,7 +3,7 @@
 'use strict';
 
 /**
- * Az adatlekérdezőt tartalmazó konténer konstruktora.
+ * Az adatlekérdezőt tartalmazó konténer konstruktora
  * A sikeres belépés után kell példányosítani.
  * 
  * @returns {Container}
@@ -127,11 +127,12 @@ Container.prototype.switchPanels = function() {
  * @returns {undefined}
  */
 Container.prototype.magnify = function(direction) {
+    global.oldPanelNumberOnScreen = global.panelNumberOnScreen;
     global.panelNumberOnScreen = Math.min(global.maxPanelCount, Math.max(1, global.panelNumberOnScreen + direction));
     global.mainToolbar_refreshState();
     if (global.panelNumberOnScreen === 1) {
         global.mediators[0].publish("magnifyPanel", undefined);
-        global.mediators[0].publish("magnifyPanel", undefined);
+        global.mediators[1].publish("magnifyPanel", undefined);
     }
     this.onResize(global.panelNumberOnScreen);
 };
@@ -162,6 +163,7 @@ Container.prototype.onResize = function(panelsPerScreen) {
  */
 Container.prototype.resizeContainers = function(duration, container0SizePercentage, panelsPerRow, isViewSwitch) {
     var that = this;
+    const currentPanelsPerRow = 
     that.resizeContainer(0, duration, container0SizePercentage, panelsPerRow, undefined, isViewSwitch);
     that.resizeContainer(1, duration, 1 - container0SizePercentage, panelsPerRow, undefined, isViewSwitch);
 };
@@ -180,7 +182,7 @@ Container.prototype.resizeContainers = function(duration, container0SizePercenta
 Container.prototype.resizeContainer = function(side, duration, sizePercentage, panelsPerRow, scaleRatio, isViewSwitch) {
     var that = this;
     var bodyWidth = parseInt(d3.select("#topdiv").style("width"));
-    var bodyHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    var bodyHeight = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);    
     var panelMargin = parseInt($(".panel").css("margin-top")) + parseInt($(".panel").css("border-top-width"));
     var panelRealWidth = global.panelWidth + 2 * panelMargin; // Egy panel ténylegesen ennyi pixelt folgalna el nagyítás nélkül.
 
@@ -192,9 +194,13 @@ Container.prototype.resizeContainer = function(side, duration, sizePercentage, p
             global.panelNumberOnScreen = panelNumberPerRow / sizePercentage;
         }
     }
-
+    
+    // Az 1 -> 2 illetve 2 -> 1 ázméretezás helyes kezeléséhez
+    const immediate = (global.oldPanelNumberOnScreen === 1 && panelNumberPerRow === 2);
+    d3.selectAll(".reportHeadPanel .halfHead").classed("vertical", (panelNumberPerRow === 1));    
+    
     scaleRatio = (scaleRatio === undefined) ? that.getScaleRatio(side, sizePercentage, panelNumberPerRow) : scaleRatio;
-
+    
     if (isViewSwitch) {
         // Azért kell így animálni, mert ha scrollbar is van, akkor a d3 hibásan számolja ki a "from" értéket. (Scrollbar nélkül veszi, míg a "to"-t scrollbarrral.)
         d3.select("#scrollPaneP" + side).style("overflow-y", "hidden");
@@ -217,7 +223,7 @@ Container.prototype.resizeContainer = function(side, duration, sizePercentage, p
 
     // A panelek (főleg a fejlécpanel) számára kiadandó resize üzenet.
     if (global.mediators[side]) {
-        global.mediators[side].publish("resize", duration, panelNumberPerRow, scaleRatio);
+        global.mediators[side].publish("resize", duration, panelNumberPerRow, scaleRatio, immediate);
     }
 
     // Animálva átméretezi a tartó konténert.
@@ -225,14 +231,14 @@ Container.prototype.resizeContainer = function(side, duration, sizePercentage, p
             .style("width", parseInt((bodyWidth * sizePercentage / scaleRatio) + 20) + "px")
             .styles(global.getStyleForScale(scaleRatio, 0, 0))
             .on("end", function() {                
-                var cutterHeight = parseInt(d3.select("#container" + side).style("height")) * scaleRatio;
-                if ((cutterHeight < parseFloat(d3.select("body").style("height")) - global.mainToolbarHeight) || global.isEmbedded) {
+                var cutterHeight = (1 + parseInt(d3.select("#container" + side).style("height"))) * scaleRatio;
+                if ((cutterHeight < window.visualViewport.height - global.mainToolbarHeight) || global.isEmbedded) {
                     d3.select("#cutter" + side).style("height", "100%");
                 } else {
-                    d3.select("#cutter" + side).style("height", cutterHeight + "px");
+                    d3.select("#cutter" + side).style("height", cutterHeight + "px");                    
                 }
             });
-
+    
     // A draglayer megfelelő méretezéséhez beállítjuk globálisra.
     if (scaleRatio > 0) {
         global.scaleRatio = scaleRatio;
@@ -263,17 +269,18 @@ Container.prototype.getScaleRatio = function(side, sizePercentage, panelsPerRow,
         panelNumber = panelNumber + 3;
         panelNumber = Math.max(panelNumber, global.panelNumberOnScreen * 2); // Ha van nagyított, akkor legalább 2 sort el kell foglalni.
     }
-    var unscaledPageWidth = panelsPerRow * panelRealWidth;
-    var unscaledPageHeight = parseFloat(d3.select("#headPanelP" + side).style("height")) + 2 * panelMargin + panelRealHeight * parseInt(panelNumber / panelsPerRow + 0.99);
+    var unscaledPageWidth = panelsPerRow * panelRealWidth;    
+    var unscaledPageHeight = parseFloat(d3.select("#headPanelP" + side).style("height")) + 3 * panelMargin + panelRealHeight * parseInt(panelNumber / panelsPerRow + 0.99);
 
     var availableWidth = bodyWidth * sizePercentage;
     var availabelHeight = bodyHeight - ((global.isEmbedded) ? 0 : global.mainToolbarHeight);
 
     var widthMultiplier = availableWidth / unscaledPageWidth;
     var widthMultiplierWithScrollbar = (availableWidth - global.scrollbarWidth) / unscaledPageWidth;
+    
     var heightMultiplier = availabelHeight / unscaledPageHeight;
     
-    var scaleRatio = (widthMultiplier < heightMultiplier) ? widthMultiplier : widthMultiplierWithScrollbar;
+    var scaleRatio = (widthMultiplier < heightMultiplier) ? widthMultiplier : (widthMultiplierWithScrollbar > heightMultiplier) ? widthMultiplierWithScrollbar : heightMultiplier;    
     return scaleRatio;
 };
 
@@ -346,7 +353,6 @@ Container.prototype.navigateTo = function(startObject) {
     global.panelNumberOnScreen = startObject.n;
     global.isEmbedded = startObject.e;
     if (global.isEmbedded) {
-        //d3.select("body").style("opacity", 1);
         
         d3.select("body").attr("class", "embedded");                  
         setTimeout(function () {
@@ -525,9 +531,7 @@ Container.prototype.killSide = function(side) {
 
             global.facts[side] = null;
             this.dataDirector[side] = undefined;
-        
-            //this.initSide(side, global.selfDuration);
-            //global.mainToolbar_refreshState();
+
             const that = this;
             global.get(global.url.superMeta, "", function (result, status) {
                 global.superMeta = result.reports;

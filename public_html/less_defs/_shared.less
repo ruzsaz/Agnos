@@ -17,7 +17,7 @@
 
 /* A toolbar magassága */
 @mainToolbarHeight: 32px;
-@helpControlHeight: @mainToolbarHeight;
+@helpControlHeight: 32px;
 
 /* A háttérszín */
 @baseBackgroundColor: black;
@@ -37,6 +37,7 @@
 /* Keretek */
 @borderSize: 0px; // Az elemek körül
 @dimValBorder: @borderSize solid white; // A dimenzió és érték elemek körül
+@dimValDraggadBorder: 2px solid @baseBackgroundColor; // A vonszolt dimenzió és érték körül
 @panelBorderSize: @borderSize;  // A panelek körül (valójában az árnyékok között van megvalósítva)
 @panelBorderColor: white;  // A panelek körül (valójában az árnyékok között van megvalósítva)
 @panelBorder: @borderSize solid @panelBorderColor; // A panelek körül
@@ -121,7 +122,7 @@
 @lineSymbolStroke: black;
 
 /* A css-es animáció ideje */
-@animDurationText: 0.1s;
+@animDurationText: 0.01s;
 @animDurationHover: 0.0s;
 @appearDuration: 0.2s;
 
@@ -179,6 +180,11 @@
     user-select: none;
     font-family: arial, sans-serif;
     background-size: cover;
+    -webkit-tap-highlight-color: transparent;
+}
+
+body.mobile .hideForMobile {
+    display: none !important;
 }
 
 /* Safarihoz bugfix */
@@ -194,7 +200,8 @@ root {
     display: block;
 }
 
-body {	
+body {
+    font-size: @mainToolbarHeight;
     margin: 0px;
     padding: 0px;
     overflow-x: hidden;
@@ -245,8 +252,9 @@ svg {
 /* container */
 #scrollPaneP0, #scrollPaneP1 {
     position: absolute;
-    height: calc(~"100% - " @mainToolbarHeight);
-    top: @mainToolbarHeight;
+    /*#height: calc(~"100% - " @mainToolbarHeight);*/
+    height: calc(100% - 1em);
+    top: 1em;
     overflow-y: auto;
     overflow-x: hidden;
 }
@@ -266,7 +274,8 @@ svg {
 /* container */
 #cutter0, #cutter1 {
     position: relative;
-    height: calc(~"100vh - " @mainToolbarHeight);
+    /*height: calc(~"100vh - " @mainToolbarHeight);*/
+    height: calc(100vh - 1em);
     overflow: hidden;
 }
 
@@ -701,6 +710,7 @@ g.sankey_nodes_shadow .nodeShadow {
         text-align: end;
         color: @panelWriteColor;
         cursor: pointer;
+        font-size: @fontSizeHuge;
             
         &:hover {
             color: @panelWriteValueColor;
@@ -824,7 +834,7 @@ g.sankey_nodes_shadow .nodeShadow {
 .dragCircle {
     background: lightGrey;
     border-radius: @rounding;
-    border: @dimValBorder;
+    border: @dimValDraggadBorder;
     z-index: 900;
     position: absolute;
     display: none;
@@ -839,6 +849,8 @@ g.sankey_nodes_shadow .nodeShadow {
     font-size: @fontSizeNormal;
     pointer-events: none;
     color: red;
+    width: 400px;
+    box-shadow: @dimValShadow;
 }
 
 .button {
@@ -881,8 +893,6 @@ g.sankey_nodes_shadow .nodeShadow {
     -ms-transition: fill @animDurationText linear;
     -o-transition: fill @animDurationText linear;
 }
-
-
 
 body {
     -ms-scrollbar-face-color: @scrollbarColor;
@@ -1035,6 +1045,7 @@ text {
     overflow-x: hidden;
     overflow-y: hidden;
     z-index: 100;
+    /*font-size: @mainToolbarHeight;*/
 }
 
 #mainToolbar * {
@@ -1063,6 +1074,10 @@ text {
     -moz-box-shadow: @mainToolbarShadow;
 }
 
+body.mobile #mainToolbar nav ul ul {
+    right: -0.6em;
+}
+
 
 #mainToolbar nav ul {
     background: @mainToolbarBackgroundColor; 
@@ -1071,7 +1086,7 @@ text {
 }
 
 #mainToolbar > nav > ul {
-    height: @mainToolbarHeight;
+    height: 1em;
     width: 100vw;
     padding: 0px;
     border-bottom-left-radius: @rounding;
@@ -1080,7 +1095,7 @@ text {
 
 #mainToolbar nav ul li {
     float: left;
-    min-width: 60px;
+    min-width: 1.2em;
     max-width: 160px;
     width: 7%;
     position: relative;
@@ -1095,24 +1110,24 @@ text {
 }
 
 #mainToolbar > nav > ul > li#mainPlusButton, svg.plusButtonHelp {
-    min-width: 32px;
-    max-width: 44px;
+    min-width: 1em;
+    max-width: 1.375em;
     width: 5%;
     border-bottom-left-radius: @rounding;
     background: @switchColor; 
 }
 
 #mainToolbar > nav > ul > li#mainMinusButton, svg.minusButtonHelp {
-    min-width: 32px;
-    max-width: 44px;
+    min-width: 1em;
+    max-width: 1.375em;
     width: 5%;
     background: @closeColor;
 }
 
 #mainToolbar > nav > ul > li#mainCloseButton, svg.closeButtonHelp {
     float: right;
-    min-width: 32px;
-    max-width: 44px;
+    min-width: 1em;
+    max-width: 1.375em;
     width: 5%;
     border-bottom-right-radius: @rounding;
     background: @switchColor; 
@@ -1120,8 +1135,8 @@ text {
 
 #mainToolbar > nav > ul > li#mainSwitchButton, svg.switchButtonHelp {
     float: right;
-    min-width: 32px;
-    max-width: 44px;
+    min-width: 1em;
+    max-width: 1.375em;
     width: 5%;
     background: @closeColor;
 }
@@ -1131,7 +1146,7 @@ text {
 }
 
 #mainToolbar > nav > ul {
-    height: @mainToolbarHeight;
+    height: 1em;
     width: 100vw;
     padding: 0px;
     border-bottom-left-radius: @rounding;
@@ -1149,8 +1164,13 @@ text {
 
 /* Egy nem inaktív ikon fölé menve váltson aktív színre. */
 #mainToolbar nav ul li:hover:not(.inactive) > span:hover > svg > *:not(.nohover) {
-    stroke: @mainToolbarHoverColor !important;
+    //@media (pointer: fine) {
+        stroke: @mainToolbarHoverColor !important;
+    //}   
 }
+
+
+
 
 /* Az ikonok svg-rajzolási stílusa. */
 #mainToolbar svg *, .helpContent svg * {
@@ -1183,8 +1203,8 @@ text {
     color: @mainToolbarActiveColor;
     text-decoration: none;
     text-align: center;
-    height: @mainToolbarHeight;
-    line-height: @mainToolbarHeight;
+    height: 1em;
+    line-height: 1em;
     margin: auto;
 }
 
@@ -1221,9 +1241,9 @@ text {
     color: @mainToolbarHoverColor;
 }
 
-#mainToolbar nav ul li.switch span {
+#mainToolbar nav ul li.switch ul span {
     margin: 0px;
-    font-size: larger;
+    font-size: @fontSizeHuge;
 }
 
 #mainToolbar nav ul ul li:first-child {
@@ -1283,7 +1303,7 @@ text {
     position: absolute;
     top: 0px;
     width: 100vw;
-    height: @mainToolbarHeight;
+    height: 1em;
     background: rgba(0,0,0,0);
     border-bottom-left-radius: @rounding;
     border-bottom-right-radius: @rounding;
@@ -1296,17 +1316,22 @@ text {
     z-index: 101;
 }
 
+
+
 /* Nagyító-fül. */
-.magnifyPanelButton:not(:hover) > g {
+.magnifyPanelButton * {
     stroke: @magnifyPanelButtonColor;
 }
 
 /* Nagyító-fül, ha fölötte van az egér */
-.magnifyPanelButton:hover > g {
-    stroke: @magnifyPanelButtonHoverColor;
+.magnifyPanelButton:hover * {
+    @media (pointer: fine) {
+        stroke: @magnifyPanelButtonHoverColor;
+    }
 }
 
 .magnifyPanelButton * {
+    pointer-events: bounding-box;
     stroke-width: 2;
     stroke-linecap : round;
     fill: red;
@@ -1315,7 +1340,16 @@ text {
     -webkit-transition: stroke @animDurationText linear;
     -moz-transition: stroke @animDurationText linear;
     -ms-transition: stroke @animDurationText linear;
-    -o-transition: stroke @animDurationText linear;
+    -o-transition: stroke @animDurationText linear;    
+}
+
+.magnifyPanelButton:active * {
+    transition: stroke 0s linear !important;
+    -webkit-transition: stroke 0s linear !important;
+    -moz-transition: stroke 0s linear !important;
+    -ms-transition: stroke 0s linear !important;
+    -o-transition: stroke 0s linear !important;
+    stroke: @magnifyPanelButtonHoverColor !important;
 }
 
 .svgScrollbarG {
@@ -1363,6 +1397,7 @@ text {
 }
 
 #dialogPanel {
+    font-size: @fontSizeHuge;
     left: 50vw;
     top: 35vh;
     overflow: hidden;
@@ -1492,6 +1527,7 @@ text {
 }
 
 #helpPanel {
+    font-size: @fontSizeNormal;
     display: block;
     position: absolute;
     z-index: 150;
@@ -1571,6 +1607,12 @@ text {
 }
 
 #helpControl {
+    @media (pointer: coarse) {
+        display: none;
+    }
+}
+
+#helpControl {
     white-space: nowrap;
     overflow: auto;
     background: @helpBackgroundColor; 
@@ -1609,11 +1651,13 @@ text {
 }
 
 
+/*
 #helpControl > nav > ul > li:last-child {
     position: absolute;
     bottom: 0px;
     width: 100%;
 }
+*/
 
 #helpControl nav li {
     padding: 0 0px;
