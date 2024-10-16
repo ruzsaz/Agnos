@@ -16,7 +16,7 @@ var baseUrl = "http://agnos:9091/ars";
 
 var agnosConfig = {};
 //agnosConfig.keycloakSettings = {url: 'http://localhost:8080', realm: 'AgnosRealm', clientId: 'agnos'};
-agnosConfig.keycloakSettings = {url: 'http://localhost:8082/auth', realm: 'AgnosRealm', clientId: 'agnos'};  // For local & prod
+ agnosConfig.keycloakSettings = {url: 'http://localhost:8082/auth', realm: 'AgnosRealm', clientId: 'agnos'};  // For local & prod
 //agnosConfig.keycloakSettings = {url: 'http://192.168.1.2:8082/auth', realm: 'AgnosRealm', clientId: 'agnos'};  // Local, azonos alháló
 agnosConfig.url = {
     auth: baseUrl + "/auth/login",
