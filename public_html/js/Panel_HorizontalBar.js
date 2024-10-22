@@ -50,7 +50,7 @@ function panel_horizontalbar(init) {
             .tickFormat(global.cleverRound3);
 
     // Baloldali dobómező.
-    that.svg.insert("svg:g", ".title_group")
+    that.svg.insert("svg:g", ".panelControlButton")
             .attr("class", "minus background listener droptarget droptarget1")
             .on('mouseover', function() {
                 that.hoverOn(this, "minus");
@@ -63,7 +63,7 @@ function panel_horizontalbar(init) {
             .attr("height", that.h);
 
     // Jobboldali dobómező.
-    that.svg.insert("svg:g", ".title_group")
+    that.svg.insert("svg:g", ".panelControlButton")
             .attr("class", "plus background listener droptarget droptarget1")
             .on('mouseover', function() {
                 that.hoverOn(this, "plus");
@@ -77,7 +77,7 @@ function panel_horizontalbar(init) {
             .attr("height", that.h);
 
     // Az alapréteg.
-    that.svg.insert("svg:g", ".title_group")
+    that.svg.insert("svg:g", ".panelControlButton")
             .attr("class", "background listener droptarget droptarget0")
             .on("click", function() {
                 that.drill();

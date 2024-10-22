@@ -60,7 +60,7 @@ function panel_bar2d(init) {
     }
 
     // A fő alapréteg, ami mentén az X dimenzóban való furkálás történik.
-    that.svg.insert("svg:g", ".title_group")
+    that.svg.insert("svg:g", ".panelControlButton")
             .attr("class", "background listener droptarget droptarget0")
             .on('click', function () {
                 that.drill(that.dimX);
@@ -76,7 +76,7 @@ function panel_bar2d(init) {
             .attr("height", that.height + that.margin.top);
 
     // Az alsó alapréteg, ami mentén az Y dimenzóban való furkálás történik.
-    that.svg.insert("svg:g", ".title_group")
+    that.svg.insert("svg:g", ".panelControlButton")
             .attr("class", "background listener droptarget droptarget0")
             .on('click', function () {
                 that.drill(that.dimY);

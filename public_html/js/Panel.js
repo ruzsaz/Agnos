@@ -99,6 +99,9 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
             .attr("height", that.h)
             .attr("rx", global.rectRounding);
 
+    
+
+
     this.gLegend = that.svg;
 
     // Feliratkozás a panelt megölő mediátorra.
@@ -121,12 +124,15 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     });
     that.mediatorIds.push({"channel": "magnifyPanel", "id": med.id});
 
+    const scaleString = (global.hasTouchScreen) ? " scale(1.4)" : "";
+
     // Sorbarendezés váltó
     // TODO: mobil esetén duplájára nagyítani
     if (that.isShortingByValueEnabled && !global.isEmbedded) {    
         var sortSwitcher = that.svg.insert("svg:g")
-                .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
-                .attr("transform", "translate(0, " + (that.h - 30) +")")
+                .attr("class", "listener visibleInPanic panelControlButton")
+                .attr("transform", "translate(0, " + (that.h - 30) +")" + scaleString)
+                .attr("transform-origin", "4 24")
                 .on('click', function() {
                     that.sortSwitch();
                 });
@@ -136,11 +142,11 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     }
 
     // A nagyító fül
-    // TODO: 1 oszlopos mód esetén levenni
     if (!global.isEmbedded) {
         var duplicator = that.svg.append("svg:g")
-                .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
-                .attr("transform", "translate(" + (that.w - 30)  + ", " + (that.h - 30) +")")
+                .attr("class", "listener visibleInPanic panelControlButton magnifyPanelButton")
+                .attr("transform", "translate(" + (that.w - 30)  + ", " + (that.h - 30) +")" + scaleString)
+                .attr("transform-origin", "24 24")
                 .on('click', function() {
                     if (global.panelNumberOnScreen !== 1) {
                         that.mediator.publish("magnifyPanel", that.panelId);
@@ -156,8 +162,9 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     // TODO: mobil esetén duplájára nagyítani
     if (!global.isEmbedded) {
         var closeButton = that.svg.append("svg:g")
-                .attr("class", "listener title_group visibleInPanic magnifyPanelButton")
-                .attr("transform", "translate(" + (that.w - 24)  + ", 0)")
+                .attr("class", "listener visibleInPanic panelControlButton")
+                .attr("transform", "translate(" + (that.w - 24)  + ", 0)" + scaleString)
+                .attr("transform-origin", "16 8")
                 .on('click', function() {
                     if (global.panelNumberOnScreen !== 0) {
                         that.mediator.publish("killPanel", that.panelId);

@@ -63,7 +63,7 @@ function panel_sankey(init) {
     
     // Alaprétegek. Annyi, ahány dimenziós a sankey.
     for (let i = 0, iMax = this.numberOfDims; i < iMax; i++) {
-        that.svg.insert("svg:g", ".title_group")
+        that.svg.insert("svg:g", ".panelControlButton")
                 .attr("class", "background listener droptarget droptarget0")
                 .on('mouseover', function () {
                     that.hoverOn(this, i);

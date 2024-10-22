@@ -81,7 +81,7 @@ function panel_barline(init) {
     }
 
     // Alsó dobómező.
-    that.svg.insert("svg:g", ".title_group")
+    that.svg.insert("svg:g", ".panelControlButton")
             .attr("class", "minus background listener droptarget droptarget1")
             .on('mouseover', function() {
                 that.hoverOn(this, "bar");
@@ -96,7 +96,7 @@ function panel_barline(init) {
             .attr("height", (that.isStretched) ? that.height : that.height / 2);
 
     // Felső dobómező.
-    that.svg.insert("svg:g", ".title_group")
+    that.svg.insert("svg:g", ".panelControlButton")
             .attr("class", "plus background listener droptarget droptarget1")
             .on('mouseover', function() {
                 that.hoverOn(this, "line");
@@ -111,7 +111,7 @@ function panel_barline(init) {
             .attr("height", (that.isStretched) ? 0 : that.height / 2);
 
     // Az alapréteg.
-    var background = that.svg.insert("svg:g", ".title_group")
+    var background = that.svg.insert("svg:g", ".panelControlButton")
             .attr("class", "background listener droptarget droptarget0")
             .on('click', function() {
                 that.drill();

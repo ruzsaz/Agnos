@@ -23,14 +23,13 @@ function SVGScrollbar(parentElement, isHorizontal, length, scrollFunction, wheel
     this.height = (that.isHorizontal) ? global.scrollbarWidth + 1 : length;
     this.className = (that.isHorizontal) ? "horizontal" : "vertical";
     this.length = length;
-    //this.color = null;
-    //this.opacity = 0;
     this.thumbStyle = undefined;
     this.isDragging = false;
     this.scrollRatio;
     this.scrollThumbLength;
     this.scrollFunction = scrollFunction;
     this.wheelScrollSize = wheelScrollSize || 10;
+    this.dragEvent;
 
     // A scroolbart tartalmazó div.
     this.scrollG = parentElement.append("svg:g")
@@ -51,17 +50,27 @@ function SVGScrollbar(parentElement, isHorizontal, length, scrollFunction, wheel
             .attr("height", that.height + "px");
 
     var dragStartPosition;
-    var dragPosition;
+    var dragPosition;    
 
     var dragStarted = function() {
-        if (d3.event.sourceEvent.which === 1) {
+        if (this.dragEvent.which === 1 || this.dragEvent.which === 0) {
             var coords = d3.mouse(that.scrollG.nodes()[0]);
             dragStartPosition = (that.isHorizontal) ? coords[0] : coords[1];
             dragStartPosition = dragStartPosition - parseFloat(that.scrollThumb.attr(that.positionStringToSet));
-            d3.event.sourceEvent.stopPropagation();
+            this.dragEvent.stopPropagation();
             that.scrollThumb.classed("dragging", true);
         }
     };
+
+    const dragStartedByMouse = function (d) {
+        this.dragEvent = d3.event.sourceEvent;
+        dragStarted.apply(this);
+    };
+
+    const dragStartedByTouch = function (d) {
+        this.dragEvent = d3.event;
+        dragStarted.apply(this);
+    };    
 
     /**
      * A megfogott réteg húzásakor történő dolgok.
@@ -69,6 +78,11 @@ function SVGScrollbar(parentElement, isHorizontal, length, scrollFunction, wheel
      * @returns {undefined}
      */
     var dragging = function() {
+        // Blokkoljuk a touch-scrollt, ha touchról van szó.
+        if (d3.event.preventDefault) {
+            d3.event.preventDefault();
+            d3.event.stopImmediatePropagation();
+        }
         var coords = d3.mouse(that.scrollG.nodes()[0]);
         dragPosition = Math.min(Math.max(0, ((that.isHorizontal) ? coords[0] : coords[1]) - dragStartPosition), that.length - that.scrollThumbLength);
         that.scrollThumb.attr(that.positionStringToSet, dragPosition + "px");
@@ -80,7 +94,7 @@ function SVGScrollbar(parentElement, isHorizontal, length, scrollFunction, wheel
      * 
      * @returns {undefined}
      */
-    var zooming = function() {
+    var zooming = function() {        
         var t = d3.event;
         var delta = t.sourceEvent.deltaY;
         if (delta !== undefined) {
@@ -100,9 +114,20 @@ function SVGScrollbar(parentElement, isHorizontal, length, scrollFunction, wheel
         that.scrollThumb.classed("dragging", false);
     };
 
+    const addDragBehavior = function (elements) {
+        elements.call(drag);
+    };
+    
+    const addTouchDragBehavior = function(elements) {
+        elements.on("touchstart", dragStartedByTouch);
+        elements.on("touchmove", dragging);
+        elements.on("touchend", dragEnd);
+        elements.on("touchcancel", dragEnd);
+    };
+
     // A drag-viselkedés definiálása.
     var drag = d3.drag()
-            .on("start", dragStarted)
+            .on("start", dragStartedByMouse)
             .on("drag", dragging)
             .on("end", dragEnd);
 
@@ -112,11 +137,16 @@ function SVGScrollbar(parentElement, isHorizontal, length, scrollFunction, wheel
             })
             .on('zoom', zooming);
 
-    this.scrollThumb.call(drag);
-    this.scrollG.call(zoom);
-    if (additionalWheelTarget) {
-        additionalWheelTarget.call(zoom);
+    if (global.hasTouchScreen) {
+        addTouchDragBehavior(this.scrollThumb);
+    } else {
+        addDragBehavior(this.scrollThumb);
+        this.scrollG.call(zoom);
+        if (additionalWheelTarget) {
+            additionalWheelTarget.call(zoom);
+        }
     }
+            
 }
 
 /**

@@ -187,6 +187,10 @@ body.mobile .hideForMobile {
     display: none !important;
 }
 
+body:not(.mobile) .hideForDesktop {
+    display: none !important;
+}
+
 /* Safarihoz bugfix */
 input[type=text], input[type=password] {
     -moz-user-select: -moz-text !important;
@@ -208,6 +212,10 @@ body {
     overflow-y: hidden;
     background: @baseBackgroundColor;
     color: @panelWriteColor;
+}
+
+body::backdrop {
+    background-color: @baseBackgroundColor;
 }
 
 svg {
@@ -696,7 +704,7 @@ g.sankey_nodes_shadow .nodeShadow {
         margin: 0px !important;
     }
     
-    & .greeting{
+    & .greeting {
         font-size: @fontSizeHuge;
         margin: auto;
         
@@ -711,12 +719,33 @@ g.sankey_nodes_shadow .nodeShadow {
         color: @panelWriteColor;
         cursor: pointer;
         font-size: @fontSizeHuge;
+        text-decoration: underline;
             
         &:hover {
             color: @panelWriteValueColor;
             text-decoration: underline;
         }
     }    
+}
+
+/* HeadPanel, greeting badge at vertical mode*/
+.HeadPanel_Browser .greetingBadge.vertical {
+    flex-direction: column-reverse;
+    
+    & input {
+        //margin: 32px 0px 0px 0px !important;
+    }
+    
+    & .greeting {
+        margin: 12px 0px 36px 0px !important;
+        line-height: 0px;
+    }
+    
+    & #logoutLink {                
+        margin: 12px 0px -12px 0px !important;
+        line-height: 0px;
+    } 
+    
 }
 
 .dimTable .cell:nth-child(1), .dimTable .cell:nth-child(2) {
@@ -819,7 +848,18 @@ g.sankey_nodes_shadow .nodeShadow {
 }
 
 .hoverable:hover text {
-    color: @highlightColor;
+    @media (pointer: fine) {
+        color: @highlightColor;
+    }
+}
+
+.hoverable:active text {
+    transition: color 0s linear !important;
+    -webkit-transition: color 0s linear !important;
+    -moz-transition: color 0s linear !important;
+    -ms-transition: color 0s linear !important;
+    -o-transition: color 0s linear !important;
+    color: @highlightColor !important;
 }
 
 .hoverable text {
@@ -878,8 +918,20 @@ g.sankey_nodes_shadow .nodeShadow {
     fill: @multiValuesColor;
 }
 
+/* ha fölötte van az egér */
 .titleButton0:hover ~ .titleText0, .titleButton1:hover ~ .titleText1 {
-    fill: @highlightColor;
+    @media (pointer: fine) {
+        fill: @highlightColor;
+    }
+}
+
+.titleButton0:active ~ .titleText0, .titleButton1:active ~ .titleText1 {
+    transition: fill 0s linear !important;
+    -webkit-transition: fill 0s linear !important;
+    -moz-transition: fill 0s linear !important;
+    -ms-transition: fill 0s linear !important;
+    -o-transition: fill 0s linear !important;
+    fill: @highlightColor !important;
 }
 
 .titleText {
@@ -1133,7 +1185,7 @@ body.mobile #mainToolbar nav ul ul {
     background: @switchColor; 
 }
 
-#mainToolbar > nav > ul > li#mainSwitchButton, svg.switchButtonHelp {
+#mainToolbar > nav > ul > li#mainSwitchButton, #mainToolbar > nav > ul > li#fullScreenButton, svg.switchButtonHelp {
     float: right;
     min-width: 1em;
     max-width: 1.375em;
@@ -1164,13 +1216,39 @@ body.mobile #mainToolbar nav ul ul {
 
 /* Egy nem inaktív ikon fölé menve váltson aktív színre. */
 #mainToolbar nav ul li:hover:not(.inactive) > span:hover > svg > *:not(.nohover) {
-    //@media (pointer: fine) {
+    @media (pointer: fine) {
         stroke: @mainToolbarHoverColor !important;
-    //}   
+    }
+}
+
+/* Mobilon, ha nyitva van az almenü, a főmenü színe maradjon világos */
+#mainToolbar nav ul li.switch:hover, #mainToolbar nav ul li.newpanel:hover {
+    @media (pointer: coarse) {
+        stroke: @mainToolbarHoverColor !important;
+    } 
+}
+
+/* Mobilon múljon el a gomb színezése a klikk után. */
+#mainToolbar nav ul li#mainPlusButton:hover:not(.inactive) > span:hover > svg > *:not(.nohover),
+#mainToolbar nav ul li#mainMinusButton:hover:not(.inactive) > span:hover > svg > *:not(.nohover),
+#mainToolbar nav ul li#mainSwitchButton:hover:not(.inactive) > span:hover > svg > *:not(.nohover),
+#mainToolbar nav ul li#fullScreenButton:hover:not(.inactive) > span:hover > svg > *:not(.nohover),
+#mainToolbar nav ul li#mainCloseButton:hover:not(.inactive) > span:hover > svg > *:not(.nohover),
+#mainToolbar nav ul li.save:hover:not(.inactive) > span:hover > svg > *:not(.nohover) {
+    @media (pointer: coarse) {
+        stroke: @mainToolbarActiveColor;
+    }    
 }
 
 
-
+#mainToolbar nav ul li:active:not(.inactive) > span:active > svg > *:not(.nohover) {
+    transition: stroke 0s linear !important;
+    -webkit-transition: stroke 0s linear !important;
+    -moz-transition: stroke 0s linear !important;
+    -ms-transition: stroke 0s linear !important;
+    -o-transition: stroke 0s linear !important;
+    stroke: @mainToolbarHoverColor !important;
+}
 
 /* Az ikonok svg-rajzolási stílusa. */
 #mainToolbar svg *, .helpContent svg * {
@@ -1316,21 +1394,19 @@ body.mobile #mainToolbar nav ul ul {
     z-index: 101;
 }
 
-
-
 /* Nagyító-fül. */
-.magnifyPanelButton * {
+.panelControlButton * {
     stroke: @magnifyPanelButtonColor;
 }
 
 /* Nagyító-fül, ha fölötte van az egér */
-.magnifyPanelButton:hover * {
+.panelControlButton:hover * {
     @media (pointer: fine) {
         stroke: @magnifyPanelButtonHoverColor;
     }
 }
 
-.magnifyPanelButton * {
+.panelControlButton * {
     pointer-events: bounding-box;
     stroke-width: 2;
     stroke-linecap : round;
@@ -1343,13 +1419,18 @@ body.mobile #mainToolbar nav ul ul {
     -o-transition: stroke @animDurationText linear;    
 }
 
-.magnifyPanelButton:active * {
+.panelControlButton:active * {
     transition: stroke 0s linear !important;
     -webkit-transition: stroke 0s linear !important;
     -moz-transition: stroke 0s linear !important;
     -ms-transition: stroke 0s linear !important;
     -o-transition: stroke 0s linear !important;
     stroke: @magnifyPanelButtonHoverColor !important;
+}
+
+/* Nagyító fül levétele 1 oszlopos mód esetén */
+.singleWidth .magnifyPanelButton {
+    display: none;
 }
 
 .svgScrollbarG {

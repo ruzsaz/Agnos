@@ -5,6 +5,7 @@ var changelog = [
     {
         "language": "hu",
         "history": [
+            {"entity": "Agnos", "date": "2024-10-23", "change": "Mobil- és tabletbarát kialakítás."},
             {"entity": "Agnos", "date": "2024-08-23", "change": "Csv-ként mentés megtiltásának lehetősége."},
             {"entity": "Agnos", "date": "2024-06-18", "change": "Beágyazott Agnos működés."},
             {"entity": "Agnos", "date": "2024-05-28", "change": "Új diagram: szalagdiagram."},
@@ -36,6 +37,7 @@ var changelog = [
     {
         "language": "en",
         "history": [
+            {"entity": "Agnos", "date": "2024-10-23", "change": "Mobile and touch friendly solution."},
             {"entity": "Agnos", "date": "2024-08-23", "change": "Disable 'save as csv' on demand."},
             {"entity": "Agnos", "date": "2024-06-18", "change": "Embedded Agnos mechanism introduced."},
             {"entity": "Agnos", "date": "2024-05-28", "change": "New diagram: sankey."},

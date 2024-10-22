@@ -41,7 +41,7 @@ function panel_table2d(init) {
     this.tableSpacingHorizontal = that.tableWidth / ((that.magLevel === 1) ? 7 : 16);	// Egy táblázatoszlop szélessége.
 
     // Alapréteg a sorokban való furkáláshoz.
-    that.svg.insert("svg:g", ".title_group")
+    that.svg.insert("svg:g", ".panelControlButton")
             .attr("class", "background listener droptarget droptarget0")
             .on('mouseover', function() {
                 that.hoverOn(this, 0);
@@ -57,7 +57,7 @@ function panel_table2d(init) {
             .attr("height", that.h);
 
     // Alapréteg az oszlopokban való furkáláshoz.
-    that.svg.insert("svg:g", ".title_group")
+    that.svg.insert("svg:g", ".panelControlButton")
             .attr("class", "background listener droptarget droptarget0")
             .on('mouseover', function() {
                 that.hoverOn(this, 1);

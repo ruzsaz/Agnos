@@ -20,7 +20,8 @@ function HeadPanel_Browser(init, superMeta, startScale, duration) {
 
     // Felhasználó köszöntése rész
     this.top = that.divTableBase.append("html:div")
-            .attr("id", "greetingBadge");    
+            .attr("id", "greetingBadge")
+            .attr("class", "greetingBadge");    
 
     // A keresés mező.
     this.top.append("html:input")
@@ -60,7 +61,7 @@ function HeadPanel_Browser(init, superMeta, startScale, duration) {
 
     heading.append("html:div")
             .attr("class", "cell loc")
-            .text("Rövid név");
+            .text("Név");
 
     heading.append("html:div")
             .attr("class", "cell loc")

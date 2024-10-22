@@ -72,7 +72,7 @@ function panel_map(init) {
             .projection(that.projection);
 
     // Alapréteg.
-    that.svg.insert("svg:g", ".title_group")
+    that.svg.insert("svg:g", ".panelControlButton")
             .attr("class", "background listener droptarget droptarget0")
             .on('click', function () {
                 that.drill();

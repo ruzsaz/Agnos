@@ -174,10 +174,10 @@ function Draglayer(side, mediator) {
             .on("end", dragEnd);
 
     mediator.subscribe("addDrag", function (elements) {
-        if (!global.hasTouchScreen) {
-            that.addDragBehavior(elements);
+        if (global.hasTouchScreen) {
+            addTouchDragBehavior(elements);            
         } else {            
-            addTouchDragBehavior(elements);
+            that.addDragBehavior(elements);
         }
     });
         
@@ -198,14 +198,11 @@ function Draglayer(side, mediator) {
                 document.getElementById("scrollPaneP0").scrollBy(0, offset);
                 const endScrollPosition = scrollElement.scrollTop;                
                 dragCircle.style("top", parseFloat(dragCircle.style("top")) + ((endScrollPosition - startScrollPosition) / global.scaleRatio) + "px");
-                global.dragDropManager.scrollRepeaterTimer = setTimeout(autoScroller, 10);
-                
-            }    
-            
+                global.dragDropManager.scrollRepeaterTimer = setTimeout(autoScroller, 10);                
+            }                
         }                
-    }
-    
-    
+    };
+        
 }
 
 /**
@@ -217,5 +214,3 @@ function Draglayer(side, mediator) {
 Draglayer.prototype.addDragBehavior = function (elements) {
     elements.call(this.mouseDrag);      
 };
-
-// TODO: mobilon képernyőből való kihúzást kezelni

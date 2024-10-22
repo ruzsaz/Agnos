@@ -132,8 +132,9 @@ Container.prototype.magnify = function(direction) {
     global.mainToolbar_refreshState();
     if (global.panelNumberOnScreen === 1) {
         global.mediators[0].publish("magnifyPanel", undefined);
-        global.mediators[1].publish("magnifyPanel", undefined);
+        global.mediators[1].publish("magnifyPanel", undefined);        
     }
+    d3.select("#topdiv").classed("singleWidth", (global.panelNumberOnScreen === 1));
     this.onResize(global.panelNumberOnScreen);
 };
 
@@ -197,7 +198,8 @@ Container.prototype.resizeContainer = function(side, duration, sizePercentage, p
     
     // Az 1 -> 2 illetve 2 -> 1 ázméretezás helyes kezeléséhez
     const immediate = (global.oldPanelNumberOnScreen === 1 && panelNumberPerRow === 2);
-    d3.selectAll(".reportHeadPanel .halfHead").classed("vertical", (panelNumberPerRow === 1));    
+    d3.selectAll(".reportHeadPanel .halfHead").classed("vertical", (panelNumberPerRow === 1));
+    d3.selectAll(".HeadPanel_Browser .greetingBadge").classed("vertical", (panelNumberPerRow === 1));
     
     scaleRatio = (scaleRatio === undefined) ? that.getScaleRatio(side, sizePercentage, panelNumberPerRow) : scaleRatio;
     
@@ -387,6 +389,9 @@ Container.prototype.navigateTo = function(startObject) {
 
     d3.select("#container0").classed("activeSide", (this.panelState !== 2));
     d3.select("#container1").classed("activeSide", (this.panelState !== 0));
+    global.mainToolbar_refreshState();
+    global.mediators[side].publish("drill", {dim: -1, direction: 0});
+    this.onResize();
 };
 
 /**
@@ -432,7 +437,7 @@ Container.prototype.newReportReady = function(side, reportMeta) {
     var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, reportMeta.visualizations.length);
     this.resizeContainer(side, 0, sizePercentage, global.panelNumberOnScreen, scaleRatio);
 
-    that.counter--;
+    that.counter--;        
     if (that.counter <= 0) {
         global.mainToolbar_refreshState();                                      // A toolbar kiszürkültségi állapotának felfrissítése.
         global.setLanguage(String.locale);                                      // Nyelvi beállítások érvényesítése az új paneleken is.

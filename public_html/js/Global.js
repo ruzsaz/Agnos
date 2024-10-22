@@ -58,6 +58,9 @@ var global = function () {
         document.getElementsByTagName("head").item(0).appendChild(newLink);
 
         resetAfterChangeCSS(cssFile);
+        if (global.hasTouchScreen) {
+            _recreateElement(document.getElementsByClassName("cssSwitch")[0]);
+        }
     };
 
     var resetAfterChangeCSS = function (cssFile) {
@@ -766,7 +769,6 @@ var global = function () {
     var realCompare = function (aString, bString) {
         const indexA = localizedSortArray.indexOf(aString.toLocaleLowerCase());
         const indexB = localizedSortArray.indexOf(bString.toLocaleLowerCase());
-        //console.log(indexA, indexB)
         if (indexA === -1 && indexB === -1) {
             let result = 0;
             try {
@@ -1248,6 +1250,9 @@ var global = function () {
     var mainToolbar_createNewPanel = function (panelType) {
         global.mediators[0].publish('addPanel', panelType);
         global.mediators[1].publish('addPanel', panelType);
+        if (global.hasTouchScreen) {
+            _recreateElement(document.getElementsByClassName("newpanel")[0]);        
+        }
     };
 
     /**
@@ -1281,14 +1286,16 @@ var global = function () {
     };
 
     var mainToolbar_setLanguage = function (lang) {
-        
-        // Klónozzuk a html elemet, és a meglévő helyére rakjuk, hogy a hover-státusza jó legyen mobilon is
-        const languageSwitchNode = document.getElementsByClassName("languageSwitch")[0];
-        const clonedNode = languageSwitchNode.cloneNode(true);
-        languageSwitchNode.parentNode.insertBefore(clonedNode, languageSwitchNode);
-        languageSwitchNode.remove();
-        
+        if (global.hasTouchScreen) {
+            _recreateElement(document.getElementsByClassName("languageSwitch")[0]);        
+        }
         global.setLanguage(lang);
+    };
+
+    var _recreateElement = function (node) {
+        const clonedNode = node.cloneNode(true);
+        node.parentNode.insertBefore(clonedNode, node);
+        node.remove();
     };
 
     /**
@@ -1453,6 +1460,7 @@ var global = function () {
 
     var hasTouchScreen = false;
     var isMobile = false;
+    var isFullscreen = false;
     var changeCSSInProgress = false;
     var isEmbedded = false;
     var preferredUsername = undefined;
@@ -1505,14 +1513,30 @@ var global = function () {
 
     }
 
+    const toogleFullscreen = function () {
+        const body = d3.select("body");
+        if (body.classed("fullscreen")) {
+            document.exitFullscreen().then( e => {
+                    body.classed("fullscreen", false);
+                    global.isFullscreen = false;
+            });            
+        } else {
+            document.body.requestFullscreen({ navigationUI: "hide" }).then( e => {
+                    body.classed("fullscreen", true);
+                    global.isFullscreen = true;
+            });            
+        }        
+    };
+
     const initDeviceProperties = function () {
         global.hasTouchScreen = _hasTouchScreen();
         global.isMobile = _detectMobile();
-        const optimalMainToolbarHeight = _determineOptimalMainToolbarHeight(global.hasTouchScreen);        
+        const optimalMainToolbarHeight = _determineOptimalMainToolbarHeight(global.hasTouchScreen, global.isMobile);        
         setMainToolbarHeight(optimalMainToolbarHeight);
         if (global.isMobile) {
-            document.body.className += " mobile";         
-        }        
+            document.body.className += " mobile";
+            
+        }           
     };
     
     const setMainToolbarHeight = function(valueInPixels) {
@@ -1520,11 +1544,15 @@ var global = function () {
         document.body.style.fontSize = valueInPixels + "px";
     };
 
-    const _determineOptimalMainToolbarHeight = function(isTouchEnabled) {
+    const _determineOptimalMainToolbarHeight = function(isTouchEnabled, isMobile) {
         if (isTouchEnabled) {
-            return Math.ceil(Math.min(screen.width, screen.height) / 10); 
+            if (isMobile) {
+                return Math.ceil(Math.min(screen.width, screen.height) / 10); 
+            } else {
+                return Math.ceil(Math.min(screen.width, screen.height) / 16); 
+            }
         } else {            
-            return 32;
+            return Math.ceil(Math.min(screen.width, screen.height) / 32);
         }
     };
 
@@ -1638,6 +1666,7 @@ var global = function () {
         localizedSortArray: localizedSortArray,
         hasTouchScreen: hasTouchScreen,
         isMobile: isMobile,
+        isFullscreen: isFullscreen,
         // Globálisan elérendő függvények.
         logout: logout, // Logs the current user out from the identity provider
         login: login, // Starts the login method of the identity provider
@@ -1673,6 +1702,7 @@ var global = function () {
         mainToolbar_saveAllImages: mainToolbar_saveAllImages, // Elmenti az összes panelt képként.
         mainToolbar_setLanguage: mainToolbar_setLanguage, // Nyelvet vált.
         mainToolbar_refreshState: mainToolbar_refreshState, // Frissíti az ikonok láthatóságát.
+        toogleFullscreen: toogleFullscreen, // Normál és teljes képernyős mód között vált.
         getConfig: getConfig, // Kiírja a pillanatnyilag meglevő panelek konfigurációját a konzolra.
         getUntranslated: getUntranslated, // Kiírja a még lefordítatlan szövegeket a konzolra.
         getEmbeddedUrl: getEmbeddedUrl, // Embedded módra vált

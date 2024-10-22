@@ -41,7 +41,7 @@ function panel_table1d(init) {
     that.titleBox.gContainer.classed("droptarget1", false);
 
     // Alapréteg.
-    that.svg.insert("svg:g", ".title_group")
+    that.svg.insert("svg:g", ".panelControlButton")
             .attr("class", "background listener droptarget droptarget0")
             .on('mouseover', function () {
                 that.hoverOn(this);
