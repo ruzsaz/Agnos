@@ -79,7 +79,9 @@
                         isEmbedded = true;
                         return startObject.s;
                     }
-                } catch (error) { }
+                } catch (error) { 
+                    console.log(error)
+                }
                 
                                 
                 // Css kiolvasása cookie-ból, ha van ott
@@ -271,7 +273,7 @@
              */
             function loadLevel4() {
                 loadResourcesAsync([
-                    "js/HeadPanel_Browser." + min + "js",
+                    "js/CardPanel." + min + "js",
                     "js/HeadPanel_Report." + min + "js",
                     "js/Panel_Pie." + min + "js",
                     "js/Panel_BarLine." + min + "js",

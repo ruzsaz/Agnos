@@ -111,6 +111,8 @@
 
 @axisTextOpacity: 1;
 
+@fontSizeXXXL: 40px;
+@fontSizeGiant: 26px;
 @fontSizeHuge: 20px;
 @fontSizeBig: 16px;
 @fontSizeNormal: 16px;
@@ -138,7 +140,36 @@
 @magnifyPanelButtonColor: @mainToolbarActiveColor;
 @magnifyPanelButtonHoverColor: @mainToolbarHoverColor;
 
+/* Kilépés, belépés gomb */
+@loginButtonBackgroundColor: @closeColor;
+@logoutButtonBackgroundColor: @switchColor;
+@loginButtonBorder: @panelBorder;
+@loginButtonShadow: @mainToolbarShadow;
+@loginButtonColor: @mainToolbarActiveColor;
+@loginButtonHoverColor: @mainToolbarHoverColor;
+
+/* Report-kártyák */
+@cardGap: 20px;
+@cardRounding: calc(~"0.8 * " @rounding);
+@cardBorder: @panelBorder;
+@cardShadow: @panelShadow;
+@cardHeight: 200px;
+@cardBackgroundColor: @panelBackgroundColor;
+@cardNameFontSize: 22px;
+@cardNameHeight: 28px;
+@cardNameBackgroundColor: @oddColor;
+@cardKpiFontSize: 50px;
+@cardKpiFontFamily: serif;
+@cardKpiColor: @panelWriteColor;
+@cardTimeColor: @baseBackgroundColor;
+@cardDescriptionFontSize: @fontSizeSmall;
+@cardWriteColor: @panelWriteColor;
+@cardWriteColor2: @panelWriteValueColor;
+@cardSplit: calc(~"6px + 3 * " @cardDescriptionFontSize);
+
 ////////////////////////////////////////////////////////////////////////////
+@import url('../data/fonts/fontawesome.css');
+@import url('../data/fonts/solid.css');
 
 #less {
     .panelWidth {width: @panelWidth;}
@@ -287,7 +318,7 @@ svg {
     overflow: hidden;
 }
 
-.panel {
+.panel:not(.cardPanelHolder) {
     box-shadow: @panelShadow;
     border-radius: @rounding;
     padding: 0px;
@@ -369,7 +400,7 @@ svg {
     fill: @valWriteColor;
 }
 
-.panel.double {
+.panel.double:not(.cardPanelHolder) {
     width: 600px;
     overflow: hidden;
     position: relative;
@@ -635,8 +666,209 @@ g.sankey_nodes_shadow .nodeShadow {
     position: relative;
 }
 
+.divTableBase.cardPanel {
+    margin: 0px;
+}
+
 .divTableBase.HeadPanel_Browser {
     margin-bottom: 8px;
+}
+
+/* Card-style CardPanel */
+.cardHolder {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0px @cardGap;
+}
+
+.cardPanel .backClickCaptureDiv {    
+    position: fixed;
+    width: 100%;
+    height: 1000%;    
+    top: 0px;
+    left: 0px;
+    z-index: 1;
+}
+
+.card {
+    color: @cardWriteColor;
+    position: relative;
+    width: calc(~"300px - " @cardGap);
+    height: @cardHeight;
+    background: @cardBackgroundColor;
+    border-radius: @cardRounding;
+    box-shadow: @cardShadow;    
+    flex-grow: 1;
+    padding: 0px 0px;
+    overflow: hidden;
+    margin-bottom: @cardGap;
+    cursor: pointer;
+}
+
+.card.dummy {
+    height: 0px;
+    box-shadow: none !important;
+    border:  none !important;
+    margin-bottom: 0px !important;
+}
+
+.card.dummy * {
+    display: none !important;
+}
+
+.cardCell {
+    display: block;
+    font-size: @fontSizeNormal;
+    padding-top: 5.5px;
+    padding-bottom: 4.5px;
+    line-height: 20px;
+    z-index: 2;
+    position: relative;
+}
+
+.cardCell.kpi {
+    font-size: @cardKpiFontSize;
+    color: @cardKpiColor;
+    position: absolute;    
+    height: 100%;
+    align-content: center;
+    height: 100%;
+    align-content: center;    
+    justify-content: center;
+    width: 84%;
+    margin-left: 8%;
+    margin-right: 8%;
+    display: flex;    
+    align-items: center;
+    font-style: italic;
+    line-height: unset;
+    
+    & > span {
+        font-family: @cardKpiFontFamily;
+        font-size: @cardKpiFontSize;
+        
+        & > span {
+            font-size: @cardNameFontSize;            
+        }
+    }    
+}
+
+.card.collector > .cardCell.kpi {
+    width: 30%;
+    margin-left: 70%;
+    margin-right: 0%;
+    color: @valWriteColor;
+    top: 6px;
+    
+    & > span {
+        font-size: 1.3em;
+    }
+}
+
+.cardCell.name {
+    font-size: @cardNameFontSize;
+    line-height: @cardNameHeight;
+    position: absolute;
+    top: 0px;
+    width: 100%;
+    justify-content: space-evenly;
+    display: inline-flex;
+    background-color: @cardNameBackgroundColor;
+    padding-left: 1ex;
+    padding-right: 1ex;
+    box-sizing: border-box;
+    overflow: hidden;
+    white-space: nowrap;            
+    text-overflow: ellipsis;
+    
+    & > span {
+        max-width: 100%;
+        overflow: hidden;
+        white-space: nowrap;            
+        text-overflow: ellipsis;
+    }
+    
+}
+
+.cardCell.icon {
+    justify-content: center;
+    width: 70%;
+    display: flex;
+    align-items: center;
+    position: absolute;
+    font-size: 1.6em;
+    color: black;
+    height: calc(~"100% - " @cardNameHeight);
+    top: calc(~"-8px + " @cardNameHeight);
+    box-sizing: content-box;
+}
+
+.card.collector > .cardCell.name {
+    color: @valWriteColor;
+}
+
+
+.cardCell.hrule {
+    position: absolute;
+    bottom: @cardSplit;
+    width: 50%;
+    height: 1px;
+    background: @cardWriteColor;
+    padding: 0px;
+    margin-left: 0.6rem;
+}
+
+.card.collector > .cardCell.hrule {
+    height: 100%;    
+    height: 100%;        
+    width: 30%;
+    margin-left: 70%;
+    margin-right: 0%;
+    bottom: 0px;
+    right: 0px;
+    z-index: 0;
+    opacity: 0.4;
+}
+
+.cardCell.description {
+    position: absolute;
+    font-size: @cardDescriptionFontSize;
+    line-height: calc(~"2px + " @cardDescriptionFontSize);
+    height: calc(~"4px + 2 * " @cardDescriptionFontSize);
+    color: @cardWriteColor2;    
+    top: calc(~"100% - " @cardSplit);
+    margin-left: 0.6rem;
+    margin-right: 1.6rem;
+    overflow: hidden;
+    padding: 0px;
+    margin-top: 4px;
+}
+
+.cardCell.time {
+    position: absolute;
+    transform: rotate(-90deg);
+    width: 100%;
+    padding-left: 50%;
+    left: calc(50% - 1em);
+    bottom: 0px;
+    box-sizing: border-box;
+    font-size: @fontSizeSmall;    
+    color: @cardTimeColor;
+    line-height: @fontSizeSmall;
+    font-style: italic;
+    & text {
+        font-family: monospace !important;
+    }
+}
+
+.cardCell.source {
+    display: none;
+}
+
+.cardPanel .tableScrollPane {
+    max-height: none !important;
+    margin: 0px;
+    padding: 6px 12px 12px 6px;
 }
 
 /* HeadPanel */
@@ -695,38 +927,93 @@ g.sankey_nodes_shadow .nodeShadow {
 }
 
 /* HeadPanel, greeting badge */
-.HeadPanel_Browser #greetingBadge {
-    padding: 16px;
+.greetingBadge {
+    padding: 32px 6px 64px 6px;
     display: flex;
-    justify-content: space-between;    
     
-    & input {
-        margin: 0px !important;
+    & input[type=text] {
+        position: relative;
+        margin: 0px !important;        
+        width: ~"calc(297px - @{cardGap} / 2)";
+        padding: 0 10px;
+        height: 40px;
+        color: @cardWriteColor;
+        background: @panelBackgroundColor;        
+        border: @inputTextBorder;
+        border-radius: @rounding;
+        -moz-outline-radius: 3px;
+        box-sizing: border-box;
+        z-index: 2;
+    }
+    
+    & input[type=text]:focus {
+        outline: none;
+        box-shadow: none;
+        -webkit-box-shadow: none;
+        -moz-box-shadow: none;
     }
     
     & .greeting {
+        display: flex;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        position: fixed;
+        top: 42px;
         font-size: @fontSizeHuge;
         margin: auto;
+        z-index: -1;
         
         & .username {
             font-style: italic;
+            margin-left: 1ex;
         }
     }
     
-    & #logoutLink {                
-        margin: auto 0px auto 240px;
-        text-align: end;
-        color: @panelWriteColor;
+    & #logoutLink {                        
+        position: fixed;
+        align-self: center;
+        right: 80px;
+        width: 160px;
+        height: 40px;        
+        text-align: center;
+        color: @loginButtonColor;
         cursor: pointer;
-        font-size: @fontSizeHuge;
-        text-decoration: underline;
+        font-size: @fontSizeGiant;        
+        border-radius: @rounding;
+        border: @loginButtonBorder;
+        align-content: center;
+        background-color: @loginButtonBackgroundColor;
+        box-shadow: @loginButtonShadow;
+        -webkit-box-shadow: @loginButtonShadow;
+        -moz-box-shadow: @loginButtonShadow;
+        z-index: 2;
             
         &:hover {
-            color: @panelWriteValueColor;
-            text-decoration: underline;
+            color: @loginButtonHoverColor;    
+            border-color: @loginButtonHoverColor;
         }
     }    
+    
+    &.loggedin #logoutLink {
+        background-color: @logoutButtonBackgroundColor;
+    }
+    
 }
+
+.singleWidth .greetingBadge {
+    
+    & .greeting {
+        top: 88px;
+    }
+    
+    &.loggedin .greeting {
+        display: none;
+    }
+            
+}
+
+
 
 /* HeadPanel, greeting badge at vertical mode*/
 .HeadPanel_Browser .greetingBadge.vertical {

@@ -42,6 +42,10 @@ and open the template in the editor.
 /* A css-es animáció ideje */
 /* Ennyi bejegyzés lehet a legend-ben. */
 /* Panel nagyító fül */
+/* Kilépés, belépés gomb */
+/* Report-kártyák */
+@import url('../data/fonts/fontawesome.css');
+@import url('../data/fonts/solid.css');
 #less .panelWidth {
   width: 600px;
 }
@@ -269,7 +273,7 @@ svg {
   height: calc(100vh - 1em);
   overflow: hidden;
 }
-.panel {
+.panel:not(.cardPanelHolder) {
   box-shadow: 0px 0px 0px 2px pink;
   border-radius: 0px;
   padding: 0px;
@@ -340,7 +344,7 @@ svg {
 .panic text {
   fill: yellow;
 }
-.panel.double {
+.panel.double:not(.cardPanelHolder) {
   width: 600px;
   overflow: hidden;
   position: relative;
@@ -563,8 +567,182 @@ g.sankey_nodes_shadow .nodeShadow {
   margin: 0px 4px 16px;
   position: relative;
 }
+.divTableBase.cardPanel {
+  margin: 0px;
+}
 .divTableBase.HeadPanel_Browser {
   margin-bottom: 8px;
+}
+/* Card-style CardPanel */
+.cardHolder {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0px 20px;
+}
+.cardPanel .backClickCaptureDiv {
+  position: fixed;
+  width: 100%;
+  height: 1000%;
+  top: 0px;
+  left: 0px;
+  z-index: 1;
+}
+.card {
+  color: darkred;
+  position: relative;
+  width: calc(300px -  20px);
+  height: 200px;
+  background: white;
+  border-radius: calc(0.8 *  0px);
+  box-shadow: 0px 0px 0px 2px pink;
+  flex-grow: 1;
+  padding: 0px 0px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+.card.dummy {
+  height: 0px;
+  box-shadow: none !important;
+  border: none !important;
+  margin-bottom: 0px !important;
+}
+.card.dummy * {
+  display: none !important;
+}
+.cardCell {
+  display: block;
+  font-size: 16px;
+  padding-top: 5.5px;
+  padding-bottom: 4.5px;
+  line-height: 20px;
+  z-index: 2;
+  position: relative;
+}
+.cardCell.kpi {
+  font-size: 50px;
+  color: darkred;
+  position: absolute;
+  height: 100%;
+  align-content: center;
+  justify-content: center;
+  width: 84%;
+  margin-left: 8%;
+  margin-right: 8%;
+  display: flex;
+  align-items: center;
+  font-style: italic;
+  line-height: unset;
+}
+.cardCell.kpi > span {
+  font-family: serif;
+  font-size: 50px;
+}
+.cardCell.kpi > span > span {
+  font-size: 22px;
+}
+.card.collector > .cardCell.kpi {
+  width: 30%;
+  margin-left: 70%;
+  margin-right: 0%;
+  color: yellow;
+  top: 6px;
+}
+.card.collector > .cardCell.kpi > span {
+  font-size: 1.3em;
+}
+.cardCell.name {
+  font-size: 22px;
+  line-height: 28px;
+  position: absolute;
+  top: 0px;
+  width: 100%;
+  justify-content: space-evenly;
+  display: inline-flex;
+  background-color: #5f5;
+  padding-left: 1ex;
+  padding-right: 1ex;
+  box-sizing: border-box;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.cardCell.name > span {
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.cardCell.icon {
+  justify-content: center;
+  width: 70%;
+  display: flex;
+  align-items: center;
+  position: absolute;
+  font-size: 1.6em;
+  color: black;
+  height: calc(100% -  28px);
+  top: calc(-8px +  28px);
+  box-sizing: content-box;
+}
+.card.collector > .cardCell.name {
+  color: yellow;
+}
+.cardCell.hrule {
+  position: absolute;
+  bottom: calc(6px + 3 *  12px);
+  width: 50%;
+  height: 1px;
+  background: darkred;
+  padding: 0px;
+  margin-left: 0.6rem;
+}
+.card.collector > .cardCell.hrule {
+  height: 100%;
+  width: 30%;
+  margin-left: 70%;
+  margin-right: 0%;
+  bottom: 0px;
+  right: 0px;
+  z-index: 0;
+  opacity: 0.4;
+}
+.cardCell.description {
+  position: absolute;
+  font-size: 12px;
+  line-height: calc(2px +  12px);
+  height: calc(4px + 2 *  12px);
+  color: darkblue;
+  top: calc(100% -  calc(6px + 3 *  12px));
+  margin-left: 0.6rem;
+  margin-right: 1.6rem;
+  overflow: hidden;
+  padding: 0px;
+  margin-top: 4px;
+}
+.cardCell.time {
+  position: absolute;
+  transform: rotate(-90deg);
+  width: 100%;
+  padding-left: 50%;
+  left: calc(50% - 1em);
+  bottom: 0px;
+  box-sizing: border-box;
+  font-size: 12px;
+  color: yellow;
+  line-height: 12px;
+  font-style: italic;
+}
+.cardCell.time text {
+  font-family: monospace !important;
+}
+.cardCell.source {
+  display: none;
+}
+.cardPanel .tableScrollPane {
+  max-height: none !important;
+  margin: 0px;
+  padding: 6px 12px 12px 6px;
 }
 /* HeadPanel */
 .halfHead .table {
@@ -615,32 +793,76 @@ g.sankey_nodes_shadow .nodeShadow {
   position: relative;
 }
 /* HeadPanel, greeting badge */
-.HeadPanel_Browser #greetingBadge {
-  padding: 16px;
+.greetingBadge {
+  padding: 32px 6px 64px 6px;
   display: flex;
-  justify-content: space-between;
 }
-.HeadPanel_Browser #greetingBadge input {
+.greetingBadge input[type=text] {
+  position: relative;
   margin: 0px !important;
+  width: calc(297px - 20px / 2);
+  padding: 0 10px;
+  height: 40px;
+  color: darkred;
+  background: white;
+  border: 2px solid darkgreen;
+  border-radius: 0px;
+  -moz-outline-radius: 3px;
+  box-sizing: border-box;
+  z-index: 2;
 }
-.HeadPanel_Browser #greetingBadge .greeting {
+.greetingBadge input[type=text]:focus {
+  outline: none;
+  box-shadow: none;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+}
+.greetingBadge .greeting {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  position: fixed;
+  top: 42px;
   font-size: 20px;
   margin: auto;
+  z-index: -1;
 }
-.HeadPanel_Browser #greetingBadge .greeting .username {
+.greetingBadge .greeting .username {
   font-style: italic;
+  margin-left: 1ex;
 }
-.HeadPanel_Browser #greetingBadge #logoutLink {
-  margin: auto 0px auto 240px;
-  text-align: end;
-  color: darkred;
+.greetingBadge #logoutLink {
+  position: fixed;
+  align-self: center;
+  right: 80px;
+  width: 160px;
+  height: 40px;
+  text-align: center;
+  color: #00ffaa;
   cursor: pointer;
-  font-size: 20px;
-  text-decoration: underline;
+  font-size: 26px;
+  border-radius: 0px;
+  border: 2px solid darkgreen;
+  align-content: center;
+  background-color: #bad642;
+  box-shadow: inset 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px rgba(0, 0, 0, 0.75);
+  -webkit-box-shadow: inset 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: inset 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px rgba(0, 0, 0, 0.75);
+  z-index: 2;
 }
-.HeadPanel_Browser #greetingBadge #logoutLink:hover {
-  color: darkblue;
-  text-decoration: underline;
+.greetingBadge #logoutLink:hover {
+  color: #88ffff;
+  border-color: #88ffff;
+}
+.greetingBadge.loggedin #logoutLink {
+  background-color: #ffbddf;
+}
+.singleWidth .greetingBadge .greeting {
+  top: 88px;
+}
+.singleWidth .greetingBadge.loggedin .greeting {
+  display: none;
 }
 /* HeadPanel, greeting badge at vertical mode*/
 .HeadPanel_Browser .greetingBadge.vertical {

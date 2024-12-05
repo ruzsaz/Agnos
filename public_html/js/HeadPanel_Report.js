@@ -24,6 +24,8 @@ function HeadPanel_Report(init, reportMeta, startScale) {
     // Panel regisztrálása a nyilvántartóba.
     that.mediator.publish("register", that, that.panelId, [], that.preUpdate, that.update);
 
+    that.panelDiv.classed("cardPanelHolder", false);
+
     that.divTableBase.append("html:div")
             .attr("class", "mainTitle")
             .append("html:text");

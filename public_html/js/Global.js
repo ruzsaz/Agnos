@@ -600,9 +600,11 @@ var global = function () {
         keycloak.updateToken(10).then(function (refreshed) {
             if (refreshed) {
                 console.log('Token is successfully refreshed');
+            } else {
+                //console.log('Token NOT refreshed');
             }
         }).catch(function () {
-            //console.log('Failed to refresh the token, or the session has expired');
+            console.log('Failed to refresh the token, or the session has expired');
         }).finally(() => {
             $.ajax({
                 url: url,
@@ -626,6 +628,7 @@ var global = function () {
                     clearTimeout(progressCounter);
                     progressDiv.style("z-index", -1);
                     if (jqXHR.status === 401) { // Ha a szerver 'nem vagy autentikálva' választ ad, autentikáljuk.
+                        console.log("401-es hiba")
                         showNotAuthenticated();
                     } else if (jqXHR.status === 403) { // Ha az autentikáció jó, de nincs olvasási jog az adathoz
                         showNotAuthorized();
@@ -720,6 +723,25 @@ var global = function () {
     };
 
     /**
+     * Szám rövid kijelzése kiíráshoz, 3-4 számkarakterrel. (pl. 32.5 Mrd.)
+     * 
+     * @param {Number} n Kijelzendő szám.
+     * @returns {String} A kiírandó sztring.
+     */
+    var cleverRound2 = function (n) {
+        if (n === undefined) {
+            return "???";
+        }
+        if (!isFinite(n)) {
+            return "inf";            
+        }
+        if (Math.abs(n) > 0.01 && Math.abs(n) < 9999.5) {
+            return parseFloat(d3.format(".3g")(n)).toLocaleString(String.locale);
+        }
+        return parseFloat(d3.format(".3s")(n)).toLocaleString(String.locale) + _(d3.format(".3s")(n).replace(/-*\d*\.*\d*/g, ''));        
+    };
+
+    /**
      * Szám rövid kijelzése kiíráshoz, max 4 számkarakterrel. (pl. 32.51 Mrd.)
      * 
      * @param {Number} n Kijelzendő szám.
@@ -755,6 +777,21 @@ var global = function () {
             return parseFloat(d3.format(".6g")(n)).toLocaleString(String.locale);
         }
         return parseFloat(d3.format(".6s")(n)).toLocaleString(String.locale) + _(d3.format(".6s")(n).replace(/-*\d*\.*\d*/g, ''));
+    };
+    
+    var cleverDate = function (date) {
+        const now = new Date();
+        const diffInDays = (now.getTime() - date.getTime()) / (1000 * 3600 * 24);
+        if (diffInDays < 3) {
+            return date.toLocaleDateString(String.locale, {year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric"});
+        }
+        if (diffInDays < 365) {
+            return date.toLocaleDateString(String.locale, {year: "numeric", month: "long", day: "numeric"});
+        }
+        if (diffInDays < 730) {
+            return date.toLocaleDateString(String.locale, {year: "numeric", month: "long"});
+        }
+        return date.toLocaleDateString(String.locale, {year: "numeric"});
     };
 
     /**
@@ -1552,7 +1589,7 @@ var global = function () {
                 return Math.ceil(Math.min(screen.width, screen.height) / 16); 
             }
         } else {            
-            return Math.ceil(Math.min(screen.width, screen.height) / 32);
+            return Math.max(32, Math.ceil(Math.min(screen.width, screen.height) / 32));
         }
     };
 
@@ -1714,8 +1751,10 @@ var global = function () {
         getStyleForScale: getStyleForScale, // Nagyítást/kicsinyítést végrehajtó style generálása.
         orZero: orZero, // Egy szám helyett 0-t ad, ha az NaN, vagy infinite.
         getAnimDuration: getAnimDuration, // Egy panel animálásának ideje.
-        cleverRound3: cleverRound3, // Szám rövid kijelzése kiíráshoz, max 3 számkarakterrel. (pl. 3.51 Mrd.)
+        cleverRound2: cleverRound2, // Szám rövid kijelzése kiíráshoz, 3-4 számkarakterrel. (pl. 3.5 Mrd.)
+        cleverRound3: cleverRound3, // Szám rövid kijelzése kiíráshoz, max 4 számkarakterrel. (pl. 3.51 Mrd.)
         cleverRound5: cleverRound5, // Szám rövid kijelzése kiíráshoz, max 5 számkarakterrel. (pl. 34514 M.)
+        cleverDate: cleverDate,
         realCompare: realCompare, // Pótlás a picit hibásan működő localeCompare helyett.
         realCompare2d: realCompare2d, // 2 részből álló sztringpárt összehasonlít.
         cleverCompress: cleverCompress, // Betömörít kiírt feliratokat a megadott helyre.

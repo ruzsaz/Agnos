@@ -5,6 +5,7 @@ var changelog = [
     {
         "language": "hu",
         "history": [
+            {"entity": "Agnos", "date": "2024-12-02", "change": "Kártyás report-elrendezés."},
             {"entity": "Agnos", "date": "2024-10-23", "change": "Mobil- és tabletbarát kialakítás."},
             {"entity": "Agnos", "date": "2024-08-23", "change": "Csv-ként mentés megtiltásának lehetősége."},
             {"entity": "Agnos", "date": "2024-06-18", "change": "Beágyazott Agnos működés."},
@@ -37,6 +38,7 @@ var changelog = [
     {
         "language": "en",
         "history": [
+            {"entity": "Agnos", "date": "2024-12-02", "change": "Show available reports as cards."},
             {"entity": "Agnos", "date": "2024-10-23", "change": "Mobile and touch friendly solution."},
             {"entity": "Agnos", "date": "2024-08-23", "change": "Disable 'save as csv' on demand."},
             {"entity": "Agnos", "date": "2024-06-18", "change": "Embedded Agnos mechanism introduced."},

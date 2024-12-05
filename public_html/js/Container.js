@@ -12,7 +12,7 @@ function Container() {
     this.dataDirector = [];
     var that = this;
     var topdiv = d3.select("body").append("html:div")
-            .attr("id", "topdiv");
+            .attr("id", "topdiv");    
     
     // Toolbar div-je.
     this.mainToolbar = topdiv.append("html:div")
@@ -62,6 +62,7 @@ function Container() {
 
     var bodyWidth = parseInt(d3.select("#topdiv").style("width"));
     global.panelNumberOnScreen = parseInt((bodyWidth / global.panelWidth) + 0.5);
+    
     this.panelState = 0; // 0: baloldal, 1: mindkettő, 2: jobboldal, 3: mindkettő látszik.
     this.resizeInProgress = false; // Hogy ne induljon egyszerre 2 resize event.
 
@@ -133,8 +134,7 @@ Container.prototype.magnify = function(direction) {
     if (global.panelNumberOnScreen === 1) {
         global.mediators[0].publish("magnifyPanel", undefined);
         global.mediators[1].publish("magnifyPanel", undefined);        
-    }
-    d3.select("#topdiv").classed("singleWidth", (global.panelNumberOnScreen === 1));
+    }    
     this.onResize(global.panelNumberOnScreen);
 };
 
@@ -150,6 +150,8 @@ Container.prototype.onResize = function(panelsPerScreen) {
         panelsPerScreen = global.panelNumberOnScreen;
     }
     var newSize = Math.abs((this.panelState / 2) - 1);
+                d3.select("#topdiv").classed("singleWidth", (global.panelNumberOnScreen === 1));
+
     this.resizeContainers(global.selfDuration, newSize, panelsPerScreen);
 };
 
@@ -378,7 +380,8 @@ Container.prototype.navigateTo = function(startObject) {
             }
             that.newReport(side, reportMeta, sideInit);
             var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, sideInit.v.length);            
-            that.resizeContainer(side, 1000, sizePercentage, global.panelNumberOnScreen, scaleRatio);            
+            that.resizeContainer(side, 1000, sizePercentage, global.panelNumberOnScreen, scaleRatio); 
+            global.mediators[side].publish("drill", {dim: -1, direction: 0});
         } else {
             that.counter--;
             var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, 0);
@@ -390,7 +393,7 @@ Container.prototype.navigateTo = function(startObject) {
     d3.select("#container0").classed("activeSide", (this.panelState !== 2));
     d3.select("#container1").classed("activeSide", (this.panelState !== 0));
     global.mainToolbar_refreshState();
-    global.mediators[side].publish("drill", {dim: -1, direction: 0});
+//    global.mediators[side].publish("drill", {dim: -1, direction: 0});
     this.onResize();
 };
 
@@ -488,13 +491,13 @@ Container.prototype.initSide = function(side, duration) {
                 .style("opacity", 0)
                 .on("end", function() {
                     d3.select(this).style("opacity", null);
-                    new HeadPanel_Browser({group: side}, global.superMeta, scaleRatio, 0); // Fejléc.
+                    new CardPanel({group: side}, global.superMeta, scaleRatio, 0); // Fejléc.
                     global.setLanguage(undefined, side);
                     that.onResize();
                     global.mainToolbar_refreshState();
                 });
     } else {
-        new HeadPanel_Browser({group: side}, global.superMeta, scaleRatio); // Fejléc.        
+        new CardPanel({group: side}, global.superMeta, scaleRatio); // Fejléc.        
         that.onResize();
         global.mainToolbar_refreshState();
     }
