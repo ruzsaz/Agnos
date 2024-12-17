@@ -15,7 +15,7 @@ function CardPanel(init, superMeta, startScale, duration) {
     var that = this;
 
     this.panelSide = init.group || 0;
-    this.superMeta = superMeta;
+    this.superMeta = that.fillMissingLabels(superMeta);
     this.mediator = global.mediators[init.group];
     this.mediatorIds = [];		// A mediátorok id-jeit tartalmazó tömb.
     this.panelDiv = d3.select("#headPanelP" + this.panelSide);
@@ -104,7 +104,37 @@ function CardPanel(init, superMeta, startScale, duration) {
 
     that.initPanel();    
            
-}
+};
+
+CardPanel.prototype.fillMissingLabels = function(superMeta) {
+    for (var i = 0, iMax = superMeta.length; i < iMax; i++) {
+        const reportMeta = superMeta[i];
+        if (reportMeta.labels.length > 0) {
+            const defaultLabel = reportMeta.labels[0];
+            defaultLabel.caption = global.getFirstValidString(defaultLabel.caption, defaultLabel.description);
+            defaultLabel.description = global.getFirstValidString(defaultLabel.description, defaultLabel.caption);
+            for (var l = 1, lMax = reportMeta.labels.length; l < lMax; l++) {
+                const actualLabel = reportMeta.labels[l];
+                actualLabel.caption = global.getFirstValidString(actualLabel.caption, actualLabel.description, defaultLabel.caption, defaultLabel.description);
+                actualLabel.description = global.getFirstValidString(actualLabel.description, actualLabel.caption, defaultLabel.description, defaultLabel.caption);
+                actualLabel.datasource = global.getFirstValidString(defaultLabel.datasource, defaultLabel.datasource);
+            }
+        }
+        
+        if (reportMeta.kpi.labels.length > 0) {
+            const defaultKpiLabel = reportMeta.kpi.labels[0];
+            defaultKpiLabel.caption = global.getFirstValidString(defaultKpiLabel.caption, defaultKpiLabel.description);
+            defaultKpiLabel.description = global.getFirstValidString(defaultKpiLabel.description, defaultKpiLabel.caption);
+            for (var l = 1, lMax = reportMeta.kpi.labels.length; l < lMax; l++) {
+                const actualKpiLabel = reportMeta.kpi.labels[l];
+                actualKpiLabel.caption = global.getFirstValidString(actualKpiLabel.caption, actualKpiLabel.description, defaultKpiLabel.caption, defaultKpiLabel.description);
+                actualKpiLabel.description = global.getFirstValidString(actualKpiLabel.description, actualKpiLabel.caption, defaultKpiLabel.description, defaultKpiLabel.caption);
+            }
+        }
+    }
+    return superMeta;
+};
+
 
 //////////////////////////////////////////////////
 // Osztály-konstansok inicializálása.
@@ -251,51 +281,6 @@ CardPanel.prototype.searchFilter = function() {
 };
 
 CardPanel.prototype.createGrouping = function(data, maxEntries, depth) {
-    if (depth === undefined) {
-        depth = 0;
-    }
-    if (data.length <= maxEntries) {
-        return data;
-    }
-        
-    const accessor = function(item) {
-        return item.name;
-    };
-    
-    var keywords = [];
-    for (var i = 0, iMax = data.length; i < iMax; i++) {
-        const reportKeywords = data[i].keywords;
-        reportKeywords.forEach(item => this.putArrayWithScore(keywords, item, accessor, 0));
-    }
-    
-    keywords.sort(function(a,b) {
-        return b.multiplicity - a.multiplicity;
-    });
-    
-    var magickeyword = undefined;
-    for (var i = 0, iMax = keywords.length; i < iMax; i++) {
-        if (keywords[i].multiplicity < data.length - depth && keywords[i].multiplicity > 1) {
-            magickeyword = keywords[i];
-            break;
-        }
-    }
-                    
-    if (magickeyword === undefined) {
-        return data;
-    }
-        
-    data = this.removeFromArray(data, magickeyword.name);
-    
-    magickeyword.keywords = [];
-    magickeyword.collector = true;
-        
-    data.push(magickeyword);
-    return this.createGrouping(data, maxEntries, depth + 1);            
-};
-
-
-
-CardPanel.prototype.createGrouping2 = function(data, maxEntries, depth) {
     
     if (data.length <= maxEntries) {
         return data;
@@ -314,23 +299,17 @@ CardPanel.prototype.createGrouping2 = function(data, maxEntries, depth) {
     
     keywords.forEach(item => item.usefulness = this.collectorUsefulnessScore(item.multiplicity, data.length, item.score));
     keywords.sort(function(a, b){return b.usefulness - a.usefulness;});
-    console.log(keywords);
     
     for (var i = 0, iMax = keywords.length; i < iMax; i++) {
         const keyword = keywords[i];
         if (keyword.usefulness > 0) {
-            console.log("elotte: " + data.length)
-            console.log("remove " + keywords[i].name);
             const newData = this.removeFromArray(data, keywords[i].name);
             keywords[i].collector = true;
             keywords[i].keywords = [];
             newData.push(keywords[i])
-            console.log("utana: " + newData.length)
             if (newData.length < data.length) {
-                console.log("KIVESZEM")
                 data = newData;
             }                
-            console.log("")
         }
     }
     
@@ -394,13 +373,13 @@ CardPanel.prototype.createData = function(superMeta) {
     var maxCards = Math.min(global.panelNumberOnScreen * 2 * 3, this.maxCards);    
     maxCards = 6;
         
-    var filteredDataForCards = this.createGrouping2([...filteredData], maxCards);
+    var filteredDataForCards = this.createGrouping([...filteredData], maxCards);
     this.determineGroupSizes(filteredDataForCards, filteredData);
     this.addKpiToReports(filteredDataForCards);
     
     // Elemek nyelvfüggő sorbarendezése.
     filteredDataForCards.sort(function(a, b) {
-        if ((a.collector && b.collector) || (!a.collector && !b.collector)) {
+        if ((a.collector && b.collector) || (!a.collector && !b.collector)) {            
             return global.getFromArrayByLang(a.labels).caption.localeCompare(global.getFromArrayByLang(b.labels).caption, {sensitivity: 'variant', caseFirst: 'upper'});
         }
         return (a.collector) ? -1 : 1;

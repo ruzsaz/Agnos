@@ -85,17 +85,28 @@ function Container() {
         // Ha a bookmarkba van kódolva valami, annak megfelelően indítunk.
         var startString = location.href.split("#")[1];
         if (startString) {
+            var startObject = undefined;
             try {
                 that.counter = 2;   // 2 report betöltésére várunk, bal, jobbpanel.
-                var startObject = JSON.parse(LZString.decompressFromEncodedURIComponent(startString));
-                that.navigateTo(startObject);
+                startObject = JSON.parse(LZString.decompressFromEncodedURIComponent(startString));
+            } catch (e) {
+                startObject = null;
+            }
+            
+            if(startObject === null) {
+                location.replace(location.origin + location.pathname);                
+                return;
+            } 
+
+            try {
+                that.navigateTo(startObject);                
             } catch (e) {
                 if (global.preferredUsername === undefined) {
                     global.showNotAuthenticated();             
                 } else {
                     global.showNotAuthorized(global.preferredUsername);
                 }                             
-            }
+            }            
         } else {
             that.resizeContainers(0, 1, global.panelNumberOnScreen);
         }

@@ -17,9 +17,22 @@ function panel_sankey(init) {
     // Inicializáló objektum beolvasása, feltöltése default értékekkel.
     this.defaultInit = {group: 0, position: undefined, dim: [3,2,2], val: 0, ratio: false, mag: 1, frommg: 1, sortbyvalue: false};
     this.actualInit = global.combineObjects(that.defaultInit, init);
+    this.rzscale = 1.5;
 
-    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, false, global.legendOffsetX, global.legendOffsetX); // A Panel konstruktorának meghívása.
 
+    
+    if (this.actualInit.dim.length <= 3) {
+        Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, false, global.legendOffsetX, global.legendOffsetX); // A Panel konstruktorának meghívása.
+    } else {        
+        Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, false, 4, 4); // A Panel konstruktorának meghívása.
+        this.nodeWidthInPixels = 60;
+        this.rzscale = 3;
+    }
+
+    
+    this.nodeWidth = this.nodeWidthInPixels * this.rzscale;
+    this.rzdescale = "scale(" + (1 / this.rzscale) + " , 1)";
+    
     this.valMultiplier = 1;			// A mutatott érték szorzója.
     this.fracMultiplier = 1;			// A mutatott érték szorzója.
     this.dimsToShow = that.actualInit.dim;	// A mutatott dimenziók tömbje.
@@ -47,7 +60,7 @@ function panel_sankey(init) {
             .nodeAlign(function(n) {
                         return n.columnIndex;
                     })
-            .size([that.width, that.height]);
+            .size([that.width*this.rzscale, that.height]);
 
     // Az oszlopok árnyékához létrehozandó kamu-gráf
     const nodes = [];
@@ -83,7 +96,7 @@ function panel_sankey(init) {
     // A diagram rétege.
     this.gLinks = that.svg.insert("svg:g", ".title_group")
             .attr("class", "sankey_links")
-            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");
+            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ") " + this.rzdescale);
     this.gNodes = that.svg;
 
     // Feliratok rétege.
@@ -94,7 +107,7 @@ function panel_sankey(init) {
     // Oszlopok alá a dimenzió ráírása.
     this.axisCaptions = that.svg.insert("svg:g", ".title_group")
             .attr("class", "dimensionLabel noEvents")
-            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");    
+            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ") ");    
 
 
     // Feliratkozás a mediátorokra.
@@ -122,7 +135,7 @@ function panel_sankey(init) {
 
 {
     panel_sankey.prototype = global.subclassOf(Panel); // A Panel metódusainak átvétele.    
-    panel_sankey.prototype.nodeWidth = 80;
+    panel_sankey.prototype.nodeWidthInPixels = 80;
     panel_sankey.prototype.linkOpacity = 0.35;
 }
 
@@ -544,7 +557,7 @@ panel_sankey.prototype.drawSankey = function (graph, trans) {
             .remove();
     
     gNodes = gNodes.enter().insert("svg:rect", ".sankey_links")            
-            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")")
+            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ") " + this.rzdescale)
             .attr("x", d => d.x0)
             .attr("width", d => (d.x1 - d.x0))
             .attr("y", d => d.startY0)
@@ -633,7 +646,7 @@ panel_sankey.prototype.drawAxes = function (graph, trans) {
             .merge(axisCaptions);
     
     axisCaptions
-            .attr("x", (d, i) => this.shadowGraph.nodes[i].x0)            
+            .attr("x", (d, i) => this.shadowGraph.nodes[i].x0  / that.rzscale)            
             .attr("y", 0)
             .attr("dy", '-0.4ex')
             .text(d => d);            
@@ -664,7 +677,7 @@ panel_sankey.prototype.drawLabels = function (graph, trans) {
             .attr("class", "node legend noEvents")
             .attr("opacity", d => d.startTextOpacity)
             .attr("x", function (d) {                
-                return (d.x0 + d.x1) / 2;
+                return (d.x0 + d.x1) / 2 / that.rzscale;
             })
             .attr("y", function (d) {
                 return (d.startY0 + d.startY1) / 2;
@@ -681,7 +694,7 @@ panel_sankey.prototype.drawLabels = function (graph, trans) {
     
     gLabels.transition(trans)
             .attr("x", function (d) {
-                return (d.x0 + d.x1) / 2;
+                return (d.x0 + d.x1) / 2 / that.rzscale;
             })
             .attr("y", function (d) {
                 return (d.y0 + d.y1) / 2;
@@ -691,7 +704,7 @@ panel_sankey.prototype.drawLabels = function (graph, trans) {
             });
 
     // A szövegek összenyomása, hogy elférjenek.    
-    global.cleverCompress(gLabels, that.sankey.nodeWidth(), 0.9, undefined, false, false, 80);       
+    global.cleverCompress(gLabels, that.sankey.nodeWidth() / that.rzscale, 0.9, undefined, false, false, 80);       
 };
 
 //////////////////////////////////////////////////

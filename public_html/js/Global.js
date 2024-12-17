@@ -599,12 +599,12 @@ var global = function () {
 
         keycloak.updateToken(10).then(function (refreshed) {
             if (refreshed) {
-                console.log('Token is successfully refreshed');
+                //console.log('Token is successfully refreshed');
             } else {
                 //console.log('Token NOT refreshed');
             }
         }).catch(function () {
-            console.log('Failed to refresh the token, or the session has expired');
+            //console.log('Failed to refresh the token, or the session has expired');
         }).finally(() => {
             $.ajax({
                 url: url,
@@ -1043,6 +1043,22 @@ var global = function () {
             }
         }
         return position;
+    };
+
+    var getFirstValidString = function(a, b, c, d) {
+        if (a !== undefined && a.length > 0) {
+            return a;
+        }
+        if (b !== undefined && b.length > 0) {
+            return b;
+        }
+        if (c !== undefined && c.length > 0) {
+            return c;
+        }
+        if (d !== undefined && d.length > 0) {
+            return d;
+        }
+        return "-";
     };
 
     /**
@@ -1724,6 +1740,7 @@ var global = function () {
         positionInArrayByProperties: positionInArrayByProperties, // Megkeresi egy tömb elemének indexét az elem néhány property-je alapján.
         positionInArray: positionInArray, // Megnézi, hogy a tömb hányadik eleme egy érték.
         getArrayFromObjectArrayByProperty: getArrayFromObjectArrayByProperty, // Egy objektum-tömbből egy tömböt csinál, amely az objektumok egyik propertyeit tartalmazza.
+        getFirstValidString: getFirstValidString,
         sort_unique: sort_unique,
         valueInRange: valueInRange, // Eldönti, hogy egy érték a [min, max) intervallumba esik-e?
         initGlobals: initGlobals, // Inicializálja a globális változókat a belépés után.

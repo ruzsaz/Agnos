@@ -79,24 +79,26 @@ Fact.prototype.getLocalMeta = function() {
         this.localMeta = {};
         this.localMeta.actualLanguage = language;
         const localLabel = global.getFromArrayByLang(this.reportMeta.labels, language);
-        this.localMeta.caption = localLabel.caption;
+        const defaultLabel = global.getFromArrayByLang(this.reportMeta.labels, "");
+        this.localMeta.caption = global.getFirstValidString(localLabel.caption, defaultLabel.caption, localLabel.description, defaultLabel.description);
         this.localMeta.cube_unique_name = this.reportMeta.name;
         this.localMeta.saveAllowed = this.reportMeta.saveAllowed;
-        this.localMeta.datasource = localLabel.datasource;
-        this.localMeta.description = localLabel.description;
-        
+        this.localMeta.datasource = global.getFirstValidString(localLabel.datasource, defaultLabel.datasource);
+        this.localMeta.description = global.getFirstValidString(localLabel.description, defaultLabel.description, localLabel.caption, defaultLabel.caption);
+                
         this.localMeta.dimensions = [];
         for (var i = 0, iMax = this.reportMeta.dimensions.length; i < iMax; i++) {
             var d = this.reportMeta.dimensions[i];
             const localLabel = global.getFromArrayByLang(d.multilingualization, language);
+            const defaultLabel = global.getFromArrayByLang(d.multilingualization, "");
             var dimension = {
-                'caption': localLabel.caption,
-                'description': localLabel.description,
+                'caption': global.getFirstValidString(localLabel.caption, defaultLabel.caption, localLabel.description, defaultLabel.description),
+                'description': global.getFirstValidString(localLabel.description, defaultLabel.description, localLabel.caption, defaultLabel.caption),
                 'dimension_unique_name': d.name,
                 'id': d.id,
                 'is_territorial': (d.type === "" || d.type === null) ? 0 : 1,
                 'levels': d.allowedDepth + 1,
-                'top_level_caption': localLabel.topLevelString
+                'top_level_caption': global.getFirstValidString(localLabel.topLevelString, defaultLabel.topLevelString)
             };
             this.localMeta.dimensions.push(dimension);
         }
@@ -105,16 +107,17 @@ Fact.prototype.getLocalMeta = function() {
         for (var i = 0, iMax = this.reportMeta.indicators.length; i < iMax; i++) {
             var d = this.reportMeta.indicators[i];
             const localLabel = global.getFromArrayByLang(d.multilingualization, language);
+            const defaultLabel = global.getFromArrayByLang(d.multilingualization, "");
             var indicator = {
-                'caption': localLabel.caption,
-                'description': localLabel.description,
+                'caption': global.getFirstValidString(localLabel.caption, defaultLabel.caption, localLabel.description, defaultLabel.description),
+                'description': global.getFirstValidString(localLabel.description, defaultLabel.description, localLabel.caption, defaultLabel.caption),
                 'fraction': {
                     'hide': d.denominatorIsHidden,
                     'measure_unique_name': d.denominatorName,
                     'multiplier': d.denominatorMultiplier,
                     'sign': d.denominatorSign,
-                    'unit': localLabel.denominatorUnit,
-                    'unitPlural': localLabel.denominatorUnitPlural
+                    'unit': global.getFirstValidString(localLabel.denominatorUnit, localLabel.denominatorUnitPlural, defaultLabel.denominatorUnit, defaultLabel.denominatorUnitPlural),
+                    'unitPlural': global.getFirstValidString(localLabel.denominatorUnitPlural, localLabel.denominatorUnit, defaultLabel.denominatorUnitPlural, defaultLabel.denominatorUnit)
                 },
                 'id': d.id,
                 'value': {
@@ -122,8 +125,8 @@ Fact.prototype.getLocalMeta = function() {
                     'measure_unique_name': d.valueName,
                     'multiplier': d.valueMultiplier,
                     'sign': d.valueSign,
-                    'unit': localLabel.valueUnit,
-                    'unitPlural': localLabel.valueUnitPlural
+                    'unit': global.getFirstValidString(localLabel.valueUnit, localLabel.valueUnitPlural, defaultLabel.valueUnit, defaultLabel.valueUnitPlural),
+                    'unitPlural': global.getFirstValidString(localLabel.valueUnitPlural, localLabel.valueUnit, defaultLabel.valueUnitPlural, defaultLabel.valueUnit)
                 }
             };
             this.localMeta.indicators.push(indicator);

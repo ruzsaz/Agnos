@@ -2739,6 +2739,10 @@ svg.switchButtonHelp {
   margin-left: 40px;
   margin-bottom: 1ex;
 }
+.helpContent div.helpInnerHTML * {
+  color: unset !important;
+  background-color: unset !important;
+}
 .helpContent .helpAbout > .changelog > span > span {
   font-weight: bold;
 }
