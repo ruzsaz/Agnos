@@ -885,7 +885,7 @@ panel_bar2d.prototype.drawLegend = function (preparedData, trans) {
 panel_bar2d.prototype.drawAxes = function (preparedData, trans) {
     var that = this;
 
-    that.xAxisTextColor = global.readableColor(global.colorValue(0));
+    that.xAxisTextColor = global.readableColor(global.colorValue(0, that.panelSide));
     var shadowSize = global.axisTextSize(that.xScale(1));	// A vízszintes tengely betűje mögötti klikk-téglalap mérete.
     var axisTextSize = (shadowSize < 6) ? 0 : shadowSize;	// A vízszintes tengely betűmérete.
 

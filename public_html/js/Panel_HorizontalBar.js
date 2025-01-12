@@ -33,7 +33,7 @@ function panel_horizontalbar(init) {
     this.shadowTimeout;									// A háttértéglalapokat létrehozó időzítés.
 
     // Az y tengely szövegszínének meghatározása.	
-    this.yAxisColor = global.readableColor(global.colorValue(that.valBarsToShow[0]));
+    this.yAxisColor = global.readableColor(global.colorValue(that.valBarsToShow[0], that.panelSide));
 
     // Vízszintes skála.
     this.xScale = d3.scaleLinear()
@@ -363,7 +363,7 @@ panel_horizontalbar.prototype.preUpdate = function(drill) {
                     return d2.width;
                 })
                 .attr("fill", function(d2, i2) {
-                    return global.colorValue(that.valBarsToShow[i2]);
+                    return global.colorValue(that.valBarsToShow[i2], that.panelSide);
                 });
     }
 };
@@ -615,7 +615,7 @@ panel_horizontalbar.prototype.drawBars = function(preparedData, trans) {
                 return d2.oldWidth;
             })
             .attr("fill", function(d2, i2) {
-                return global.colorValue(that.valBarsToShow[i2]);
+                return global.colorValue(that.valBarsToShow[i2], that.panelSide);
             });
 
     // Új és maradó elemek összeöntése.
@@ -648,7 +648,7 @@ panel_horizontalbar.prototype.drawBars = function(preparedData, trans) {
             })
             .attr("height", that.yScale(1 - that.barPadding))
             .attr("fill", function(d, i) {
-                return global.colorValue(that.valBarsToShow[i]);
+                return global.colorValue(that.valBarsToShow[i], that.panelSide);
             });
 
 };
@@ -701,7 +701,7 @@ panel_horizontalbar.prototype.drawLegend = function() {
                 .attr("width", l_width - that.legendOffsetX)
                 .attr("height", l_height)
                 .attr("fill", function(d) {
-                    return global.colorValue(d.id);
+                    return global.colorValue(d.id, that.panelSide);
                 });
 
         // A jelkulcs-szöveg kiírása.
@@ -714,7 +714,7 @@ panel_horizontalbar.prototype.drawLegend = function() {
                 .attr("y", that.h - l_height / 2 - global.legendOffsetY)
                 .attr("dy", ".35em")
                 .attr("fill", function(d) {
-                    return global.readableColor(global.colorValue(d.id));
+                    return global.readableColor(global.colorValue(d.id, that.panelSide));
                 })
                 .text(function(d, i) {
                     return that.localMeta.indicators[that.legendArray[i].id].caption;
@@ -735,7 +735,7 @@ panel_horizontalbar.prototype.drawLegend = function() {
 panel_horizontalbar.prototype.drawAxes = function(preparedData, trans) {
     var that = this;
 
-    that.yAxisColor = global.readableColor(global.colorValue(that.valBarsToShow[0]))
+    that.yAxisColor = global.readableColor(global.colorValue(that.valBarsToShow[0], that.panelSide));
     var shadowSize = global.axisTextSize(that.yScale(1));	// A függőleges tengely betűje mögötti klikk-téglalap mérete.
     var axisTextSize = (shadowSize < 6) ? 0 : shadowSize;	// A függőleges tengely betűmérete.
 

@@ -5,6 +5,8 @@ var changelog = [
     {
         "language": "hu",
         "history": [
+            {"entity": "Agnos", "date": "2025-01-14", "change": "Mutatók opcionális szín meghatározása."},
+            {"entity": "AgnosServer", "date": "2025-01-12", "change": "Memória-korlátozás és cache-mentés."},
             {"entity": "Agnos", "date": "2024-12-02", "change": "Kártyás report-elrendezés."},
             {"entity": "Agnos", "date": "2024-10-23", "change": "Mobil- és tabletbarát kialakítás."},
             {"entity": "Agnos", "date": "2024-08-23", "change": "Csv-ként mentés megtiltásának lehetősége."},
@@ -38,6 +40,8 @@ var changelog = [
     {
         "language": "en",
         "history": [
+            {"entity": "Agnos", "date": "2025-01-14", "change": "Optional color for indicators."},
+            {"entity": "AgnosServer", "date": "2025-01-12", "change": "Memory-restriction and cache preserving."},
             {"entity": "Agnos", "date": "2024-12-02", "change": "Show available reports as cards."},
             {"entity": "Agnos", "date": "2024-10-23", "change": "Mobile and touch friendly solution."},
             {"entity": "Agnos", "date": "2024-08-23", "change": "Disable 'save as csv' on demand."},

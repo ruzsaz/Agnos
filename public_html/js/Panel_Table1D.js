@@ -391,10 +391,10 @@ panel_table1d.prototype.drawCells = function (preparedData, trans) {
         });
         if (that.columnHeadVector[i].hide !== 3) {
             if (that.columnHeadVector[i].hide % 2 === 0) {
-                that.columnColorIndex.push(d3.rgb(global.colorValue(i)).brighter(that.darkenBrightenFactor));
+                that.columnColorIndex.push(d3.rgb(global.colorValue(i, that.panelSide)).brighter(that.darkenBrightenFactor));
             }
             if (that.columnHeadVector[i].hide >> 1 === 0) {
-                that.columnColorIndex.push(d3.rgb(global.colorValue(i)).darker(that.darkenBrightenFactor));
+                that.columnColorIndex.push(d3.rgb(global.colorValue(i, that.panelSide)).darker(that.darkenBrightenFactor));
             }
         }
     }
@@ -504,7 +504,7 @@ panel_table1d.prototype.drawColumnHeaders = function (trans) {
             })
             .attr("height", that.tableHeadHeight / 2)
             .style("fill", function (d, i) {
-                return global.colorValue(i);
+                return global.colorValue(i, that.panelSide);
             });
 
     // Az indikátor megnevezése.
@@ -533,7 +533,7 @@ panel_table1d.prototype.drawColumnHeaders = function (trans) {
             .attr("height", that.tableHeadHeight / 2)
             .attr("y", that.tableHeadHeight / 2)
             .style("fill", function (d, i) {
-                return d3.rgb(global.colorValue(i)).brighter(that.darkenBrightenFactor);
+                return d3.rgb(global.colorValue(i, that.panelSide)).brighter(that.darkenBrightenFactor);
             });
 
     //Az indikátor érték megnevezése.
@@ -560,7 +560,7 @@ panel_table1d.prototype.drawColumnHeaders = function (trans) {
                 return (d.hide % 2 === 0) ? that.tableSpacingHorizontal : 0;
             })
             .style("fill", function (d, i) {
-                return d3.rgb(global.colorValue(i)).darker(that.darkenBrightenFactor);
+                return d3.rgb(global.colorValue(i, that.panelSide)).darker(that.darkenBrightenFactor);
             });
 
     // Az indikátor hányados megnevezése.
@@ -742,10 +742,10 @@ panel_table1d.prototype.langSwitch = function (duration, isInitial) {
             valueNamesVector.push(that.localMeta.indicators[i].caption);
             pos += (that.columnHeadVector[i].hide === 0) ? 2 : 1;
             if (that.columnHeadVector[i].hide % 2 === 0) {
-                that.columnColorIndex.push(d3.rgb(global.colorValue(i)).brighter(that.darkenBrightenFactor));
+                that.columnColorIndex.push(d3.rgb(global.colorValue(i, that.panelSide)).brighter(that.darkenBrightenFactor));
             }
             if (that.columnHeadVector[i].hide >> 1 === 0) {
-                that.columnColorIndex.push(d3.rgb(global.colorValue(i)).darker(that.darkenBrightenFactor));
+                that.columnColorIndex.push(d3.rgb(global.colorValue(i, that.panelSide)).darker(that.darkenBrightenFactor));
             }
         }
     }

@@ -373,7 +373,7 @@ HeadPanel_Report.prototype.initPanel = function (trans) {
     // Háttérszín.
     valRow.select(".backgroundCell")
             .style("background", function (d, i) {
-                return global.colorValue(i);
+                return global.colorValue(i, that.panelSide);
             });
 
 };

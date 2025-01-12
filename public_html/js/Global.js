@@ -79,6 +79,9 @@ var global = function () {
             // Ha megvan az új, akkor végrehajtjuk a változtatást    
         } else {
 
+            global.mediators[0].publish("cssSwitch");
+            global.mediators[1].publish("cssSwitch");
+
             var savedDuration = global.selfDuration;
             global.selfDuration = 0;
 
@@ -847,13 +850,121 @@ var global = function () {
     };
 
     /**
-     * Megadja egy érték kijelzésének színét.
+     * Megadja egy érték kijelzésének színét az adott oldalon lévő report számára.
      * 
      * @param {Integer} valueId Az érték sorszáma.
+     * @param {Integer} side A panel oldala (0 vagy 1).
      * @returns {String} A hozzá tartozó szín, html kódolva.
      */
-    var colorValue = function (valueId) {
-        return (isNaN(valueId)) ? colorNA : colors[(valueId) % 20];
+    var colorValue = function (valueId, side) {
+        return (isNaN(valueId)) ? colorNA : valColors[side][(valueId) % 20];
+    };
+
+    /**
+     * Beállítja az értékek színét a css séma alapján. Ha a report metában
+     * van kért szín, azt is figyelembe veszi.
+     * 
+     * @param {type} meta A report metája.
+     * @param {type} side Az oldal, amely színeit állítani kell (0 vagy 1).
+     * @returns {undefined}
+     */
+    var resetValColorsFromReportMeta = function(meta, side) {
+        const availableColors = [];
+        for (var i = 0; i < 20; i++) {
+            availableColors[i] = {color: colors[i], cielab: _rgb2cielab(_rgbComponents(colors[i]))};
+            valColors[side][i] = undefined;
+        }
+        
+        // Beállítjuk a report metában kért színeket, ha egzakt a kérés azt, ha nem, a legközelebbit.
+        for (var i = 0; i < meta.indicators.length; i++) {
+            const indicator = meta.indicators[i];
+            if (indicator.preferredColor !== undefined && indicator.preferredColor !== null && indicator.preferredColor.length > 2) {
+                const color = _hexToRgb(indicator.preferredColor);
+                if (color) {
+                    if (indicator.colorExact) {
+                        valColors[side][i] = color;
+                    } else {
+                        const bestMatchIndex = _getClosestColorIndex(_rgb2cielab(_rgbComponents(color)), availableColors);
+                        if (bestMatchIndex !== -1) {
+                            valColors[side][i] = availableColors[bestMatchIndex].color;
+                            availableColors.splice(bestMatchIndex, 1);
+                        }
+                    }
+                }
+            }
+        }
+        
+        // Beállítjuk a külön nem kért színeket is
+        for (var i = 0; i < 20; i++) {
+            if (valColors[side][i] === undefined) {
+                valColors[side][i] = availableColors[0].color;
+                availableColors.splice(0, 1);
+            }
+        }
+    };
+
+    var _hexToRgb = function (hex) {
+        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        return result ? "rgb(" + parseInt(result[1], 16) + "," + parseInt(result[2], 16) + "," + parseInt(result[3], 16) + ")" : undefined;
+    };
+
+    /**
+     * Megkeresi egy adott színhez legjobban hasonlítót egy szín-tömbben.
+     * 
+     * @param {Array} colorInCielab A keresett szín a CieL*a*b térben.
+     * @param {Array} colorArray A szín tömb.
+     * @returns {Integer} A legjobban hasonlító szín indexe, vagy -1 ha nincs.
+     */
+    var _getClosestColorIndex = function(colorInCielab, colorArray) {
+        const result = {min: 9999999, index: -1};
+        for (var i = 0; i < colorArray.length; i++) {
+            const distance = Math.hypot(colorInCielab[0]-colorArray[i].cielab[0], colorInCielab[1]-colorArray[i].cielab[1], colorInCielab[2]-colorArray[i].cielab[2]);
+            if (distance < result.min) {
+                result.min = distance;
+                result.index = i;
+            }
+        }
+        return result.index;
+    };
+
+    /**
+     * RGB tömbbé konvertál egy "rgb(1,45,64)" stringet.
+     * 
+     * @param {String} rgbColorString A szín string formában
+     * @returns {Array} Az rgb értékek tömbje.
+     */
+    var _rgbComponents = function(rgbColorString) {
+        const result = rgbColorString.split(",");
+        result.forEach(function(item, index, arr) {arr[index] = parseInt(item.match(/\d+/)[0]);});
+        return result;
+    };
+
+    /**
+     * Egy RGB-ben megadott színt CieL*a*b-ban megadottá konvertál.
+     * 
+     * @param {Array} rgbArray A szín rgb tömbben.
+     * @returns {Array} A szín CieL*a*b tömbben.
+     */
+    var _rgb2cielab = function(rgbArray) {
+        var var_R = ( rgbArray[0] / 255.0 );
+        var var_G = ( rgbArray[1] / 255.0 );
+        var var_B = ( rgbArray[2] / 255.0 );
+
+        var_R = ( var_R > 0.04045 ) ? Math.pow( ( var_R + 0.055 ) / 1.055, 2.4) : var_R / 12.92;
+        var_G = ( var_G > 0.04045 ) ? Math.pow( ( var_G + 0.055 ) / 1.055, 2.4) : var_G / 12.92;
+        var_B = ( var_B > 0.04045 ) ? Math.pow( ( var_B + 0.055 ) / 1.055, 2.4) : var_B = var_B / 12.92;
+
+        var var_X = (var_R * 41.24 + var_G * 35.76 + var_B * 18.05) / 95.047;
+        var var_Y = (var_R * 21.26 + var_G * 71.52 + var_B * 7.22) / 100.000;
+        var var_Z = (var_R * 1.93 + var_G * 11.92 + var_B * 95.05) / 108.883;
+                
+        var_X = ( var_X > 0.008856 ) ? Math.pow(var_X, 1/3) : 7.787*var_X + 0.137931034;
+        var_Y = ( var_Y > 0.008856 ) ? Math.pow(var_Y, 1/3) : 7.787*var_Y + 0.137931034;
+        var_Z = ( var_Z > 0.008856 ) ? Math.pow(var_Z, 1/3) : 7.787*var_Z + 0.137931034;
+
+        return [116*var_Y - 16,
+                500*(var_X-var_Y),
+                200*(var_Y-var_Z)];
     };
 
     /**
@@ -1526,6 +1637,9 @@ var global = function () {
         // Az értékek megjelenését színező színpaletta.
         var colorNA = 'grey';
         var colors = [];
+        var valColors = [];
+        valColors[0] = [];
+        valColors[1] = [];
 
         // Húzd-és-ejtsd működését vezérlő ojektum.
         var dragDropManager = {
@@ -1644,6 +1758,8 @@ var global = function () {
         global.colorNA = varsFromCSS.valClorNA; // A "nem szám", ill "nem definiált" érték színezési színe.
         for (var i = 0; i < 20; i++) {
             colors[i] = varsFromCSS["valColor" + (i + 1)];
+            valColors[0][i] = varsFromCSS["valColor" + (i + 1)];
+            valColors[1][i] = varsFromCSS["valColor" + (i + 1)];
         }
 
         // A CSS-ből kiolvasott értékek.
@@ -1778,6 +1894,7 @@ var global = function () {
         rectanglePath: rectanglePath, // Egy SVG téglalapot kirajzoló path-t generál, opcionálisan lekerekített sarkokkal.
         colorValue: colorValue, // Megadja egy érték kijelzésének színét.
         color: color, // Megadja egy dimenzióelem kijelzésének színét.
+        resetValColorsFromReportMeta: resetValColorsFromReportMeta, // Beállítja az értékek színét a css séma alapján.
         randomString: randomString, // Adott hosszúságú véletlen stringet generál.
         initValuesFromCss: initValuesFromCss,
         initDeviceProperties: initDeviceProperties,
@@ -1791,7 +1908,7 @@ global.initValuesFromCss();
 global.initDeviceProperties();
 
 if (!global.isEmbedded) {
-    console.log("Az épp aktuális panelkonfiguráció kiíratása: global.getConfig();");
+    console.log("Az épp aktuális panelkonfiguráció, és drillvektor kiíratása: global.getConfig();");
     console.log("A fordítás segítéséhez: global.getUntranslated('lang');");
-    console.log("Embedded link: global.getEmbeddedUrl();");
+    console.log("Embedded link kiírása: global.getEmbeddedUrl();");
 }

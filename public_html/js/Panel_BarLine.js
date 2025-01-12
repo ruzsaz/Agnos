@@ -51,7 +51,7 @@ function panel_barline(init) {
     this.maskId = global.randomString(12);              // A maszk réteg id-je. Véletlen, nehogy kettő azonos legyen.
 
     // Az x tengely szövegszínének meghatározása.
-    this.xAxisColor = global.readableColor(global.colorValue[0]);
+    this.xAxisColor = global.readableColor(global.colorValue(0, that.panelSide));
 
     // Vízszintes skála.
     this.xScale = d3.scaleLinear()
@@ -606,7 +606,7 @@ panel_barline.prototype.preUpdate = function(drill) {
                     return d2.height;
                 })
                 .attr("fill", function(d2, i2) {
-                    return global.colorValue(that.valBarsToShow[i2]);
+                    return global.colorValue(that.valBarsToShow[i2], that.panelSide);
                 });
 
         // Átlagvonalak: széthúzás kilógóra.
@@ -1070,7 +1070,7 @@ panel_barline.prototype.drawBars = function(preparedData, trans) {
                     return d2.oldHeight;
                 })
                 .attr("fill", function(d2, i2) {
-                    return global.colorValue(that.valBarsToShow[i2]);
+                    return global.colorValue(that.valBarsToShow[i2], that.panelSide);
                 });
 
         // Új és maradó elemek összeöntése.
@@ -1103,7 +1103,7 @@ panel_barline.prototype.drawBars = function(preparedData, trans) {
                 })
                 .attr("width", that.xScale(1 - that.barPadding))
                 .attr("fill", function(d2, i2) {
-                    return global.colorValue(that.valBarsToShow[i2]);
+                    return global.colorValue(that.valBarsToShow[i2], that.panelSide);
                 });
 
     }
@@ -1134,7 +1134,7 @@ panel_barline.prototype.drawLines = function(preparedData, trans, isClearRequire
         line = line.enter().insert("svg:path", ".lineSymbolGroup")
                 .attr("d", that.oldLineBarGenerator)
                 .attr("stroke", function(d, i) {
-                    return global.colorValue(that.valLinesToShow[i]);
+                    return global.colorValue(that.valLinesToShow[i], that.panelSide);
                 })
                 .merge(line);
 
@@ -1145,7 +1145,7 @@ panel_barline.prototype.drawLines = function(preparedData, trans, isClearRequire
                 })
                 .attr("d", that.lineBarGenerator)
                 .attr("stroke", function(d, i) {
-                    return global.colorValue(that.valLinesToShow[i]);
+                    return global.colorValue(that.valLinesToShow[i], that.panelSide);
                 });
 
         // Egy vonalhoz tartozó összes szimbólum tartója, és az adatok hozzátársítása.
@@ -1190,7 +1190,7 @@ panel_barline.prototype.drawLines = function(preparedData, trans, isClearRequire
                 })
                 .transition(trans)
                 .attr("fill", function(d) {
-                    return global.colorValue(that.valLinesToShow[d.number]);
+                    return global.colorValue(that.valLinesToShow[d.number], that.panelSide);
                 });
 
         // Az új szimbólumok tartócsoportjának létrehozása.
@@ -1219,7 +1219,7 @@ panel_barline.prototype.drawLines = function(preparedData, trans, isClearRequire
                     return d3.symbol().type(d3.symbols[(that.valLinesToShow[d.number]) % 6]).size(that.symbolSize)();
                 })
                 .attr("fill", function(d) {
-                    return global.colorValue(that.valLinesToShow[d.number]);
+                    return global.colorValue(that.valLinesToShow[d.number], that.panelSide);
                 });
 
         // Új és maradó elemek összeöntése.
@@ -1273,7 +1273,7 @@ panel_barline.prototype.drawAvgLines = function(preparedData, trans) {
                 })
                 .transition(trans)
                 .attr("stroke", function(d, i) {
-                    return d3.rgb(global.colorValue(that.valAvgToShow[i])).darker(2);
+                    return d3.rgb(global.colorValue(that.valAvgToShow[i], that.panelSide)).darker(2);
                 })
                 .attr("d", function(d) {
                     return that.horizontalLine(d.x0, d.x1, d.y);
@@ -1316,7 +1316,7 @@ panel_barline.prototype.drawAvgLines = function(preparedData, trans) {
                 })
                 .attr("opacity", 1)
                 .attr("stroke", function(d, i) {
-                    return d3.rgb(global.colorValue(that.valAvgToShow[i])).darker(2);
+                    return d3.rgb(global.colorValue(that.valAvgToShow[i], that.panelSide)).darker(2);
                 })
                 .attr("transform", function(d) {
                     return "rotate(-90," + (that.width + that.avgTextHeight) + "," + d.y + ")";
@@ -1381,13 +1381,13 @@ panel_barline.prototype.drawLegend = function() {
                 .attr("width", l_width - that.legendOffsetX)
                 .attr("height", l_height)
                 .attr("fill", function(d) {
-                    return global.colorValue(d.id);
+                    return global.colorValue(d.id, that.panelSide);
                 })
                 .attr("fill-opacity", function(d) {
                     return (d.isBarRequired) ? 1 : 0;
                 })
                 .attr("stroke", function(d) {
-                    return global.colorValue(d.id);
+                    return global.colorValue(d.id, that.panelSide);
                 })
                 .attr("stroke-opacity", function(d) {
                     return (d.isLineRequired) ? 1 : 0;
@@ -1407,7 +1407,7 @@ panel_barline.prototype.drawLegend = function() {
                 .attr("height", l_height)
                 .attr("fill", "none")
                 .attr("stroke", function(d) {
-                    return d3.rgb(global.colorValue(d.id)).darker(2);
+                    return d3.rgb(global.colorValue(d.id, that.panelSide)).darker(2);
                 })
                 .attr("stroke-dasharray", function(d) {
                     return (d.isLineRequired) ? 10 : "none";
@@ -1439,7 +1439,7 @@ panel_barline.prototype.drawLegend = function() {
                         return d3.symbol().type(d3.symbols[d.id % 6]).size(that.symbolSize)();
                     })
                     .attr("fill", function(d) {
-                        return global.colorValue(d.id);
+                        return global.colorValue(d.id, that.panelSide);
                     })
                     .attr("transform", function(d, i) {
                         return "translate(" + (global.rectRounding / 2) + ", 0)";
@@ -1452,7 +1452,7 @@ panel_barline.prototype.drawLegend = function() {
                 .attr("y", global.legendHeight / 2)
                 .attr("dy", ".35em")
                 .attr("fill", function(d) {
-                    return global.readableColor((d.isBarRequired) ? global.colorValue(d.id) : global.panelBackgroundColor);
+                    return global.readableColor((d.isBarRequired) ? global.colorValue(d.id, that.panelSide) : global.panelBackgroundColor);
                 })
                 .text(function(d, i) {
                     return that.localMeta.indicators[that.legendArray[i].id].caption;
@@ -1498,7 +1498,7 @@ panel_barline.prototype.drawLegend = function() {
 panel_barline.prototype.drawAxes = function(preparedData, trans) {
     var that = this;
     
-    that.xAxisColor = global.readableColor(global.colorValue(0));
+    that.xAxisColor = global.readableColor(global.colorValue(0, that.panelSide));
 
     var shadowSize = global.axisTextSize(that.xScale(1));	// A vízszintes tengely betűje mögötti klikk-téglalap mérete.
     var axisTextSize = (shadowSize < 6) ? 0 : shadowSize;	// A vízszintes tengely betűmérete.

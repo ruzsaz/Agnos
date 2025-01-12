@@ -32,6 +32,7 @@ function DataDirector(side, mediator) {
     that.mediator.subscribe("getConfig", function(callback) {
         that.getConfigs(callback);
     });
+    this.cubePreparationRequired = true;
 }
 
 /**
@@ -133,7 +134,7 @@ DataDirector.prototype.getNumberOfPanels = function() {
  * @param {Object} drill A fúrás objektum.
  * @returns {undefined}
  */
-DataDirector.prototype.drill = function(drill) {
+DataDirector.prototype.drill = function(drill) {    
     var that = this;
     var isSuccessful = false;
     var dim = drill.dim;
@@ -217,8 +218,10 @@ DataDirector.prototype.requestNewData = function(drill) {
     var requestObject = {
         "reportName" : global.facts[that.side].reportMeta.name,
         "baseVector": baseVector,
-        "drillVectors": queries
+        "drillVectors": queries,
+        "isCubePreparationRequired": that.cubePreparationRequired
     };
+    that.cubePreparationRequired = false;
     const encodedQuery = "queries=" + window.btoa(encodeURIComponent((JSON.stringify(requestObject))));
     // A letöltés élesben.
     global.get(global.url.fact, encodedQuery, function(result) {
@@ -323,7 +326,22 @@ DataDirector.prototype.getConfigs = function(callback) {
             configObject.v = global.minifyInits(configs); // A panelek init sztringje, minifyolva.
         }
         callback(configObject);
-    } else {
-        console.log(configs);
+    } else {        
+        var collector = "[ ";
+        var sep0 = "";
+        const baseArray = global.baseLevels[this.side];
+        for (var i = 0, iMax = baseArray.length; i < iMax; i++) {
+            collector += sep0 + "[";                    
+            var sep1 = "";
+            for (var j = 0, jMax = baseArray[i].length; j < jMax; j++) {
+                collector += sep1 + "'" + baseArray[i][j].id + "'";
+                sep1 = ", ";
+            }
+            collector += "]";
+            sep0 = ", ";
+        }
+        collector += " ]";
+        console.log((this.side === 0) ? "Left side panels: " : "Right side panels: " + configs);
+        console.log("          base drill: " + collector);        
     }
 };

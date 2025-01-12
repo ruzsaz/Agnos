@@ -15,6 +15,7 @@ function TitleBox(parentSVG, panelId, mediator, magLevel) {
     var that = this;
 
     this.panelId = panelId;		// Panel id-je.
+    this.panelSide = parseInt(panelId.split("#panel")[1]);    
     this.mediator = mediator;	// A panel mediátora, ezen át kommunikál a fejléc a panellel.
     this.currentId;				// Épp kijelzett mutató id-je, tömb ha többet mutat.
     this.currentRatio;			// Éppen hányadost jelez-e?
@@ -111,7 +112,7 @@ TitleBox.prototype.update = function (idA, nameA, szUnitA, ratioUnitA, isRatio, 
         that.gContainer.selectAll(".titleRect")
                 .attr("rx", global.rectRounding)
                 .transition(trans)
-                .style("fill", (id instanceof Array) ? null : global.colorValue(id))
+                .style("fill", (id instanceof Array) ? null : global.colorValue(id, that.panelSide))
                 .style("opacity", 1);
 
         // Régi szövegek letörlése.

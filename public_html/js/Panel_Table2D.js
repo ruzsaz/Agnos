@@ -557,8 +557,8 @@ panel_table2d.prototype.update = function(data, drill) {
         that.preparedData = that.prepareData(that.preparedData, that.data.rows, drill);
         var maxInDim = Math.max(that.preparedData.dimCArray.length, Math.ceil(that.data.rows.length / that.preparedData.dimCArray.length));
         if (maxInDim > that.maxEntries1D) {
-            that.horizontalScrollbar.set(0, global.colorValue(that.valToShow), trans);
-            that.verticalScrollbar.set(0, global.colorValue(that.valToShow), trans);
+            that.horizontalScrollbar.set(0, global.colorValue(that.valToShow, that.panelSide), trans);
+            that.verticalScrollbar.set(0, global.colorValue(that.valToShow, that.panelSide), trans);
             that.panic(true, _("<html>A panel nem képes ") + maxInDim + _(" értéket egy dimenzió mentén megjeleníteni.<br />A maximálisan megjeleníthető értékek száma ") + that.maxEntries1D + _(".</html>"));
             that.preparedData = undefined;
         } else {
@@ -568,8 +568,8 @@ panel_table2d.prototype.update = function(data, drill) {
             that.drawColumnHeaders(that.preparedData, trans);
             that.drawCells(that.preparedData, trans);
 
-            that.horizontalScrollbar.set(that.preparedData.dimCArray.length * that.tableSpacingHorizontal, global.colorValue(that.valToShow), trans);
-            that.verticalScrollbar.set(that.preparedData.dataArray.length * that.tableSpacingVerical, global.colorValue(that.valToShow), trans);
+            that.horizontalScrollbar.set(that.preparedData.dimCArray.length * that.tableSpacingHorizontal, global.colorValue(that.valToShow, that.panelSide), trans);
+            that.verticalScrollbar.set(that.preparedData.dataArray.length * that.tableSpacingVerical, global.colorValue(that.valToShow, that.panelSide), trans);
         }
     }
     // A panel fejlécének beállítása.
@@ -947,10 +947,10 @@ panel_table2d.prototype.langSwitch = function(duration, isInitial) {
 //            valueNamesVector.push(that.localMeta.indicators[i].caption);
 //            pos += (that.columnHeadVector[i].hide === 0) ? 2 : 1;
 //            if (that.columnHeadVector[i].hide % 2 === 0) {
-//                that.columnColorIndex.push(d3.rgb(global.colorValue(i)).brighter(that.darkenBrightenFactor));
+//                that.columnColorIndex.push(d3.rgb(global.colorValue(i, that.panelSide)).brighter(that.darkenBrightenFactor));
 //            }
 //            if (that.columnHeadVector[i].hide >> 1 === 0) {
-//                that.columnColorIndex.push(d3.rgb(global.colorValue(i)).darker(that.darkenBrightenFactor));
+//                that.columnColorIndex.push(d3.rgb(global.colorValue(i, that.panelSide)).darker(that.darkenBrightenFactor));
 //            }
 //        }
 //    }

@@ -52,7 +52,7 @@ function panel_map(init) {
     // A színskála alacsony, magas, és opcionálisan középső elemét tartalmazó tömb.
     this.colorRange;
     if (!that.isColorsLocked) {
-        that.colorRange = [that.defaultColorMin, global.colorValue(that.valToShow), that.defaultColorMax];
+        that.colorRange = [that.defaultColorMin, global.colorValue(that.valToShow, that.panelSide), that.defaultColorMax];
     } else {
         that.colorRange = that.actualInit.range;
         if (that.colorRange.length === 2) {
@@ -526,7 +526,7 @@ panel_map.prototype.preparePoiData = function (rawPois, newDataRows) {
         var preparedPoi = [];
         preparedPoi.caption = rawPoi.caption;
         preparedPoi.description = rawPoi.description;
-        preparedPoi.color = (rawPoi.color === parseInt(rawPoi.color, 10)) ? global.colorValue(rawPoi.color) : rawPoi.color;
+        preparedPoi.color = (rawPoi.color === parseInt(rawPoi.color, 10)) ? global.colorValue(rawPoi.color, that.panelSide) : rawPoi.color;
         preparedPoi.symbol = rawPoi.symbol;
         preparedPoi.points = [];
         for (var i = 0, iMax = rawPoi.points.length; i < iMax; i++) {
@@ -568,7 +568,7 @@ panel_map.prototype.update = function (data, drill) {
 
     // Színséma feltöltése
     if (!that.isColorsLocked) {
-        that.colorRange = [that.defaultColorMin, global.colorValue(that.valToShow), that.defaultColorMax];
+        that.colorRange = [that.defaultColorMin, global.colorValue(that.valToShow, that.panelSide), that.defaultColorMax];
     }
 
     // A hányados kijelzés, és a szorzó felfrissítése.
@@ -886,7 +886,7 @@ panel_map.prototype.drawPoiLegend = function (trans) {
                     return d3.symbol().type(d3.symbols[d.symbol]).size(that.poiLegendRadius * that.poiLegendRadius)();
                 })
                 .attr("fill", function (d) {
-                    return (d.color === parseInt(d.color, 10)) ? global.colorValue(d.color) : d.color;
+                    return (d.color === parseInt(d.color, 10)) ? global.colorValue(d.color, that.panelSide) : d.color;
                 })
                 .attr("transform", "translate(" + (that.poiLegendRadius + 5) + ", " + (that.poiLegendHeight / 2) + ")");
 
@@ -1035,7 +1035,7 @@ panel_map.prototype.doChangeValue = function (panelId, value, ratio) {
             that.actualInit.ratio = that.valFraction;
         }
         if (!that.isColorsLocked) {
-            that.colorRange = [that.defaultColorMin, global.colorValue(that.valToShow), that.defaultColorMax];
+            that.colorRange = [that.defaultColorMin, global.colorValue(that.valToShow, that.panelSide), that.defaultColorMax];
         }
         that.update();
         global.getConfig2();

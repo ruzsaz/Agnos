@@ -63,6 +63,9 @@ Fact.prototype.enrichReportMeta = function(startObject) {
     for (var i = 0, iMax = this.reportMeta.indicators.length; i < iMax; i++) {
         this.reportMeta.indicators[i].id = i;
     }
+    
+    // Az esetleges előre beállított színek érvényesítése.
+    global.resetValColorsFromReportMeta(this.reportMeta, this.side);
 
 };
 
@@ -109,6 +112,8 @@ Fact.prototype.getLocalMeta = function() {
             const localLabel = global.getFromArrayByLang(d.multilingualization, language);
             const defaultLabel = global.getFromArrayByLang(d.multilingualization, "");
             var indicator = {
+                'colorExact': d.colorExact,
+                'preferredColor': d.preferredColor,
                 'caption': global.getFirstValidString(localLabel.caption, defaultLabel.caption, localLabel.description, defaultLabel.description),
                 'description': global.getFirstValidString(localLabel.description, defaultLabel.description, localLabel.caption, defaultLabel.caption),
                 'fraction': {

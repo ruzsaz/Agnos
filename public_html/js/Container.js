@@ -492,6 +492,10 @@ Container.prototype.initSide = function(side, duration) {
     global.mediators[side].subscribe("save", function() {
         that.save(side);
     });
+    global.mediators[side].subscribe("cssSwitch", function() {
+        that.cssChange(side);
+    });
+    
     that.isSideInUse[side] = false;
     that.updateHelp(side);
     new Draglayer(side, global.mediators[side]);
@@ -545,6 +549,7 @@ Container.prototype.killSide = function(side) {
             global.mediators[side].remove("getConfig");
             global.mediators[side].remove("save");
             global.mediators[side].remove("langSwitch");
+            global.mediators[side].remove("cssSwitch");
 
             global.baseLevels[side] = [];
 
@@ -638,6 +643,14 @@ Container.prototype.addPanel = function(side, panelType) {
         this.onResize();
     }
 };
+
+Container.prototype.cssChange = function(side) {
+    var that = this;
+    if (this.isSideInUse[side]) {
+        global.resetValColorsFromReportMeta(global.facts[side].localMeta, side);
+    }    
+};
+
 
 /**
  * Adatok csv-be való mentését intézi. Feldob egy párbeszédablakot,
