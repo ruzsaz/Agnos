@@ -341,7 +341,7 @@ DataDirector.prototype.getConfigs = function(callback) {
             sep0 = ", ";
         }
         collector += " ]";
-        console.log((this.side === 0) ? "Left side panels: " : "Right side panels: " + configs);
+        console.log(((this.side === 0) ? "Left side panels: " : "Right side panels: ") + configs);
         console.log("          base drill: " + collector);        
     }
 };

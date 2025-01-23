@@ -127,7 +127,6 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     const scaleString = (global.hasTouchScreen) ? " scale(1.4)" : "";
 
     // Sorbarendezés váltó
-    // TODO: mobil esetén duplájára nagyítani
     if (that.isShortingByValueEnabled && !global.isEmbedded) {    
         var sortSwitcher = that.svg.insert("svg:g")
                 .attr("class", "listener visibleInPanic panelControlButton")
@@ -159,7 +158,6 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     
     
     // A becsukó gomb fül
-    // TODO: mobil esetén duplájára nagyítani
     if (!global.isEmbedded) {
         var closeButton = that.svg.append("svg:g")
                 .attr("class", "listener visibleInPanic panelControlButton")
@@ -174,6 +172,11 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
 
         closeButton.append("svg:g")
                 .html('<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close_panel_button"></use>');
+    }
+    
+    // Placeholder, hogy embedded módban is legyen mihez igazítani a többi réteget
+    if (global.isEmbedded) {
+        that.svg.append("svg:g").attr("class", "listener visibleInPanic panelControlButton");
     }
 
     // Fejléc.
