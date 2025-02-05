@@ -3,8 +3,6 @@
 'use strict';
 
 
-
-
 /**
  * Kiterjeszti a d3.selectiont egy .moveToFront() függvénnyel, ami az adott
  * elemeket a vele egy szinten levő elemek elé mozgatja.
@@ -18,7 +16,12 @@ d3.selection.prototype.moveToFront = function () {
 };
 
 
-// Nyelv beállító függvény. "blabla" helyett _("blabla") írandó.
+/**
+ * Fordítást végző függvény. "blabla" helyett _("blabla") írandó.
+ * 
+ * @param {String} string Lefordítandó szöveg
+ * @returns {String} A kiválasztott locale-re lefordított szöveg.
+ */
 var _ = function (string) {    
     return (string) ? string.toLocaleString() : "";
 };
@@ -35,13 +38,18 @@ var global = function () {
 // Lokálisan használt függvények.
 //////////////////////////////////////////////////
 
+    /**
+     * Betölt és alkalmaz egy css-t.
+     * 
+     * @param {String} cssFile Az alkalmazandó css url-je.
+     * @returns {undefined}
+     */
     var changeCSS = function (cssFile) {
         if (!global.isEmbedded) {
             setCookie("css", cssFile, 730);
         }
         clearTimeout(global.cssChangeTimer);
         global.changeCSSInProgress = true;
-
 
         d3.select('body').style("opacity", 0);
 
@@ -63,6 +71,12 @@ var global = function () {
         }
     };
 
+    /**
+     * Css váltás után frissíti a már képernyőn levő tartalmat.
+     * 
+     * @param {String} cssFile A css url-je.
+     * @returns {undefined}
+     */
     var resetAfterChangeCSS = function (cssFile) {
 
         // Megpróbáljuk beolvasni az új css-t
@@ -143,7 +157,7 @@ var global = function () {
     /**
      * Kiolvassa a css-be írt változók értékeit.
      * 
-     * @type Function|@exp;Global_L32@pro;configVars
+     * @returns {Object} A css változók key, value objectként.
      */
     var readVarsFromCSS = function () {
         var configVars = {};
@@ -330,6 +344,7 @@ var global = function () {
      * Átáll a kiválasztott nyelvre.
      * 
      * @param {String} lang A nyelv kódja, pl. 'hu', 'en'.
+     * @param {Number} side Az átváltandó oldal sorszáma (0, 1, vagy undefined).
      * @returns {undefined}
      */
     var setLanguage = function (lang, side) {
@@ -427,7 +442,7 @@ var global = function () {
     };
 
     /**
-     * Embedded módra vált, hogy a bookmark beilleszthető legyen.
+     * Kiírja a konzolra az épp aktuális állapottot embedded-ként beillesztő url-t.
      * 
      * @returns {undefined}
      */
@@ -444,6 +459,7 @@ var global = function () {
      * Kiegészíti a böngésző URL-jét egy hash-al, ami bookmarkolhatóan
      * tartalmazza a panelek állapotát, a reportokat, és a lefúrási szinteket.
      * 
+     * @param {Boolean} onlyForDisplay True: csak a konzolra írja ki, false: elvégzi a beállítást.
      * @returns {undefined}
      */
     var getConfigToHash = function(onlyForDisplay) {
@@ -593,6 +609,17 @@ var global = function () {
         getWithRetries(url, data, callback, isDeleteDialogRequired, 3);
     };
 
+    /**
+     * Aszinkron ajax adatletöltés GET-en át, újrapróbálkozással, hibakezeléssel.
+     * A keycloak tokent frissíti, ha lejáróban van.
+     * 
+     * @param {String} url Az URL, ahonnan le kell tölteni.
+     * @param {String} data A felküldendő adat.
+     * @param {String} callback Sikeres letöltés után meghívandó függvény.
+     * @param {Boolean} isDeleteDialogRequired Sikeres letöltés után törölje-e a dialógusablakot?
+     * @param {Nimber} triesLeft Ennyi próbálkozást engedünk meg.
+     * @returns {undefined}
+     */
     var getWithRetries = function (url, data, callback, isDeleteDialogRequired, triesLeft) {
         triesLeft--;
         var progressDiv = d3.select("#progressDiv");
@@ -703,6 +730,36 @@ var global = function () {
     };
 
     /**
+     * Egy sztringből rövidítést csinál.
+     * 
+     * @param {String} str A rövidítendő szöveg.
+     * @param {Number} length Maximális karakterszám.
+     * @returns {String} A rövidítés.
+     */
+    var cleverAbbreviate = function(str, length) {
+        if (length === undefined) {
+            length = 6;
+        }
+        if (str.length < length) {
+            return str;
+        }
+        if (str.indexOf(" ") <= length) {
+            return str.substring(0, str.indexOf(" "));
+        }
+        const strArray = str.split(" ");        
+        const letters = [];
+        strArray.forEach(function(e) {letters.push(e.substring(0,1).toLocaleUpperCase());});
+        if (letters.length * 3 <=  length + 1) {
+            return letters.join(". ") + ".";
+        }
+        if (letters.length * 2 <= length) {
+            return letters.join(".") + ".";
+        }
+        return letters.join(".").substring(0, length);        
+    };
+
+
+    /**
      * Egy SVG téglalapot kirajzoló path-t generál, opcionálisan lekerekített sarkokkal.
      * 
      * @param {Number} x Balfelső csúcs x koordinátája.
@@ -745,7 +802,7 @@ var global = function () {
     };
 
     /**
-     * Szám rövid kijelzése kiíráshoz, max 4 számkarakterrel. (pl. 32.51 Mrd.)
+     * Szám rövid kijelzése kiíráshoz, max. 4 számkarakterrel. (pl. 32.51 Mrd.)
      * 
      * @param {Number} n Kijelzendő szám.
      * @returns {String} A kiírandó sztring.
@@ -764,7 +821,7 @@ var global = function () {
     };
 
     /**
-     * Szám hosszabb kijelzése kiíráshoz, max 6 számkarakterrel. (pl. 35123 M.)
+     * Szám hosszabb kijelzése kiíráshoz, max. 6 számkarakterrel. (pl. 35123 M.)
      *  
      * @param {Number} n Kijelzendő szám.
      * @returns {String} A kiírandó sztring.
@@ -782,6 +839,13 @@ var global = function () {
         return parseFloat(d3.format(".6s")(n)).toLocaleString(String.locale) + _(d3.format(".6s")(n).replace(/-*\d*\.*\d*/g, ''));
     };
     
+    /**
+     * Egy dátumot ember által fogyasztható formában ír ki, a beállított
+     * locale-nak megfelelő nyelven (közelmúltat pontosan, távolabbit csak kb.).
+     * 
+     * @param {Date} date A konvertálandó dátum.
+     * @returns {String} A dátumot tartalmazó string.
+     */
     var cleverDate = function (date) {
         const now = new Date();
         const diffInDays = (now.getTime() - date.getTime()) / (1000 * 3600 * 24);
@@ -802,9 +866,9 @@ var global = function () {
      * Figyelembe veszi, hogyha az egyik, vagy mindkét sztring szerepel a speciális
      * sorbarendezési tömbben: ekkor ezeket veszi előre, az ottani sorrendjükben.
      * 
-     * @param {String} aString
-     * @param {String} bString
-     * @returns {-1 ha a van előrébb, 1 ha b, 0 ha azonosak}
+     * @param {String} aString Az első összehasonlítandó.
+     * @param {String} bString A második összehasonlítandó.
+     * @returns {Number} -1 ha aString van előrébb, 1 ha bString, 0 ha azonosak.
      */
     var realCompare = function (aString, bString) {
         const indexA = localizedSortArray.indexOf(aString.toLocaleLowerCase());
@@ -839,11 +903,11 @@ var global = function () {
      * Ha a két sztring az első felükben eltér, az alapján, ha azonosak,
      * a második felük alapján.
      * 
-     * @param {String} a0String Az első szting első fele
-     * @param {String} a1String Az első sztring másofik fele
-     * @param {String} b0String A második sztring első fele
-     * @param {String} b1String A második sztring másofik fele
-     * @returns {-1 ha a van előrébb, 1 ha b, 0 ha azonosak}
+     * @param {String} a0String Az első szting első fele.
+     * @param {String} a1String Az első sztring másofik fele.
+     * @param {String} b0String A második sztring első fele.
+     * @param {String} b1String A második sztring másofik fele.
+     * @returns {Number} -1 ha a van előrébb, 1 ha b, 0 ha azonosak.
      */
     var realCompare2d = function (a0String, a1String, b0String, b1String) {
         return (a0String !== b0String) ? realCompare(a0String, b0String) : realCompare(a1String, b1String);
@@ -903,6 +967,12 @@ var global = function () {
         }
     };
 
+    /**
+     * Hexa kódolt rgb-t rgb(r,g,b) alakba ír.
+     * 
+     * @param {String} hex A hexa kód, pl. #00ffee.
+     * @returns {String} Az rgb kódolt megfelelő, vagy undefined, ha nem sikerül a dekódolás.
+     */
     var _hexToRgb = function (hex) {
         var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         return result ? "rgb(" + parseInt(result[1], 16) + "," + parseInt(result[2], 16) + "," + parseInt(result[3], 16) + ")" : undefined;
@@ -1021,9 +1091,14 @@ var global = function () {
         return text;
     };
 
-
-    
-    var sort_unique = function (arr, sortby){
+    /**
+     * Egy tömböt sorbarendez, és miden elemből csak 1-et tart meg.
+     * 
+     * @param {Array} arr A rendezendő tömb.
+     * @param {Function} sortby Comparator függvény. Ha undefined, az alapértelmezett.
+     * @returns {Array} A rendezett, unique tömb.
+     */
+    var sort_unique = function (arr, sortby) {
         var A1 = arr.slice();
         A1 = (typeof sortby === 'function') ? A1.sort(sortby): A1.sort();
 
@@ -1156,6 +1231,15 @@ var global = function () {
         return position;
     };
 
+    /**
+     * Visszaadja az első legalább 1 karakter hosszú szöveget, vagy "-"-t ha nincs.
+     * 
+     * @param {String} a Első jelölt.
+     * @param {String} b Második jelölt.
+     * @param {String} c Harmadik jelölt.
+     * @param {String} d Negyedik jelölt.
+     * @returns {String} Az első érvényes sztring, vagy - ha nincs.
+     */
     var getFirstValidString = function(a, b, c, d) {
         if (a !== undefined && a.length > 0) {
             return a;
@@ -1449,6 +1533,12 @@ var global = function () {
         });
     };
 
+    /**
+     * Nyelvet vált.
+     * 
+     * @param {String} lang A váltandó nyelv kódja.
+     * @returns {undefined}
+     */
     var mainToolbar_setLanguage = function (lang) {
         if (global.hasTouchScreen) {
             _recreateElement(document.getElementsByClassName("languageSwitch")[0]);        
@@ -1537,6 +1627,8 @@ var global = function () {
      * @param {String} rightButtonLabel Jobboldali gomb szövege. Ha undefined, nincs jobb gomb.
      * @param {Function} rightButtonFunction Jobboldali gomb megnyomásakor lefutó függvény.
      * @param {Integer} enterFunctionNumber Az enter melyik gombklikkelést hajtsa végre? (1: bal, 2: jobb, undefined: semmit se)
+     * @param {String} extraButtonLabel Extra gomb szövege.
+     * @param {Function} extraButtonFunction Az extra gomb megnyomásakor lefutó függvény.
      * @returns {undefined}
      */
     var setDialog = function (title, body, leftButtonLabel, leftButtonFunction, rightButtonLabel, rightButtonFunction, enterFunctionNumber, extraButtonLabel, extraButtonFunction) {
@@ -1680,6 +1772,11 @@ var global = function () {
 
     }
 
+    /**
+     * Normál és teljes képernyős mód között vált.
+     * 
+     * @returns {undefined}
+     */
     const toogleFullscreen = function () {
         const body = d3.select("body");
         if (body.classed("fullscreen")) {
@@ -1695,22 +1792,40 @@ var global = function () {
         }        
     };
 
+    /**
+     * Felderíti és beállítja az eszközre jellemző változókat: touchscreen, mobil-e?
+     * 
+     * @returns {undefined}
+     */
     const initDeviceProperties = function () {
         global.hasTouchScreen = _hasTouchScreen();
         global.isMobile = _detectMobile();
         const optimalMainToolbarHeight = _determineOptimalMainToolbarHeight(global.hasTouchScreen, global.isMobile);        
-        setMainToolbarHeight(optimalMainToolbarHeight);
+        _setMainToolbarHeight(optimalMainToolbarHeight);
         if (global.isMobile) {
             document.body.className += " mobile";
             
         }           
     };
-    
-    const setMainToolbarHeight = function(valueInPixels) {
+
+    /**
+     * Beállítja a felső vezérlőcsík magasságát.
+     * 
+     * @param {Number} valueInPixels A beállítandó magasság pixelben.
+     * @returns {undefined}
+     */
+    const _setMainToolbarHeight = function(valueInPixels) {
         global.mainToolbarHeight = valueInPixels;
         document.body.style.fontSize = valueInPixels + "px";
     };
 
+    /**
+     * Megállapítja a felső vezérlőcsík optimális magasságát.
+     * 
+     * @param {Boolean} isTouchEnabled Touch az interakciós mód?
+     * @param {Boolean} isMobile Mobil/tablet az eszköz?
+     * @returns {Number} Az optimális magasság pixelben.
+     */
     const _determineOptimalMainToolbarHeight = function(isTouchEnabled, isMobile) {
         if (isTouchEnabled) {
             if (isMobile) {
@@ -1723,6 +1838,11 @@ var global = function () {
         }
     };
 
+    /**
+     * Meghatározza, hogy az eszköz touch vezérlésű-e?
+     * 
+     * @returns {Boolean} True ha igen, false ha nem.
+     */
     const _hasTouchScreen = function() {
         let hasTouchScreen = false;
         if ("maxTouchPoints" in navigator) {
@@ -1746,12 +1866,22 @@ var global = function () {
         return hasTouchScreen;
     };
 
+    /**
+     * Megállapítja, hogy az eszköz mobil/tablet-e?
+     * 
+     * @returns {Boolean} True ha igen, False ha nem.
+     */
     const _detectMobile = function() {
         let check = false;
         (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);        
         return check;
     };
 
+    /**
+     * Az érvnyben levő css-ből kiolvas, és változóba rak néhány értéket.
+     * 
+     * @returns {undefined}
+     */
     var initValuesFromCss = function () {
 
         // Az értékek megjelenését színező színpaletta.
@@ -1803,16 +1933,18 @@ var global = function () {
 //////////////////////////////////////////////////
 
     return {
+        
         // Globálisan elérendő változók.        
-        url: agnosConfig.url,
-        i18nRequired: agnosConfig.i18nRequired,
-        saveToBookmarkRequired: agnosConfig.saveToBookmarkRequired,
+        url: agnosConfig.url,   // A végpontok elérési url-jét tartalmazó objektum. 
+        i18nRequired: agnosConfig.i18nRequired, // Legyen-e nyelvállítás?
+        saveToBookmarkRequired: agnosConfig.saveToBookmarkRequired, // Írja-e bookmarkba a pillanatnyi állapotot?
         facts: [], // Az adatokat tartalmazó 2 elemű tömb.
         maxPanelCount: 6, // Egy oldalon levő panelek maximális száma.		
         panelNumberOnScreen: undefined, // Megjelenítendő panelszám soronként.
-        oldPanelNumberOnScreen: undefined, // Megjelenítendő panelszám soronként.
-        isEmbedded: isEmbedded,     // Beágyazott üzemmód van-e?
+        oldPanelNumberOnScreen: undefined, // Megjelenítendő panelszám soronként.        
         mediators: [], // Az oldalak mediátorát tartalmazó 2 elemű tömb.
+        keywordFilters: [[], []],   // Az oldalon épp aktuális report-kulcsszó filter-tömb 2 elemű tömb.
+        textFilter: ["", ""], // Az oldalon épp aktuális report filter tartalma, 2 elemű tömb.
         baseLevels: [[], []], // A két oldal aktuális lefúrási szintjeit tartalmazó tömb.
         superMeta: undefined, // SuperMeta: az összes riport adatait tartalmazó leírás.
         scrollbarWidth: scrollBarSize, // Scrollbarok szélessége.
@@ -1821,27 +1953,29 @@ var global = function () {
         legendOffsetY: 15, // A jelkulcs függőleges pozicionálása.
         panelTitleHeight: 30, // A panelek fejlécének magassága.
         numberOffset: 35, // Ha a panel bal oldalán számkijelzés van a tengelyen, ennyi pixelt foglal.
-        legendHeight: 20, // Jelkulcs magassága.
+        legendHeight: 20, // Jelkulcs magassága, px.
         scaleRatio: undefined, // A képernyő svg elemeire vonatkozó nagyítás szorzója.
         dragDropManager: dragDropManager, // Húzd-és-ejtsd működését vezérlő ojektum.
         tooltip: undefined, // Épp aktuális tooltip törzse, html.
-        maxEntriesIn1D: 350,
-        maxEntriesIn2D: 10000,
-        maxEntriesIn3D: 20000,        
+        maxEntriesIn1D: 350, // Egy 1D-s panelen megjelenítendő adatelemek maximális száma.
+        maxEntriesIn2D: 10000, // Egy 2D-s panelen megjelenítendő adatelemek maximális száma.
+        maxEntriesIn3D: 20000, // Egy 3D-s panelen megjelenítendő adatelemek maximális száma.
         niceX: 4, // A vízszintes skála kerekítési finomsága
         niceY: 3, // A függőleges skála kerekítési finomsága (ha csak 1 dim. van, ez használatos)
         captionDistance: 10, // A tengelyekre írandó dimenziónév függőleges távolsága a tengelytől
         preferredUsername: preferredUsername,
         localizedSortArray: localizedSortArray,
-        hasTouchScreen: hasTouchScreen,
-        isMobile: isMobile,
-        isFullscreen: isFullscreen,
+        hasTouchScreen: hasTouchScreen, // Érintőképernyőn fut-e a program?
+        isMobile: isMobile, // Mobilon/tagleten fut-e a program?
+        isFullscreen: isFullscreen, // Teljes képernyős üzemmódban van-e a program?
+        isEmbedded: isEmbedded,     // Beágyazott üzemmód van-e?
+        changeCSSInProgress: changeCSSInProgress,   // Folyamatban van-e egy css-csere?
+        
         // Globálisan elérendő függvények.
         logout: logout, // Logs the current user out from the identity provider
         login: login, // Starts the login method of the identity provider
         reLogin: reLogin, // Logs out the current user, and starts the login method of the identity provider
-        loginOrLogout: loginOrLogout, // If an user is logged in, logs it out, else starts the login process
-        changeCSSInProgress: changeCSSInProgress,
+        loginOrLogout: loginOrLogout, // If an user is logged in, logs it out, else starts the login process        
         changeCSS: changeCSS, // Css-t vált
         tagForLocalization: tagForLocalization, // Nyelvváltoztatás előtt a szövegeket az 'origText' attrib-ba írja.
         localizeAll: localizeAll, // Elvégzi a lokalizálást az épp látható elemeken
@@ -1856,8 +1990,8 @@ var global = function () {
         positionInArrayByProperties: positionInArrayByProperties, // Megkeresi egy tömb elemének indexét az elem néhány property-je alapján.
         positionInArray: positionInArray, // Megnézi, hogy a tömb hányadik eleme egy érték.
         getArrayFromObjectArrayByProperty: getArrayFromObjectArrayByProperty, // Egy objektum-tömbből egy tömböt csinál, amely az objektumok egyik propertyeit tartalmazza.
-        getFirstValidString: getFirstValidString,
-        sort_unique: sort_unique,
+        getFirstValidString: getFirstValidString,   // Visszaadja az első legalább 1 karakter hosszú szöveget, vagy "-"-t ha nincs.
+        sort_unique: sort_unique,   // Egy tömböt sorbarendez, és miden elemből csak 1-et tart meg.
         valueInRange: valueInRange, // Eldönti, hogy egy érték a [min, max) intervallumba esik-e?
         initGlobals: initGlobals, // Inicializálja a globális változókat a belépés után.
         readableColor: readableColor, //  Olvasható színt választ egy adott háttérszínhez.
@@ -1875,7 +2009,7 @@ var global = function () {
         toogleFullscreen: toogleFullscreen, // Normál és teljes képernyős mód között vált.
         getConfig: getConfig, // Kiírja a pillanatnyilag meglevő panelek konfigurációját a konzolra.
         getUntranslated: getUntranslated, // Kiírja a még lefordítatlan szövegeket a konzolra.
-        getEmbeddedUrl: getEmbeddedUrl, // Embedded módra vált
+        getEmbeddedUrl: getEmbeddedUrl, // Kiírja a konzolra az épp aktuális állapottot embedded-ként beillesztő url-t.
         getConfig2: getConfigToHash, // A böngésző URL-jébe írja boomarkolhatóan hash-ként az állapotot.
         minifyInits: minifyInits, // Minifyol egy init-stringet, hogy az URL-kódolt verzió kisebb legyen.
         setDialog: setDialog, // Dialógusablak beállítása/levétele.
@@ -1887,26 +2021,29 @@ var global = function () {
         cleverRound2: cleverRound2, // Szám rövid kijelzése kiíráshoz, 3-4 számkarakterrel. (pl. 3.5 Mrd.)
         cleverRound3: cleverRound3, // Szám rövid kijelzése kiíráshoz, max 4 számkarakterrel. (pl. 3.51 Mrd.)
         cleverRound5: cleverRound5, // Szám rövid kijelzése kiíráshoz, max 5 számkarakterrel. (pl. 34514 M.)
-        cleverDate: cleverDate,
+        cleverDate: cleverDate, // Egy dátumot ember által fogyasztható formában ír ki, a beállított locale-nak megfelelő nyelven.
         realCompare: realCompare, // Pótlás a picit hibásan működő localeCompare helyett.
         realCompare2d: realCompare2d, // 2 részből álló sztringpárt összehasonlít.
         cleverCompress: cleverCompress, // Betömörít kiírt feliratokat a megadott helyre.
+        cleverAbbreviate: cleverAbbreviate, // Egy sztringből rövidítést csinál.
         rectanglePath: rectanglePath, // Egy SVG téglalapot kirajzoló path-t generál, opcionálisan lekerekített sarkokkal.
         colorValue: colorValue, // Megadja egy érték kijelzésének színét.
         color: color, // Megadja egy dimenzióelem kijelzésének színét.
         resetValColorsFromReportMeta: resetValColorsFromReportMeta, // Beállítja az értékek színét a css séma alapján.
         randomString: randomString, // Adott hosszúságú véletlen stringet generál.
-        initValuesFromCss: initValuesFromCss,
-        initDeviceProperties: initDeviceProperties,
-        showNotAuthenticated: showNotAuthenticated,
-        showNotAuthorized: showNotAuthorized        
+        initValuesFromCss: initValuesFromCss,   // Az érvnyben levő css-ből kiolvas, és változóba rak néhány értéket.
+        initDeviceProperties: initDeviceProperties, // Felderíti és beállítja az eszközre jellemző változókat: touchscreen, mobil-e?
+        showNotAuthenticated: showNotAuthenticated, // Shows the not authenticated dialog when a not logged in user tries to access protected content.
+        showNotAuthorized: showNotAuthorized    // Shows the not authorized dialog when an user tries to access content not available for him.        
     };
 
 }();
 
+// Elindításkor inicializálandó értékek beállítása.
 global.initValuesFromCss();
 global.initDeviceProperties();
 
+// Kiírja a konzolra az alkalmazható utasításokat.
 if (!global.isEmbedded) {
     console.log("Az épp aktuális panelkonfiguráció, és drillvektor kiíratása: global.getConfig();");
     console.log("A fordítás segítéséhez: global.getUntranslated('lang');");

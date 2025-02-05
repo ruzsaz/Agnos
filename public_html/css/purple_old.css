@@ -739,10 +739,19 @@ g.sankey_nodes_shadow .nodeShadow {
 .cardCell.source {
   display: none;
 }
-.cardPanel .tableScrollPane {
+.cardPanel .tableScrollPane,
+.cardPanel .tableScrollPaneAnimation {
   max-height: none !important;
   margin: 0px;
   padding: 6px 12px 12px 6px;
+}
+.cardPanel .tableScrollPaneAnimation {
+  position: absolute;
+  height: 100vh;
+  overflow: hidden;
+  box-sizing: border-box;
+  z-index: 2;
+  background-color: yellow;
 }
 /* HeadPanel */
 .halfHead .table {
