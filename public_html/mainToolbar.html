@@ -25,12 +25,14 @@
                         </svg>
                     </span>
                     <ul class="hidden">
+                        <!--
                         <li><span class="tloc" tooltip="<h4>Kördiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('piechartpanel');">
                                 <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_pie" />	
                                 </svg>
                             </span>
                         </li>
+                        -->
                         <li>
                             <span class="tloc" tooltip="<h4>Oszlopdiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('barpanel');">
                                 <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
@@ -67,17 +69,24 @@
                                 </svg>								
                             </span>		
                         </li>
-                        <li class="mappanelcreator">
-                            <span class="tloc" tooltip="<h4>Színezett térkép</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('mappanel');">
+                        <li>
+                            <span class="tloc mappanelcreator" tooltip="<h4>Színezett térkép</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('mappanel');">
                                 <svg version="1.1" x="0px" y="0px" width="50px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 32">
                                 <use xlink:href="#icon_panel_map" />
                                 </svg>
                             </span>
-                            <span class="tloc" tooltip="<h4>Színezett térkép POI-val</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('poimappanel');">
+                            <span class="tloc" tooltip="<h4>Kördiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('piechartpanel');">
+                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <use xlink:href="#icon_panel_pie" />	
+                                </svg>
+                            </span>
+                            <!--
+                            <span class="tloc mappanelcreator" tooltip="<h4>Színezett térkép POI-val</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('poimappanel');">
                                 <svg version="1.1" x="0px" y="0px" width="50px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 32">
                                 <use xlink:href="#icon_panel_map_marker" />
                                 </svg>
                             </span>
+                            -->
                         </li>
                         <li>
                             <span class="tloc" tooltip="<h4>2 dimenziós oszlopdiagram</h4><ul><li>dimenziók: <em>2</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('bar2panel');">

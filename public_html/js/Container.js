@@ -9,6 +9,7 @@
  * @returns {Container}
  */
 function Container() {
+    global.mapStore = new MapStore();
     this.dataDirector = [];
     var that = this;
     var topdiv = d3.select("body").append("html:div")
@@ -308,11 +309,25 @@ Container.prototype.getScaleRatio = function(side, sizePercentage, panelsPerRow,
  * @returns {undefined}
  */
 Container.prototype.newReport = function(side, reportSuperMeta, startObject) {
+    const that = this;
     global.mediators[side].remove("killListeners");
-    this.isSideInUse[side] = true;
-    this.updateHelp(side, reportSuperMeta);
-    global.facts[side] = new Fact(reportSuperMeta, side, this.newReportReady, this, startObject);
-    this.newReportReady(side, reportSuperMeta);    
+    that.isSideInUse[side] = true;
+    that.updateHelp(side, reportSuperMeta);    
+    that.loadAllMapsAsync(reportSuperMeta).then(function(result) {        
+        global.facts[side] = new Fact(reportSuperMeta, side, that.newReportReady, that, startObject);
+        that.newReportReady(side, reportSuperMeta);
+    });
+};
+
+Container.prototype.loadAllMapsAsync = async function(reportSuperMeta){
+    const mapNames = [];
+    for (var i = 0, iMax = reportSuperMeta.dimensions.length; i < iMax; i++) {
+        const mapCode = reportSuperMeta.dimensions[i].type;
+        if (mapCode && mapCode.length > 0) {
+            mapNames.push(reportSuperMeta.dimensions[i].type);
+        }
+    }
+    return global.mapStore.loadAllAsync(mapNames);
 };
 
 /**
@@ -392,7 +407,7 @@ Container.prototype.navigateTo = function(startObject) {
             that.newReport(side, reportMeta, sideInit);
             var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, sideInit.v.length);            
             that.resizeContainer(side, 1000, sizePercentage, global.panelNumberOnScreen, scaleRatio); 
-            global.mediators[side].publish("drill", {dim: -1, direction: 0});
+            //global.mediators[side].publish("drill", {dim: -1, direction: 0});
         } else {
             that.counter--;
             var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, 0);
@@ -438,17 +453,28 @@ Container.prototype.newReportReady = function(side, reportMeta) {
     }
 
     global.mediators[side].publish("killPanel", "#panel" + side + "P-1");	// Esetleges régi fejlécpanel megölése.    
-    var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, reportMeta.visualizations.length);
-    new HeadPanel_Report({group: side}, reportMeta, scaleRatio);			// Fejlécpanel létrehozása.
-
     var sizePercentage = 0;
     if ((this.panelState === 0 && side === 0) || (this.panelState === 2 && side === 1)) {
         sizePercentage = 1;
     } else if (this.panelState === 1) {
         sizePercentage = 0.5;
     }
-
+    
     var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, reportMeta.visualizations.length);
+    
+    // Ha egy card klikkelés miatt kell megnyitni, akkor belebújási animáció
+    const clickedCardNode = d3.select(".card.clicked").node();
+    if (clickedCardNode !== null) {
+        const offset = clickedCardNode.getClientRects()[0];
+        const fakeEvent = {
+            clientX: scaleRatio * (offset.x + offset.width/2),
+            clientY: scaleRatio * (offset.y + offset.height/2)
+        };
+        const transition = d3.transition().duration(global.selfDuration);
+        global.zoom(fakeEvent, d3.select("#scrollPaneP" + side).node(), transition, (1/15) / scaleRatio);
+    }
+    
+    new HeadPanel_Report({group: side}, reportMeta, scaleRatio);			// Fejlécpanel létrehozása.
     this.resizeContainer(side, 0, sizePercentage, global.panelNumberOnScreen, scaleRatio);
 
     that.counter--;        

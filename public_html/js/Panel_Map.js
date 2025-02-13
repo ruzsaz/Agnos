@@ -1,4 +1,4 @@
-/* global Panel, d3, topojson, mapOfHungary, pois, global, projections, maps */
+/* global Panel, d3, topojson, mapOfHungary, pois, global, projections */
 
 'use strict';
 
@@ -63,9 +63,11 @@ function panel_map(init) {
     }
    
     // Térképdefiníció és projekció beolvasása
-    this.projection = projections[that.mapKey]()
+    const mapToUse = global.mapStore.get(that.mapKey);
+    //const func = eval("() => d3.geoMercator().scale(30000).center([19.5, 47.2])");
+    this.projection = eval(mapToUse.projection)()
         .translate([that.w / 2, that.height / 2 + that.margin.top]);
-    this.topology = maps[that.mapKey];
+    this.topology = mapToUse.map;
 
     // Görbegenerátor a térképrajzoláshoz.
     this.path = d3.geoPath()

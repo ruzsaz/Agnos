@@ -247,13 +247,16 @@ svg {
 }
 /* container */
 #scrollPaneP0,
-#scrollPaneP1 {
+#scrollPaneP1,
+#topdiv > .clonedForZoom {
   position: absolute;
-  /*#height: calc(~"100% - " @mainToolbarHeight);*/
   height: calc(100% - 1em);
   top: 1em;
   overflow-y: auto;
   overflow-x: hidden;
+}
+#topdiv > .clonedForZoom.scrollPaneP1 {
+  right: 0px;
 }
 /* container */
 #scrollPaneP0 {
@@ -269,7 +272,6 @@ svg {
 #cutter0,
 #cutter1 {
   position: relative;
-  /*height: calc(~"100vh - " @mainToolbarHeight);*/
   height: calc(100vh - 1em);
   overflow: hidden;
 }
@@ -326,9 +328,6 @@ svg {
 /* Ez azért kell, hogy az elmentett panel-képen is ott legyen a háttér */
 .background rect {
   opacity: 0;
-  /*	opacity: 1;
-        rx: @rounding;
-        fill: @panelBackgroundColor;*/
 }
 /* Ez azért kell, hogy az elmentett panel-képen is ott legyen a háttér */
 .backgroundForSave {
@@ -740,18 +739,19 @@ g.sankey_nodes_shadow .nodeShadow {
   display: none;
 }
 .cardPanel .tableScrollPane,
-.cardPanel .tableScrollPaneAnimation {
+.cardPanel .clonedForZoom {
   max-height: none !important;
   margin: 0px;
   padding: 6px 12px 12px 6px;
 }
-.cardPanel .tableScrollPaneAnimation {
+.cardPanel .clonedForZoom {
   position: absolute;
   height: 100vh;
   overflow: hidden;
   box-sizing: border-box;
+}
+.clonedForZoom {
   z-index: 2;
-  background-color: yellow;
 }
 /* HeadPanel */
 .halfHead .table {
@@ -841,7 +841,7 @@ g.sankey_nodes_shadow .nodeShadow {
   font-style: italic;
   margin-left: 1ex;
 }
-.greetingBadge #logoutLink {
+.greetingBadge .logoutLink {
   position: fixed;
   align-self: center;
   right: 80px;
@@ -860,11 +860,11 @@ g.sankey_nodes_shadow .nodeShadow {
   -moz-box-shadow: inset 0px 0px 0px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px rgba(0, 0, 0, 0.75);
   z-index: 2;
 }
-.greetingBadge #logoutLink:hover {
+.greetingBadge .logoutLink:hover {
   color: #88ffff;
   border-color: #88ffff;
 }
-.greetingBadge.loggedin #logoutLink {
+.greetingBadge.loggedin .logoutLink {
   background-color: #ffbddf;
 }
 .singleWidth .greetingBadge .greeting {
@@ -881,7 +881,7 @@ g.sankey_nodes_shadow .nodeShadow {
   margin: 12px 0px 36px 0px !important;
   line-height: 0px;
 }
-.HeadPanel_Browser .greetingBadge.vertical #logoutLink {
+.HeadPanel_Browser .greetingBadge.vertical .logoutLink {
   margin: 12px 0px -12px 0px !important;
   line-height: 0px;
 }
@@ -2101,7 +2101,6 @@ text {
   overflow-x: hidden;
   overflow-y: hidden;
   z-index: 100;
-  /*font-size: @mainToolbarHeight;*/
 }
 #mainToolbar * {
   overflow-x: visible;
@@ -2204,13 +2203,13 @@ svg.switchButtonHelp {
 }
 /* Ha nincs fölémenve, akkor maradjon alapszínű. */
 #mainToolbar nav ul li:not(:hover) > span > svg > *,
-#mainToolbar nav ul li:hover:not(.inactive) > span:not(:hover) > svg > *,
+#mainToolbar nav ul li:hover:not(.inactive) > span:not(:hover):not(.inactive) > svg > *,
 .helpContent svg * {
   stroke: #00ffaa;
 }
 /* Egy nem inaktív ikon fölé menve váltson aktív színre. */
 @media (pointer: fine) {
-  #mainToolbar nav ul li:hover:not(.inactive) > span:hover > svg > *:not(.nohover) {
+  #mainToolbar nav ul li:hover:not(.inactive) > span:hover:not(.inactive) > svg > *:not(.nohover) {
     stroke: #88ffff !important;
   }
 }
@@ -2223,16 +2222,16 @@ svg.switchButtonHelp {
 }
 /* Mobilon múljon el a gomb színezése a klikk után. */
 @media (pointer: coarse) {
-  #mainToolbar nav ul li#mainPlusButton:hover:not(.inactive) > span:hover > svg > *:not(.nohover),
-  #mainToolbar nav ul li#mainMinusButton:hover:not(.inactive) > span:hover > svg > *:not(.nohover),
-  #mainToolbar nav ul li#mainSwitchButton:hover:not(.inactive) > span:hover > svg > *:not(.nohover),
-  #mainToolbar nav ul li#fullScreenButton:hover:not(.inactive) > span:hover > svg > *:not(.nohover),
-  #mainToolbar nav ul li#mainCloseButton:hover:not(.inactive) > span:hover > svg > *:not(.nohover),
-  #mainToolbar nav ul li.save:hover:not(.inactive) > span:hover > svg > *:not(.nohover) {
+  #mainToolbar nav ul li#mainPlusButton:hover:not(.inactive) > span:hover:not(.inactive) > svg > *:not(.nohover),
+  #mainToolbar nav ul li#mainMinusButton:hover:not(.inactive) > span:hover:not(.inactive) > svg > *:not(.nohover),
+  #mainToolbar nav ul li#mainSwitchButton:hover:not(.inactive) > span:hover:not(.inactive) > svg > *:not(.nohover),
+  #mainToolbar nav ul li#fullScreenButton:hover:not(.inactive) > span:hover:not(.inactive) > svg > *:not(.nohover),
+  #mainToolbar nav ul li#mainCloseButton:hover:not(.inactive) > span:hover:not(.inactive) > svg > *:not(.nohover),
+  #mainToolbar nav ul li.save:hover:not(.inactive) > span:hover:not(.inactive) > svg > *:not(.nohover) {
     stroke: #00ffaa;
   }
 }
-#mainToolbar nav ul li:active:not(.inactive) > span:active > svg > *:not(.nohover) {
+#mainToolbar nav ul li:active:not(.inactive) > span:active:not(.inactive) > svg > *:not(.nohover) {
   transition: stroke 0s linear !important;
   -webkit-transition: stroke 0s linear !important;
   -moz-transition: stroke 0s linear !important;
@@ -2253,7 +2252,8 @@ svg.switchButtonHelp {
   stroke-width: 1.6;
 }
 /* Inaktív ikon szín és viselkedés-megadása. */
-#mainToolbar nav ul li.inactive > span {
+#mainToolbar nav ul li.inactive > span,
+#mainToolbar nav ul li > span.inactive {
   stroke: #00ffaa;
   opacity: 0.2;
   cursor: default;
@@ -2282,22 +2282,15 @@ svg.switchButtonHelp {
   width: 180px;
   display: flex;
 }
-#mainToolbar nav ul .languageSwitch ul li {
-  /*    width: 6em;*/
-}
-#mainToolbar nav ul .languageSwitch .hidden {
-  /*	width: 6em;
-        left: 2em;*/
-}
 /* Ha nincs fölémenve, akkor maradjon alapszínű. */
 #mainToolbar nav ul li.switch li:not(:hover) text,
-#mainToolbar nav ul li.switch li:hover:not(.inactive) > span:not(:hover) {
+#mainToolbar nav ul li.switch li:hover:not(.inactive) > span:not(:hover):not(.inactive) {
   stroke-width: 0.5;
   fill: #00ffaa;
   color: #00ffaa;
 }
 /* Egy nem inaktív ikon fölé menve váltson aktív színre. */
-#mainToolbar nav ul li.switch li:hover:not(.inactive) > span {
+#mainToolbar nav ul li.switch li:hover:not(.inactive) > span:not(.inactive) {
   stroke-width: 0.5;
   fill: #88ffff;
   color: #88ffff;
@@ -2660,13 +2653,6 @@ svg.switchButtonHelp {
   position: relative;
   padding: 0px;
 }
-/*
-#helpControl > nav > ul > li:last-child {
-    position: absolute;
-    bottom: 0px;
-    width: 100%;
-}
-*/
 #helpControl nav li {
   padding: 0 0px;
   list-style: none;

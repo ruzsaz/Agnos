@@ -480,9 +480,8 @@ var global = function () {
 
                 // A megjelenítési mód (bal, jobb, osztott) kinyerése.
                 var displayMode;
-                var numberOfSides = d3.selectAll(".container.activeSide").nodes().length; // Hány aktív oldal van? (2 ha osztottkijelzős üzemmód, 1 ha nem.)
+                var numberOfSides = d3.selectAll(".container.activeSide[id]").nodes().length; // Hány aktív oldal van? (2 ha osztottkijelzős üzemmód, 1 ha nem.)
                 if (numberOfSides === 1) {
-
                     displayMode = d3.selectAll("#container1.activeSide").nodes().length * 2; // Aktív oldal id-je, 0 vagy 2. Csak akkor ételmes, ha 1 aktív oldal van.
                 } else {
                     displayMode = 1;
@@ -658,9 +657,10 @@ var global = function () {
                     clearTimeout(progressCounter);
                     progressDiv.style("z-index", -1);
                     if (jqXHR.status === 401) { // Ha a szerver 'nem vagy autentikálva' választ ad, autentikáljuk.
-                        console.log("401-es hiba")
+                        console.log("401-es hiba");
                         showNotAuthenticated();
                     } else if (jqXHR.status === 403) { // Ha az autentikáció jó, de nincs olvasási jog az adathoz
+                        console.log("403 error")
                         showNotAuthorized();
                     } else { // Más hiba esetén...    
                         if (triesLeft > 0) {
@@ -683,6 +683,35 @@ var global = function () {
 
     };
 
+    /**
+     * Loads an external json resource, with possibility to retry it.
+     * 
+     * @param {String} resource Url to the resource file.
+     * @param {Number} triesLeft Tries left before giving up.
+     * @returns {Object} The object stored in the json file.
+     */
+    var loadExternal = async function(resource, triesLeft) {
+        if (triesLeft === undefined) {
+            triesLeft = 3;
+        }
+        var base_url = window.location.href.substring(0, window.location.href.indexOf("index.html"));
+        
+        try {
+            const response = await fetch(base_url + resource);
+            if (!response.ok) {
+                throw new Error(`Response status: ${response.status}`);
+            }
+            const json = await response.json();
+            return json;     
+        } catch (error) {
+            triesLeft--;
+            if (triesLeft < 1) {
+                alert('Map file is missing. Not good...');
+            } else {
+                return await loadExternal(resource, triesLeft);
+            }
+        }
+    };
 
     /**
      * Egy panel animálásának ideje. Csak azonakat animálja, amelyek
@@ -693,6 +722,10 @@ var global = function () {
      * @returns {Number} Az animálás ideje (ms).
      */
     var getAnimDuration = function (callerId, panelId) {
+        if (d3.selectAll(".container").nodes().length > 2) {
+            return 0;
+        }
+
         var animMode = 1; // 0: mindent animál, 1: csak láthatót animál, 2: csak saját magát
         var duration = 0;
         if (animMode === 0 || callerId === panelId || (animMode === 1 && isPanelVisible(panelId))) {
@@ -1558,8 +1591,8 @@ var global = function () {
      * @returns {undefined}
      */
     var mainToolbar_refreshState = function () {
-        var numberOfActiveSides = d3.selectAll(".container.activeSide").nodes().length; // Hány aktív oldal van? (2 ha osztottkijelzős üzemmód, 1 ha nem.)
-
+        var numberOfActiveSides = d3.selectAll(".container.activeSide[id]").nodes().length; // Hány aktív oldal van? (2 ha osztottkijelzős üzemmód, 1 ha nem.)
+        
         // Alap láthatósági beállítás: ha osztottkijelzős a mód, akkor inaktívak a lokálisra ható gombok.
         d3.selectAll("#mainToolbar .onlyforreport")
                 .classed("inactive", (numberOfActiveSides === 2));
@@ -1613,6 +1646,77 @@ var global = function () {
                 .classed("inactive", (global.panelNumberOnScreen <= 1));
         d3.selectAll("#mainToolbar #mainMinusButton")
                 .classed("inactive", (global.panelNumberOnScreen >= global.maxPanelCount));        
+    };
+
+    /**
+     * A be- és kifúrásnál a maradandó objektumon végrehajtandó animáció.
+     * Klónozza az objetumot, hogy az eredeti átírható legyen.
+     * 
+     * @param {type} event A kattintás esemény.
+     * @param {type} node A maradandó objektum, mint html-dom node.
+     * @param {type} transition Az animáció, amelyhez csatlakozni kell.
+     * @param {type} to A zoomolásnál a megérkezési nagyítószorzó.
+     * @returns {undefined}
+     */
+    const cloneAndZoom = function(event, node, transition, to) {
+        const scrollTop = node.scrollTop;
+        const clonedNode = node.cloneNode(true);
+        const nodeId = node.getAttribute("id");
+        
+        node.parentNode.insertBefore(clonedNode, node);
+        clonedNode.scrollTop = scrollTop;
+        
+        const offset = clonedNode.getClientRects()[0];
+        const center = (event) ?
+                (event.clientX - offset.x)/global.scaleRatio + "px " + (event.clientY - offset.y)/global.scaleRatio + "px" :
+                offset.width/2/global.scaleRatio + "px " + (offset.top/2) /global.scaleRatio + "px";
+
+        stripIds(clonedNode);
+        d3.select(clonedNode)
+                .on("click", null)
+                .attr("class", "clonedForZoom " + nodeId)
+                .style("transform-origin", center)
+                .transition(transition)
+                .styleTween("opacity", () => (t) => 1-t)
+                .style("transform", "scale(" + to + ")")
+                .remove();      
+    };
+
+    /**
+     * A be- és kifúrásnál a maradandó objektumon végrehajtandó animáció.
+     * 
+     * @param {type} event A kattintás esemény.
+     * @param {type} node A maradandó objektum, mint html-dom node.
+     * @param {type} transition Az animáció, amelyhez csatlakozni kell.
+     * @param {type} from A zoomolásánál a kiindulási nagyítószorzó.
+     * @param {type} to A zoomolásnál a megérkezési nagyítószorzó.
+     * @returns {undefined}
+     */
+    const zoom = function(event, node, transition, from, to) {
+        if (to === undefined) {
+            to = 1;
+        }
+        const offset = node.getClientRects()[0];
+        const center = (event) ?
+                (event.clientX - offset.x)/global.scaleRatio + "px " + (event.clientY - offset.y)/global.scaleRatio + "px" :
+                offset.width/2/global.scaleRatio + "px " + (offset.top/2) /global.scaleRatio + "px";
+        d3.select(node)
+                .style("overflow", "hidden")
+                .style("transform-origin", center)
+                .style("transform", "scale(" + from + ")")
+                .transition(transition)                
+                .styleTween("opacity", () => (t) => (from === 1) ? -t : (from < 1) ? t*3 : t*t)
+                .style("transform", "scale(" + to + ")")
+                .on("end", function() {
+                    d3.select(this).style("transform", "none").style("overflow", null);
+        });
+
+    };
+
+
+    const stripIds = function(selector) {
+        d3.select(selector).selectAll("*").attr("id", null);
+        d3.select(selector).attr("id", null);
     };
 
     var dialogTimeoutVar; // A dialógusablak időzített eltüntetését számontartó időzítő.
@@ -1939,6 +2043,7 @@ var global = function () {
         i18nRequired: agnosConfig.i18nRequired, // Legyen-e nyelvállítás?
         saveToBookmarkRequired: agnosConfig.saveToBookmarkRequired, // Írja-e bookmarkba a pillanatnyi állapotot?
         facts: [], // Az adatokat tartalmazó 2 elemű tömb.
+        mapStore: undefined,
         maxPanelCount: 6, // Egy oldalon levő panelek maximális száma.		
         panelNumberOnScreen: undefined, // Megjelenítendő panelszám soronként.
         oldPanelNumberOnScreen: undefined, // Megjelenítendő panelszám soronként.        
@@ -2014,6 +2119,7 @@ var global = function () {
         minifyInits: minifyInits, // Minifyol egy init-stringet, hogy az URL-kódolt verzió kisebb legyen.
         setDialog: setDialog, // Dialógusablak beállítása/levétele.
         get: get, // Aszinkron ajax adatletöltés GET-en át, hibakezeléssel.
+        loadExternal: loadExternal, // Loads an external json resource, with possibility to retry it.        
         subclassOf: subclassOf, // Osztály származtatását megvalósító függvény.
         getStyleForScale: getStyleForScale, // Nagyítást/kicsinyítést végrehajtó style generálása.
         orZero: orZero, // Egy szám helyett 0-t ad, ha az NaN, vagy infinite.
@@ -2034,7 +2140,9 @@ var global = function () {
         initValuesFromCss: initValuesFromCss,   // Az érvnyben levő css-ből kiolvas, és változóba rak néhány értéket.
         initDeviceProperties: initDeviceProperties, // Felderíti és beállítja az eszközre jellemző változókat: touchscreen, mobil-e?
         showNotAuthenticated: showNotAuthenticated, // Shows the not authenticated dialog when a not logged in user tries to access protected content.
-        showNotAuthorized: showNotAuthorized    // Shows the not authorized dialog when an user tries to access content not available for him.        
+        showNotAuthorized: showNotAuthorized,   // Shows the not authorized dialog when an user tries to access content not available for him.
+        cloneAndZoom: cloneAndZoom, // A be- és kifúrásnál a maradandó objektumon végrehajtandó animáció. Klónozza az objetumot, hogy az eredeti átírható legyen.
+        zoom: zoom  // A be- és kifúrásnál a maradandó objektumon végrehajtandó animáció.
     };
 
 }();

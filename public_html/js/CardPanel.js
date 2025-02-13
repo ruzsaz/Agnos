@@ -81,7 +81,7 @@ function CardPanel(init, superMeta, startScale, duration) {
     // Logout link.
     this.top.append("html:span")
             .attr("id", "logoutLink")
-            .attr("class", "loc")
+            .attr("class", "loc logoutLink")
             .text((global.preferredUsername) ? "Kilépés" : "Belépés")
             .on("click", (global.preferredUsername) ? global.logout : global.login);            
 
@@ -495,69 +495,6 @@ CardPanel.prototype.kpiToShow = function(reportmeta) {
 //////////////////////////////////////////////////
 
 /**
- * A be- és kifúrásnál a maradandó objektumon végrehajtandó animáció.
- * Klónozza az objetumot, hogy az eredeti átírjató legyen.
- * 
- * @param {type} event A kattintás esemény.
- * @param {type} node A maradandó objektum, mint html-dom node.
- * @param {type} transition Az animáció, amelyhez csatlakozni kell.
- * @param {type} to A zoomolásnál a megérkezési nagyítószorzó.
- * @returns {undefined}
- */
-CardPanel.prototype.zoomClone = function(event, node, transition, to) {
-        
-    const clonedNode = node.cloneNode(true);    
-    node.parentNode.insertBefore(clonedNode, node);
-    
-    const offset = clonedNode.getClientRects()[0];
-    const center = (event) ?
-            (event.clientX - offset.x)/global.scaleRatio + "px " + (event.clientY - offset.y)/global.scaleRatio + "px" :
-            offset.width/2/global.scaleRatio + "px " + (offset.top/2) /global.scaleRatio + "px";
-        
-    d3.select(clonedNode)
-            .on("click", null)
-            .attr("class", "tableScrollPaneAnimation")
-            .style("transform-origin", center)
-            .transition(transition)
-            .style("opacity", 0)
-            .style("transform", "scale(" + to + ")")
-            .remove();      
-};
-
-/**
- * A be- és kifúrásnál a maradandó objektumon végrehajtandó animáció.
- * 
- * @param {type} event A kattintás esemény.
- * @param {type} node A maradandó objektum, mint html-dom node.
- * @param {type} transition Az animáció, amelyhez csatlakozni kell.
- * @param {type} from A zoomolásánál a kiindulási nagyítószorzó.
- * @param {type} to A zoomolásnál a megérkezési nagyítószorzó.
- * @returns {undefined}
- */
-CardPanel.prototype.zoom = function(event, node, transition, from, to) {
-    if (to === undefined) {
-        to = 1;
-    }
-    const offset = node.getClientRects()[0];
-    const center = (event) ?
-            (event.clientX - offset.x)/global.scaleRatio + "px " + (event.clientY - offset.y)/global.scaleRatio + "px" :
-            offset.width/2/global.scaleRatio + "px " + (offset.top/2) /global.scaleRatio + "px";
-    
-    d3.select(node)
-            .style("opacity", (from < 1) ? 0.8 : (from === 1) ? 1 : 0)
-            .style("overflow", "hidden")
-            .style("transform-origin", center)
-            .style("transform", "scale(" + from + ")")
-            .transition(transition)
-            .style("opacity", (to === 1) ? 1 : 0)
-            .style("transform", "scale(" + to + ")")
-            .on("end", function() {
-                d3.select(this).style("transform", "none").style("overflow", "unset");
-    });
-            
-};
-
-/**
  * Feltölti a panelt a supermetában megkapott dinamikus tartalommal.
  * Nyelvváltás esetén elég ezt lefuttatni.
  * 
@@ -588,6 +525,7 @@ CardPanel.prototype.initPanel = function() {
                 if (d.collector) {
                     that.addKeyword(d.name, d3.event);
                 } else {
+                    d3.select(this).attr("class", "card listener clicked");
                     that.showReport(d, d3.event);
                 }
             });
@@ -706,12 +644,12 @@ CardPanel.prototype.addKeyword = function(keyword, event) {
     if (keyword) {
         global.tooltip.kill();
         global.keywordFilters[this.panelSide].push(keyword);        
-        this.zoomClone(event, this.tableScrollPane.node(), transition, 10);
+        global.cloneAndZoom(event, this.tableScrollPane.node(), transition, 10);
     }
     this.table.selectAll(".card").remove();
     this.initPanel();
     if (keyword) {
-        this.zoom(event, this.tableScrollPane.node(), transition, 0.1); 
+        global.zoom(event, this.tableScrollPane.node(), transition, 0.1); 
     }
 };
 
@@ -726,11 +664,11 @@ CardPanel.prototype.popKeyword = function(event) {
     if (global.keywordFilters[this.panelSide].length > 0) {
         global.tooltip.kill();
         const transition = d3.transition().duration(global.selfDuration);
-        this.zoomClone(event, this.tableScrollPane.node(), transition, 0.1);
+        global.cloneAndZoom(event, this.tableScrollPane.node(), transition, 0.1);
         global.keywordFilters[this.panelSide].pop();
         this.table.selectAll(".card").remove();
         this.initPanel();    
-        this.zoom(event, this.tableScrollPane.node(), transition, 10);
+        global.zoom(event, this.tableScrollPane.node(), transition, 10);
     }
 };
 
@@ -799,8 +737,20 @@ CardPanel.prototype.showReport = function(reportMeta, event) {
     that.killListeners();
     global.tooltip.kill();
     that.divTableBase.select("#searchP" + that.panelSide).on("keyup", null);
+    const transition = d3.transition().duration(global.selfDuration);
     
-    const transition = d3.transition().duration(600);
-    this.zoom(event, this.tableScrollPane.node(), transition, 1, 20);
-    setTimeout(function() {that.mediator.publish("newreport", that.panelSide, reportMeta);}, 600);
+    const clickedCardNode = d3.select(".card.clicked").node();
+    var fakeEvent;
+    
+    const scaleRatio = parseFloat(d3.select(".container.activeSide").attr("style").replaceAll(/.*scale\(/g, ""));
+        
+    if (clickedCardNode !== null) {
+        const offset = clickedCardNode.getClientRects()[0];
+        fakeEvent = {
+            clientX: scaleRatio * (offset.x + offset.width/2),
+            clientY: scaleRatio * (offset.y + offset.height/2)
+        };
+    }
+    global.cloneAndZoom(fakeEvent, d3.select("#scrollPaneP" + that.panelSide).node(), transition, 15 / scaleRatio);
+    that.mediator.publish("newreport", that.panelSide, reportMeta);
 };
