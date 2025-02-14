@@ -27,12 +27,18 @@ function DataDirector(side, mediator) {
             that.drill(drill);            
         }
     });
+    that.mediator.subscribe("controlChange", function(duration) {
+        //that.drillLock = true;
+        that.controlChange(duration);                    
+    });
     
     // Feliratkozás a panel konfigurációját elkérő mediátorra.
     that.mediator.subscribe("getConfig", function(callback) {
         that.getConfigs(callback);
     });
     this.cubePreparationRequired = true;
+    
+    this.currentData;
 }
 
 /**
@@ -163,6 +169,14 @@ DataDirector.prototype.drill = function(drill) {
     }   
 };
 
+DataDirector.prototype.controlChange = function(duration) {
+    console.log(duration)
+    this.calculate(this.currentData);        
+    const drill = {dim: -1, direction: 0, duration: duration};    
+    this.notifyAllPanelsOnChange(this.currentData, drill);
+    this.drillLock = false;
+};
+
 /**
  * Meghívja az összes panel preupdate-függvényét.
  * 
@@ -224,7 +238,7 @@ DataDirector.prototype.requestNewData = function(drill) {
     that.cubePreparationRequired = false;
     const encodedQuery = "queries=" + window.btoa(encodeURIComponent((JSON.stringify(requestObject))));
     // A letöltés élesben.
-    global.get(global.url.fact, encodedQuery, function(result) {
+    global.get(global.url.fact, encodedQuery, function(result) {        
         that.processNewData(drill, result);
         that.drillLock = false;
     });
@@ -238,31 +252,90 @@ DataDirector.prototype.requestNewData = function(drill) {
  * @returns {undefined}
  */
 DataDirector.prototype.processNewData = function(drill, newDataJson) {
-    var newData = newDataJson.answer;
+    const newData = newDataJson.answer;
     for (var i = 0, iMax = newData.length; i < iMax; i++) {
         //newData[i].name = newData[i].richName.replace(/[^:0]+/g, '1');
         newData[i].name = newData[i].richName.replace(/(?<=:|^)[^:][^:]+(?=:|$)/g, '1');
     }
-    this.localizeNewData(newDataJson);    
+    
+    this.storeOrigValues(newData);
+    this.localizeNewData(newData);    
+    this.calculate(newData);
+    this.currentData = newData;
+    
+    this.notifyAllPanelsOnChange(newData, drill);
+
+};
+
+DataDirector.prototype.calculate = function(newData) {
+    const meta = global.facts[this.side].localMeta;
+    
+    // Determine the control values
+    const controlValues = [];    
+    for (var i = 0, iMax = meta.controls.length; i < iMax; i++) {
+        controlValues.push(meta.controls[i].value);
+    }
+       
+    for (var i = 0, iMax = meta.indicators.length; i < iMax; i++) {
+        const valueFunction = meta.indicators[i].value.function;
+        if (typeof valueFunction === "function") {
+            this.applyFunction(newData, controlValues, valueFunction, i, "sz");
+        }
+        const fractionFunction = meta.indicators[i].fraction.function;
+        if (typeof fractionFunction === "function") {
+            this.applyFunction(newData, controlValues, fractionFunction, i, "n");
+        }
+    }    
+};
+
+DataDirector.prototype.notifyAllPanelsOnChange = function(newData, drill) {            
     for (var i = 0, iMax = this.panelRoster.length; i < iMax; i++) {
         var pos = global.positionInArrayByProperty(newData, "name", this.panelRoster[i].dimsToShow.toString().replace(/,/g, ":"));
         var data = newData[pos].response;
         if (drill.onlyFor === undefined || drill.onlyFor === this.panelRoster[i].panelId) {
             this.panelRoster[i].updateFunction.call(this.panelRoster[i].context, data, this.getPanelDrill(i, drill));
         }
+    }   
+    global.getConfig2();    
+}
+
+DataDirector.prototype.storeOrigValues = function(data) {
+    for (var a = 0, aMax = data.length; a < aMax; a++) {
+        const answer = data[a].response;
+        for (var r = 0, rMax = answer.rows.length; r < rMax; r++) {
+            const row = answer.rows[r];
+            const vals = row.vals;
+            row.origVals = [];
+            for (var v = 0, vMax = vals.length; v < vMax; v++) {
+                const val = vals[v];
+                row.origVals.push({"sz": val.sz, "n": val.n});
+            }            
+        }
     }
-    global.getConfig2();
 };
+
+DataDirector.prototype.applyFunction = function(data, controlValues, func, index, position) {
+    for (var a = 0, aMax = data.length; a < aMax; a++) {
+        const answer = data[a].response;
+        for (var r = 0, rMax = answer.rows.length; r < rMax; r++) {
+            const row = answer.rows[r];
+            const d = row.dims;
+            const i = row.origVals;
+            const c = controlValues;
+            row.vals[index][position] = func(d, c, i);            
+        }
+    }    
+};
+
 
 /**
  * Localizes the "name" dimension attributes in the raw data.
  * There is no return value, the input data is changed.
  * 
- * @param {type} newDataJson New data to process
+ * @param {type} newData New data to process
  * @returns {undefined} 
  */
-DataDirector.prototype.localizeNewData = function(newDataJson) {
-    var newData = newDataJson.answer;
+DataDirector.prototype.localizeNewData = function(newData) {
     for (var i = 0, iMax = newData.length; i < iMax; i++) {
         const rows = newData[i].response.rows;
         for (var r = 0, rMax = rows.length; r < rMax; r++) {

@@ -58,6 +58,17 @@ function HeadPanel_Report(init, reportMeta, startScale) {
     dimTableHolder.transition(trans)
             .style("opacity", "1");
 
+    // Kontrollok táblázata
+    var controlTableHolder = dimTableHolder;
+
+    this.controlTable = controlTableHolder.select(".tableScrollPane")
+            .append("html:div")
+            .attr("class", "table dimTable controlTable")
+            .attr("id", "controlTableP" + that.panelSide);
+
+    controlTableHolder.transition(trans)
+            .style("opacity", "1");
+
     // Értékek táblázata
     var valTableHolder = that.divTableBase.append("html:div")
             .attr("id", "tableHolderP" + that.panelSide)
@@ -161,6 +172,60 @@ function HeadPanel_Report(init, reportMeta, startScale) {
         newDimRow.append("html:div")
                 .attr("class", "cell backgroundCell listener dragable");
     }
+
+    
+    // Kontroll tábla feltöltése a meta alapján
+    const controls = global.facts[that.panelSide].localMeta.controls;
+    var controlRow = that.controlTable.selectAll(".row").data(that.meta.controls);
+
+    var newControlRow = controlRow.enter().append("html:div")
+            .attr("class", "row alterColored")
+            .attr("parity", function (d, i) {
+                return (that.meta.dimensions.length + i) % 2;
+            });
+
+    // Első cella: a kontroll neve.
+    {
+        tempRowCell = newControlRow.append("html:div")
+                .attr("class", "cell");
+
+        tempRowCell.append("html:text")
+                .attr("class", "tableText0");
+
+        tempRowCell.append("html:text")
+                .attr("class", "tableText0 spacer");
+
+        tempRowCell.append("html:span")
+                .html("&nbsp;");
+    }
+
+    // Második cella: a pillanatnyi lefúrási szint.
+    {
+        tempRowCell = newControlRow.append("html:div")
+                .attr("class", "cell");
+
+        tempRowCell.append("html:text")
+                .attr("class", "tableText1 spacer");
+        
+        tempRowCell.each(function(d, i) {
+                new ControlSlider(d3.select(this), trans, controls[i], function(v) {
+                        global.facts[that.panelSide].localMeta.controls[i].value = v;
+                        //that.mediator.publish("controlChange", 0);                        
+                        that.mediator.publish("controlChange", undefined);
+                });        
+        });
+        
+    }
+
+    // A táblázatsor háttere.
+    {
+        newControlRow.append("html:div")
+                .attr("class", "cell backgroundCell listener");
+    }
+
+
+
+
 
     // Érték tábla feltöltése a meta alapján
     var newValRow = that.valTable.selectAll(".row").data(that.meta.indicators)
@@ -333,7 +398,43 @@ HeadPanel_Report.prototype.initPanel = function (trans) {
         .text(function (d) {
             return "&nbsp;";
         });
+
+
+
+
+    // Kontrol sorok
+    var controlRow = that.controlTable.selectAll(".row").data(that.localMeta.controls);
+
+    // Updateljük a dobóréteghez tartozó feliratot.
+    // controlRow.select(".dragable");
+
+    // Első dimenzió cella: a dimenzió neve.
+    controlRow.select(".tableText0:not(.spacer)")
+            .style("opacity", function (d) {
+                return (d.caption === d3.select(this).text()) ? 1 : 0;
+            })
+            .text(function (d) {
+                return d.caption;
+            })
+            .transition(trans)
+            .style("opacity", 1);
+
+    controlRow.select(".tableText0.spacer")
+            .text(function (d) {
+                return d.caption;
+            });
+            
+    controlRow.select(".tableText1.spacer")
+        .text(function (d) {
+            return "&nbsp;";
+        });
         
+        
+        
+        
+        
+        
+    
     // Érték tábla: az adatok társítása.
     var valRow = that.valTable.selectAll(".row").data(that.localMeta.indicators);
 

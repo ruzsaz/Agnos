@@ -562,6 +562,7 @@ Container.prototype.killSide = function(side) {
             global.mediators[side].remove("changeDimension");
             global.mediators[side].remove("changepanels");
             global.mediators[side].remove("drill");
+            global.mediators[side].remove("controlChange");
             global.mediators[side].remove("killside");
             global.mediators[side].remove("newreport");
             global.mediators[side].remove("killListeners");

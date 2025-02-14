@@ -94,7 +94,7 @@ Fact.prototype.getLocalMeta = function() {
             var d = this.reportMeta.dimensions[i];
             const localLabel = global.getFromArrayByLang(d.multilingualization, language);
             const defaultLabel = global.getFromArrayByLang(d.multilingualization, "");
-            var dimension = {
+            const dimension = {
                 'caption': global.getFirstValidString(localLabel.caption, defaultLabel.caption, localLabel.description, defaultLabel.description),
                 'description': global.getFirstValidString(localLabel.description, defaultLabel.description, localLabel.caption, defaultLabel.caption),
                 'dimension_unique_name': d.name,
@@ -105,18 +105,35 @@ Fact.prototype.getLocalMeta = function() {
             };
             this.localMeta.dimensions.push(dimension);
         }
+        
+        this.localMeta.controls = [];
+        for (var i = 0, iMax = this.reportMeta.controls.length; i < iMax; i++) {
+            const d = this.reportMeta.controls[i];
+            const localLabel = global.getFromArrayByLang(d.multilingualization, language);
+            const defaultLabel = global.getFromArrayByLang(d.multilingualization, "");
+            const control = {
+                'caption': global.getFirstValidString(localLabel.caption, defaultLabel.caption, localLabel.description, defaultLabel.description),
+                'description': global.getFirstValidString(localLabel.description, defaultLabel.description, localLabel.caption, defaultLabel.caption),
+                'type': d.type,
+                'parameters': d.parameters,
+                'defaultValue': d.defaultValue,
+                'value': d.defaultValue
+            };
+            this.localMeta.controls.push(control);
+        }
 
         this.localMeta.indicators = [];
-        for (var i = 0, iMax = this.reportMeta.indicators.length; i < iMax; i++) {
+        for (var i = 0, iMax = this.reportMeta.indicators.length; i < iMax; i++) {            
             var d = this.reportMeta.indicators[i];
             const localLabel = global.getFromArrayByLang(d.multilingualization, language);
             const defaultLabel = global.getFromArrayByLang(d.multilingualization, "");
-            var indicator = {
+            const indicator = {
                 'colorExact': d.colorExact,
                 'preferredColor': d.preferredColor,
                 'caption': global.getFirstValidString(localLabel.caption, defaultLabel.caption, localLabel.description, defaultLabel.description),
                 'description': global.getFirstValidString(localLabel.description, defaultLabel.description, localLabel.caption, defaultLabel.caption),
                 'fraction': {
+                    'function': this.createFunction(d.denominatorFunction),
                     'hide': d.denominatorIsHidden,
                     'measure_unique_name': d.denominatorName,
                     'multiplier': d.denominatorMultiplier,
@@ -126,6 +143,7 @@ Fact.prototype.getLocalMeta = function() {
                 },
                 'id': d.id,
                 'value': {
+                    'function': this.createFunction(d.valueFunction),
                     'hide': d.valueIsHidden,
                     'measure_unique_name': d.valueName,
                     'multiplier': d.valueMultiplier,
@@ -140,4 +158,15 @@ Fact.prototype.getLocalMeta = function() {
     }
     
     return this.localMeta;
+};
+
+Fact.prototype.createFunction = function(functionDefinition) {
+    if (functionDefinition === null || functionDefinition === undefined || functionDefinition.length === 0) {
+        return undefined;
+    }
+    console.log(functionDefinition);
+    var returnFunction;
+    eval("returnFunction = " + functionDefinition);
+    return returnFunction;
+    
 };
