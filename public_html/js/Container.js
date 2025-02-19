@@ -313,12 +313,18 @@ Container.prototype.newReport = function(side, reportSuperMeta, startObject) {
     global.mediators[side].remove("killListeners");
     that.isSideInUse[side] = true;
     that.updateHelp(side, reportSuperMeta);    
-    that.loadAllMapsAsync(reportSuperMeta).then(function(result) {        
+    that.loadAllMapsAsync(reportSuperMeta).then(function(result) {
         global.facts[side] = new Fact(reportSuperMeta, side, that.newReportReady, that, startObject);
         that.newReportReady(side, reportSuperMeta);
     });
 };
 
+/**
+ * Load the maps required for the report, async.
+ * 
+ * @param {Object} reportSuperMeta Meta of the report.
+ * @returns {Promise} Promise that resolves after the maps loaded.
+ */
 Container.prototype.loadAllMapsAsync = async function(reportSuperMeta){
     const mapNames = [];
     for (var i = 0, iMax = reportSuperMeta.dimensions.length; i < iMax; i++) {
@@ -369,7 +375,6 @@ Container.prototype.updateHelp = function(side, reportSuperMeta) {
     }
 };
 
-
 /**
  * Előre beállított helyről indítja az előre beállított reportot.
  * 
@@ -419,7 +424,6 @@ Container.prototype.navigateTo = function(startObject) {
     d3.select("#container0").classed("activeSide", (this.panelState !== 2));
     d3.select("#container1").classed("activeSide", (this.panelState !== 0));
     global.mainToolbar_refreshState();
-//    global.mediators[side].publish("drill", {dim: -1, direction: 0});
     this.onResize();
 };
 
@@ -602,66 +606,67 @@ Container.prototype.killSide = function(side) {
  */
 Container.prototype.addPanel = function(side, panelType) {
     if (this.panelState / 2 === side && this.isSideInUse[side]) {
-        var firstFreeId = this.dataDirector[side].getFirstFreeIndex();
-        var guessedDim = this.dataDirector[side].guessDimension();
+        const firstFreeId = this.dataDirector[side].getFirstFreeIndex();
+        const guessedDim = this.dataDirector[side].guessDimension();
+        const guessedVal = this.dataDirector[side].guessValue();
         if (firstFreeId >= 0) {
             switch (panelType) {
                 case 'piechartpanel':
-                    new panel_pie({group: side, position: firstFreeId, dim: guessedDim});
+                    new panel_pie({group: side, position: firstFreeId, dim: guessedDim, val: guessedVal});
                     break;
                 case 'mappanel':
-                    new panel_map({group: side, position: firstFreeId, dim: guessedDim, poi: false});
+                    new panel_map({group: side, position: firstFreeId, dim: guessedDim, val: guessedVal, poi: false});
                     break;
                 case 'poimappanel':
-                    new panel_map({group: side, position: firstFreeId, dim: guessedDim, poi: true});
+                    new panel_map({group: side, position: firstFreeId, dim: guessedDim, val: guessedVal, poi: true});
                     break;
                 case 'barpanel':
-                    new panel_barline({group: side, position: firstFreeId, dim: guessedDim});
+                    new panel_barline({group: side, position: firstFreeId, dim: guessedDim, valbars: [guessedVal]});
                     break;
                 case 'strechedbarpanel':
-                    new panel_barline({group: side, position: firstFreeId, streched: true, valbars: [0], dim: guessedDim});
+                    new panel_barline({group: side, position: firstFreeId, streched: true, valbars: [guessedVal], dim: guessedDim});
                     break;
                 case 'linepanel':
-                    new panel_barline({group: side, position: firstFreeId, valbars: [], vallines: [0], dim: guessedDim});
+                    new panel_barline({group: side, position: firstFreeId, valbars: [], vallines: [guessedVal], dim: guessedDim});
                     break;
                 case 'markedlinepanel':
-                    new panel_barline({group: side, position: firstFreeId, valbars: [], vallines: [0], symbols: true, dim: guessedDim});
+                    new panel_barline({group: side, position: firstFreeId, valbars: [], vallines: [guessedVal], symbols: true, dim: guessedDim});
                     break;
                 case 'bar2panel':
-                    new panel_bar2d({group: side, position: firstFreeId, dimx: guessedDim, dimy: this.dataDirector[side].guessDimension(guessedDim)});
+                    new panel_bar2d({group: side, position: firstFreeId, dimx: guessedDim, dimy: this.dataDirector[side].guessDimension(guessedDim), val: guessedVal});
                     break;
                 case 'strechedbar2panel':
-                    new panel_bar2d({group: side, position: firstFreeId, dimx: guessedDim, dimy: this.dataDirector[side].guessDimension(guessedDim), streched: true});
+                    new panel_bar2d({group: side, position: firstFreeId, dimx: guessedDim, dimy: this.dataDirector[side].guessDimension(guessedDim), val: guessedVal, streched: true});
                     break;
                 case 'horizontalbarpanel':
-                    new panel_horizontalbar({group: side, position: firstFreeId, centered: false, dim: guessedDim});
+                    new panel_horizontalbar({group: side, position: firstFreeId, centered: false, dim: guessedDim, valpos: [guessedVal]});
                     break;
                 case 'fixedhorizontalbarpanel':
-                    new panel_horizontalbar({group: side, position: firstFreeId, centered: true, dim: guessedDim});
+                    new panel_horizontalbar({group: side, position: firstFreeId, centered: true, dim: guessedDim, valpos: [guessedVal]});
                     break;
                 case 'Panel_Table1D':
                     new panel_table1d({group: side, position: firstFreeId, dim: guessedDim});
                     break;
                 case 'Panel_Table2D':
-                    new panel_table2d({group: side, position: firstFreeId, dimr: guessedDim, dimc: this.dataDirector[side].guessDimension(guessedDim)});
+                    new panel_table2d({group: side, position: firstFreeId, dimr: guessedDim, dimc: this.dataDirector[side].guessDimension(guessedDim), val: guessedVal});
                     break;
                 case 'top10Barpanel' :
-                    new panel_barline({group: side, position: firstFreeId, dim: guessedDim, top10: true});
+                    new panel_barline({group: side, position: firstFreeId, dim: guessedDim, valbars: [guessedVal], top10: true});
                     break;
                 case 'top10Linepanel' :
-                    new panel_barline({group: side, position: firstFreeId, valbars: [], vallines: [0], dim: guessedDim, symbols: true, top10: true});
+                    new panel_barline({group: side, position: firstFreeId, valbars: [], vallines: [guessedVal], dim: guessedDim, symbols: true, top10: true});
                     break;
                 case 'line2panel':
-                    new panel_line2d({group: side, position: firstFreeId, dimx: guessedDim, dimy: this.dataDirector[side].guessDimension(guessedDim), symbols: false});
+                    new panel_line2d({group: side, position: firstFreeId, dimx: guessedDim, dimy: this.dataDirector[side].guessDimension(guessedDim), val: guessedVal, symbols: false});
                     break;                    
                 case 'markedline2panel':
-                    new panel_line2d({group: side, position: firstFreeId, dimx: guessedDim, dimy: this.dataDirector[side].guessDimension(guessedDim), symbols: true});
+                    new panel_line2d({group: side, position: firstFreeId, dimx: guessedDim, dimy: this.dataDirector[side].guessDimension(guessedDim), val: guessedVal, symbols: true});
                     break;
                 case 'sankey2panel':
-                    new panel_sankey({group: side, position: firstFreeId, dim: [0,1]});
+                    new panel_sankey({group: side, position: firstFreeId, dim: [guessedDim, this.dataDirector[side].guessDimension(guessedDim)], val: guessedVal});
                     break;
                 case 'sankey3panel':
-                    new panel_sankey({group: side, position: firstFreeId, dim: [0,1,2]});
+                    new panel_sankey({group: side, position: firstFreeId, dim: [guessedDim, this.dataDirector[side].guessDimension(guessedDim), guessedDim], val: guessedVal});
                     break;
             }
         }

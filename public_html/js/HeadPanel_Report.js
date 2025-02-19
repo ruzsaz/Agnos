@@ -20,6 +20,7 @@ function HeadPanel_Report(init, reportMeta, startScale) {
     var trans = d3.transition().duration(global.selfDuration);
     this.dimLevelsSeparator = " ➜ "; // A dimenzióelemek összefűzésére szolgáló sztring lefúráskor.
     this.dimLevelPlaceholder = "..."; // A túl hosszú dimenzióelemeket erre cseréljük megjelenítéskor.
+    this.controlElements = [];
 
     // Panel regisztrálása a nyilvántartóba.
     that.mediator.publish("register", that, that.panelId, [], that.preUpdate, that.update);
@@ -61,8 +62,7 @@ function HeadPanel_Report(init, reportMeta, startScale) {
     // Kontrollok táblázata
     var controlTableHolder = dimTableHolder;
 
-    this.controlTable = controlTableHolder.select(".tableScrollPane")
-            .append("html:div")
+    this.controlTable = controlTableHolder.select(".tableScrollPane").append("html:div")
             .attr("class", "table dimTable controlTable")
             .attr("id", "controlTableP" + that.panelSide);
 
@@ -176,7 +176,8 @@ function HeadPanel_Report(init, reportMeta, startScale) {
     
     // Kontroll tábla feltöltése a meta alapján
     const controls = global.facts[that.panelSide].localMeta.controls;
-    var controlRow = that.controlTable.selectAll(".row").data(that.meta.controls);
+
+    var controlRow = that.controlTable.selectAll(".row").data(controls);
 
     var newControlRow = controlRow.enter().append("html:div")
             .attr("class", "row alterColored")
@@ -199,7 +200,7 @@ function HeadPanel_Report(init, reportMeta, startScale) {
                 .html("&nbsp;");
     }
 
-    // Második cella: a pillanatnyi lefúrási szint.
+    // Második cella: a konroll maga.
     {
         tempRowCell = newControlRow.append("html:div")
                 .attr("class", "cell");
@@ -208,28 +209,55 @@ function HeadPanel_Report(init, reportMeta, startScale) {
                 .attr("class", "tableText1 spacer");
         
         tempRowCell.each(function(d, i) {
-                new ControlSlider(d3.select(this), trans, controls[i], function(v) {
-                        global.facts[that.panelSide].localMeta.controls[i].value = v;
-                        //that.mediator.publish("controlChange", 0);                        
-                        that.mediator.publish("controlChange", undefined);
-                });        
+            switch(d.type) {
+                case "slider":
+                    that.controlElements.push(
+                            new ControlSlider(
+                                    d3.select(this),
+                                    "control_P" + that.panelSide + "_" + i,
+                                    controls[i],
+                                    global.facts[that.panelSide].controlValues[i],
+                                    function(v) {
+                                            global.facts[that.panelSide].controlValues[i] = v;
+                                            that.mediator.publish("controlChange", undefined);
+                                    })
+                    );  
+                    break;
+                case "radio":
+                    that.controlElements.push(
+                            new ControlRadio(
+                                    d3.select(this),
+                                    "control_P" + that.panelSide + "_" + i,
+                                    controls[i],
+                                    global.facts[that.panelSide].controlValues[i],
+                                    function(v) {
+                                            global.facts[that.panelSide].controlValues[i] = v;
+                                            that.mediator.publish("controlChange", undefined);
+                                    })
+                    );        
+                    break;
+                default:
+                    console.error("Unknow control type: " + d.type);
+            }
+    
+            
         });
         
     }
-
+    
     // A táblázatsor háttere.
     {
         newControlRow.append("html:div")
                 .attr("class", "cell backgroundCell listener");
     }
-
-
-
-
+    
 
     // Érték tábla feltöltése a meta alapján
     var newValRow = that.valTable.selectAll(".row").data(that.meta.indicators)
-            .enter().append("html:div").attr("class", "row");
+            .enter().append("html:div")
+            .attr("class", function (d) {
+                    return (d.denominatorIsHidden && d.valueIsHidden) ? "row novalue" : "row";
+            });
 
     // Első cella: a mutató neve.
     {
@@ -400,8 +428,6 @@ HeadPanel_Report.prototype.initPanel = function (trans) {
         });
 
 
-
-
     // Kontrol sorok
     var controlRow = that.controlTable.selectAll(".row").data(that.localMeta.controls);
 
@@ -427,13 +453,7 @@ HeadPanel_Report.prototype.initPanel = function (trans) {
     controlRow.select(".tableText1.spacer")
         .text(function (d) {
             return "&nbsp;";
-        });
-        
-        
-        
-        
-        
-        
+        });                                                
     
     // Érték tábla: az adatok társítása.
     var valRow = that.valTable.selectAll(".row").data(that.localMeta.indicators);
@@ -507,6 +527,7 @@ HeadPanel_Report.prototype.preUpdate = function (drill) {
 HeadPanel_Report.prototype.prepareData = function (data) {
     var that = this;
     var dimData = [];
+    var controlData = that.localMeta.controls;
     var valData = [];
 
     // Dimenziók aktuális értékeinek elkészítése.
@@ -528,6 +549,12 @@ HeadPanel_Report.prototype.prepareData = function (data) {
                 return "<html><h4>" + that.localMeta.dimensions[i].description + ": <em>" + d.text.replace(/[^➜]*➜ /, "") + "</em></h4></html>";
             });
 
+    // Tooltip hozzáadása a kontroll tábla soraihoz.
+    that.controlTable.selectAll(".row").data(controlData)
+            .attr("tooltip", function (d, i) {                
+                return "<html><h4>" + d.description + "</h4></html>";
+            });
+
     // Értékek aktuális értékeinek elkészítése.
     for (var i = 0, iMax = that.localMeta.indicators.length; i < iMax; i++) {
         var meta = that.localMeta.indicators[i];
@@ -543,7 +570,7 @@ HeadPanel_Report.prototype.prepareData = function (data) {
                 return "<html><h4>" + that.localMeta.indicators[i].description + "</h4></html>";
             });
 
-    return {"dimData": dimData, "valData": valData};
+    return {"dimData": dimData, "controlData": controlData, "valData": valData};
 };
 
 /**
@@ -581,6 +608,11 @@ HeadPanel_Report.prototype.update = function (data) {
             .text(function (d) {
                 return d.text;
             });
+
+    // Kontrol értékek upgradelése
+    for (var i = 0, iMax = that.controlElements.length; i < iMax; i++) {
+        that.controlElements[i].updateLabels(this.controlTable, preparedData.controlData[i].labels, trans);
+    }
 
     // Értékek értékeinek upgradelése.
     var valRow = that.valTable.selectAll(".row")

@@ -2,21 +2,10 @@
 
 'use strict';
 
-/**
- * Létrehoz egy html scrollbart, de egy svg-n belül, svg elemek scrollozására.
- * 
- * @param {Object} parentElement A scollbart tartalmazó szülőelem.
- * @param {Boolean} isHorizontal True: vízszintes, false: függőleges.
- * @param {Number} length A scrollbar hossza, pixelben.
- * @param {Function} callback A scrollozáskor meghívandó függvény.
- * @param {Number} wheelScrollSize A görgetés szkrollozandó mennyiség.
- * @param {Object} additionalWheelTarget Olyan elem, amelyhez a görgetést még extrán hozzárendeljük.
- * @returns {SVGScrollbar} A scollbar.
- */
-function ControlSlider(parentElement, trans, initObject, callback) {
+
+function ControlSlider(parentElement, id, initObject, startValue, callback) {
     var that = this;
     
-    console.log(initObject.parameters)
     const init = JSON.parse(initObject.parameters);    
 
     this.className = "control slider";
@@ -32,18 +21,18 @@ function ControlSlider(parentElement, trans, initObject, callback) {
     
     valueContainer
             .style("opacity", 0)
-            .text(global.cleverRound2(initObject.value))
+            .text(global.cleverRound2(startValue))
             .transition(d3.transition().duration(global.selfDuration))
             .style("opacity", 1);   
     
     const slider = container.append("html:input")
-            .attr("id", "zolikaokos")
             .attr("class", that.className)
+            .attr("id", id)
             .attr("type", "range")
             .attr("min", (init === undefined || init.min === undefined) ? 0 : init.min)
             .attr("max", (init === undefined || init.max === undefined) ? 100 : init.max)
             .attr("step", (init === undefined || init.step === undefined) ? 0 : init.step)
-            .attr("value", initObject.value)
+            .attr("value", startValue)
             .on("input", function() {
                 const value = d3.select(this).property("value");
                 valueContainer
@@ -63,3 +52,70 @@ function ControlSlider(parentElement, trans, initObject, callback) {
                 
 };
 
+ControlSlider.prototype.updateLabels = function() {
+    
+};
+
+
+function ControlRadio(parentElement, id, initObject, startValue, callback) {
+    var that = this;
+    
+    const init = JSON.parse(initObject.parameters);    
+    
+    const data = [];
+    for (var i = 0, iMax = init.values.length; i < iMax; i++) {        
+        data.push({
+            "value" : init.values[i],
+            "label" : (initObject.labels === undefined || initObject.labels.length <= i) ? init.values[i] : initObject.labels[i]
+        });        
+    }
+    
+    this.className = "control radio";
+    this.changeFunction = callback;
+
+    // A scroolbart tartalmazó div.
+    const container = parentElement.append("html:div")
+            .attr("class", "radioContainer");
+    
+    var valueContainer = container.append("html:form")
+            .attr("id", id)
+            .attr("class", that.className)
+            .on("change", function() {
+                    const value = valueContainer.select('input:checked').node().value;                    
+                    callback(value);
+            });
+    
+    valueContainer
+            .style("opacity", 0)            
+            .transition(d3.transition().duration(global.selfDuration))
+            .style("opacity", 1);   
+    
+    var newRadioOption = valueContainer.selectAll("input").data(data)
+            .enter().append("html:p");
+                        
+    newRadioOption.append("html:input")
+            .attr("type", "radio")
+            .attr("class", "radioButton")
+            .attr("name", id)
+            .attr("value", function(d){return d.value;});
+    
+    newRadioOption.insert("html:label")
+            .text(function(d){return d.label;});
+    
+    // Set the starting value
+    valueContainer.select('input[value="' + startValue + '"]').node().checked = true;
+                
+};
+
+ControlRadio.prototype.updateLabels = function(parentElement, newLabels, trans) {
+    var labels = parentElement.selectAll("label").data(newLabels);
+    labels = labels.merge(labels)
+            .style("opacity", function (d) {
+                return (d === d3.select(this).text()) ? 1 : 0;
+            })
+            .text(function (d) {
+                return d;
+            }).transition(trans)
+            .style("opacity", 1);
+    
+};

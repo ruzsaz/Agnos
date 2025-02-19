@@ -232,7 +232,7 @@ var global = function () {
                 var tosplit = text.substring(cutPositionMin, cutPositionMax);
                 var offset = Math.max(tosplit.lastIndexOf("-"), tosplit.lastIndexOf(" "), tosplit.lastIndexOf("/"));
                 var cutPosition = Math.round((offset > -1) ? cutPositionMin + offset : (cutPositionMin + cutPositionMax) / 2);
-                var newText = text.substring(0, cutPosition) + "..";
+                var newText = text.substring(0, cutPosition) + "..";              
                 renderedText.text(newText);
                 textWidth = renderedText.nodes()[0].getBBox().width; // A szöveg pillanatnyi mérete.
             }

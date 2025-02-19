@@ -983,6 +983,9 @@ panel_horizontalbar.prototype.doChangeValue = function(panelId, value, ratio, ta
             // A fejlécre klikkelés esetén.
             if (value === -1 && that.singleValMode) {
                 var newVal = (that.legendArray[0].id + 1) % that.localMeta.indicators.length;
+                while (!that.localMeta.indicators[newVal].isShown) {
+                    newVal = (newVal + 1) % that.localMeta.indicators.length;
+                }             
                 if (that.valPosNumber === 1) {
                     that.valPosToShow[0] = newVal;
                 }

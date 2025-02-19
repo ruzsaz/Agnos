@@ -571,6 +571,9 @@ panel_pie.prototype.doChangeValue = function (panelId, value, ratio) {
     if (panelId === undefined || panelId === that.panelId) {
         if (value !== undefined) {
             that.valToShow = (value === -1) ? (that.valToShow + 1) % that.localMeta.indicators.length : value;
+            while (!that.localMeta.indicators[that.valToShow].isShown) {
+                that.valToShow = (that.valToShow + 1) % that.localMeta.indicators.length;
+            }
             that.actualInit.val = that.valToShow;
         }
         if (ratio !== undefined) {

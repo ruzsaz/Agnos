@@ -28,7 +28,6 @@ function DataDirector(side, mediator) {
         }
     });
     that.mediator.subscribe("controlChange", function(duration) {
-        //that.drillLock = true;
         that.controlChange(duration);                    
     });
     
@@ -125,6 +124,21 @@ DataDirector.prototype.guessDimension = function(exceptDim) {
 };
 
 /**
+ * Keres egy ábrázolható value-t. (Aminek vagy a val-ja vagy a frac-ja nem hidden.)
+ * 
+ * @returns {Number} Egy ábrázolható value indexe, vagy 0 ha nincs ilyen.
+ */
+DataDirector.prototype.guessValue = function() {
+    var meta = global.facts[this.side].localMeta;
+    for (var i = 0, iMax = meta.indicators.length; i < iMax; i++) {
+        if (meta.indicators[i].isShown) {
+            return i;
+        }
+    }
+    return 0;
+};
+
+/**
  * Visszaadja az épp használatban levő normál panelek számát.
  * 
  * @returns {Number} A haszálatban levő normál panelek száma.
@@ -169,8 +183,13 @@ DataDirector.prototype.drill = function(drill) {
     }   
 };
 
+/**
+ * Makes the changes on the screen after a control's value changed.
+ * 
+ * @param {Number} duration Duration of the animation in milliseconds.
+ * @returns {undefined}
+ */
 DataDirector.prototype.controlChange = function(duration) {
-    console.log(duration)
     this.calculate(this.currentData);        
     const drill = {dim: -1, direction: 0, duration: duration};    
     this.notifyAllPanelsOnChange(this.currentData, drill);
@@ -254,40 +273,48 @@ DataDirector.prototype.requestNewData = function(drill) {
 DataDirector.prototype.processNewData = function(drill, newDataJson) {
     const newData = newDataJson.answer;
     for (var i = 0, iMax = newData.length; i < iMax; i++) {
-        //newData[i].name = newData[i].richName.replace(/[^:0]+/g, '1');
         newData[i].name = newData[i].richName.replace(/(?<=:|^)[^:][^:]+(?=:|$)/g, '1');
-    }
-    
+    }    
     this.storeOrigValues(newData);
     this.localizeNewData(newData);    
     this.calculate(newData);
-    this.currentData = newData;
-    
+    this.currentData = newData;    
     this.notifyAllPanelsOnChange(newData, drill);
-
 };
 
-DataDirector.prototype.calculate = function(newData) {
+/**
+ * Calculates the actual value of the calculated indicators. It modifies the
+ * data object received on input.
+ * 
+ * @param {Object} data The data object containing the input values.
+ * @returns {undefined}
+ */
+DataDirector.prototype.calculate = function(data) {
     const meta = global.facts[this.side].localMeta;
     
     // Determine the control values
-    const controlValues = [];    
-    for (var i = 0, iMax = meta.controls.length; i < iMax; i++) {
-        controlValues.push(meta.controls[i].value);
-    }
+    const controlValues = global.facts[this.side].controlValues;    
        
     for (var i = 0, iMax = meta.indicators.length; i < iMax; i++) {
         const valueFunction = meta.indicators[i].value.function;
         if (typeof valueFunction === "function") {
-            this.applyFunction(newData, controlValues, valueFunction, i, "sz");
+            this.applyFunction(data, controlValues, valueFunction, i, "sz");
         }
         const fractionFunction = meta.indicators[i].fraction.function;
         if (typeof fractionFunction === "function") {
-            this.applyFunction(newData, controlValues, fractionFunction, i, "n");
+            this.applyFunction(data, controlValues, fractionFunction, i, "n");
         }
     }    
 };
 
+/**
+ * Calls the panels' registered update functions after a data change (drill or
+ * calculation from a new input).
+ * 
+ * @param {Object} newData New data object.
+ * @param {Object} drill The drill that started the data change.
+ * @returns {undefined}
+ */
 DataDirector.prototype.notifyAllPanelsOnChange = function(newData, drill) {            
     for (var i = 0, iMax = this.panelRoster.length; i < iMax; i++) {
         var pos = global.positionInArrayByProperty(newData, "name", this.panelRoster[i].dimsToShow.toString().replace(/,/g, ":"));
@@ -297,8 +324,16 @@ DataDirector.prototype.notifyAllPanelsOnChange = function(newData, drill) {
         }
     }   
     global.getConfig2();    
-}
+};
 
+/**
+ * Stores the original (without calculations applied) values of the indicators.
+ * Should be called before applying the calculations. It modifies the received
+ * data object.
+ * 
+ * @param {Object} data The data object to process.
+ * @returns {undefined}
+ */
 DataDirector.prototype.storeOrigValues = function(data) {
     for (var a = 0, aMax = data.length; a < aMax; a++) {
         const answer = data[a].response;
@@ -314,6 +349,19 @@ DataDirector.prototype.storeOrigValues = function(data) {
     }
 };
 
+/**
+ * Applies a function to calculate the calculated values. It should have 3
+ * arrays as inputs: d[] as the dimensions' values, i[] as the indicators'
+ * values and c[] as the controls' values.
+ * The result will be stored in the received data object.
+ * 
+ * @param {Object} data The data object to process.
+ * @param {Array} controlValues Array of the actual control values.
+ * @param {Function} func Function to calculate the calculated value.
+ * @param {Number} index Index of the value to calculate.
+ * @param {String} position "sz" or "n" to calculate the számláló or nevező.
+ * @returns {undefined}
+ */
 DataDirector.prototype.applyFunction = function(data, controlValues, func, index, position) {
     for (var a = 0, aMax = data.length; a < aMax; a++) {
         const answer = data[a].response;
@@ -396,6 +444,7 @@ DataDirector.prototype.getConfigs = function(callback) {
             configObject.s = this.side; // Az oldal, amire vonatkozik (0 vagy 1).
             configObject.c = global.facts[this.side].localMeta.cube_unique_name; // A cube neve.
             configObject.b = global.baseLevels[this.side]; // A bázisszintek, amire épp lefúrva van.
+            configObject.i = global.facts[this.side].controlValues; // Actual value of the controls.
             configObject.v = global.minifyInits(configs); // A panelek init sztringje, minifyolva.
         }
         callback(configObject);

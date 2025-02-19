@@ -787,6 +787,9 @@ g.sankey_nodes_shadow .nodeShadow {
 .heading {
   display: table-row;
 }
+.row.novalue {
+  display: none;
+}
 /* HeadPanel */
 .HeadPanel_Browser .row * {
   cursor: pointer;
@@ -2784,10 +2787,23 @@ body.embedded .titleButton1:hover ~ .titleText1 {
   margin-top: -8px;
   min-height: 8px;
 }
-.sliderContainer .control {
+.control.slider {
   position: relative;
   left: 4em;
   pointer-events: all !important;
+}
+.control.radio {
+  display: inline-flex;
+}
+.control.radio p {
+  display: contents;
+}
+.control.radio input {
+  margin: 0px 0.2em 0px 0px;
+  pointer-events: all !important;
+}
+.control.radio label {
+  margin-right: 1em;
 }
 /*
 To change this license header, choose License Headers in Project Properties.

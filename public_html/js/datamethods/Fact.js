@@ -21,16 +21,16 @@ function Fact(reportSuperMeta, side, callbackFunction, callContext, startObject)
 
     this.reportMeta = reportSuperMeta;
     this.localMeta = undefined;
-    
+    this.controlValues = [];
+        
     that.enrichReportMeta(startObject);
-            
+    that.setControlValues((startObject) ? startObject.i : undefined);  
 }
 
 /**
  * A meták betöltése után meghívandó függvény. Beállít néhány változót,
  * majd meghívja a fact callbackját.
  * 
- * @param {Object} reportSuperMeta A reporthoz tartozó superMeta.
  * @param {Object} startObject Az indulást leíró objektum, ha a reportba nem a legfelső szinten lépünk be.
  * @returns {Fact.reportMetaReady}
  */
@@ -107,19 +107,23 @@ Fact.prototype.getLocalMeta = function() {
         }
         
         this.localMeta.controls = [];
-        for (var i = 0, iMax = this.reportMeta.controls.length; i < iMax; i++) {
-            const d = this.reportMeta.controls[i];
-            const localLabel = global.getFromArrayByLang(d.multilingualization, language);
-            const defaultLabel = global.getFromArrayByLang(d.multilingualization, "");
-            const control = {
-                'caption': global.getFirstValidString(localLabel.caption, defaultLabel.caption, localLabel.description, defaultLabel.description),
-                'description': global.getFirstValidString(localLabel.description, defaultLabel.description, localLabel.caption, defaultLabel.caption),
-                'type': d.type,
-                'parameters': d.parameters,
-                'defaultValue': d.defaultValue,
-                'value': d.defaultValue
-            };
-            this.localMeta.controls.push(control);
+        if (this.reportMeta.controls !== undefined) {
+            for (var i = 0, iMax = this.reportMeta.controls.length; i < iMax; i++) {
+                const d = this.reportMeta.controls[i];
+                const localLabel = global.getFromArrayByLang(d.multilingualization, language);
+                const defaultLabel = global.getFromArrayByLang(d.multilingualization, "");
+                const controlLabelsString = global.getFirstValidString(localLabel.values, defaultLabel.values);
+
+                const control = {
+                    'caption': global.getFirstValidString(localLabel.caption, defaultLabel.caption, localLabel.description, defaultLabel.description),
+                    'description': global.getFirstValidString(localLabel.description, defaultLabel.description, localLabel.caption, defaultLabel.caption),
+                    'type': d.type,
+                    'parameters': d.parameters,
+                    'labels': (controlLabelsString.length < 2) ? undefined : JSON.parse(controlLabelsString),
+                    'defaultValue': d.defaultValue
+                };
+                this.localMeta.controls.push(control);
+            }
         }
 
         this.localMeta.indicators = [];
@@ -128,6 +132,7 @@ Fact.prototype.getLocalMeta = function() {
             const localLabel = global.getFromArrayByLang(d.multilingualization, language);
             const defaultLabel = global.getFromArrayByLang(d.multilingualization, "");
             const indicator = {
+                'isShown' : !d.denominatorIsHidden || !d.valueIsHidden,
                 'colorExact': d.colorExact,
                 'preferredColor': d.preferredColor,
                 'caption': global.getFirstValidString(localLabel.caption, defaultLabel.caption, localLabel.description, defaultLabel.description),
@@ -160,13 +165,35 @@ Fact.prototype.getLocalMeta = function() {
     return this.localMeta;
 };
 
+/**
+ * Create a javascript function from a string containing the function's body.
+ * 
+ * @param {String} functionDefinition Definition of the function, like "function (a) {return a}".
+ * @returns {Function} The created javascript function.
+ */
 Fact.prototype.createFunction = function(functionDefinition) {
     if (functionDefinition === null || functionDefinition === undefined || functionDefinition.length === 0) {
         return undefined;
     }
-    console.log(functionDefinition);
     var returnFunction;
     eval("returnFunction = " + functionDefinition);
-    return returnFunction;
-    
+    return returnFunction;    
+};
+
+/**
+ * Set the controls' values as in the argument.
+ * If no argument is given, set the default values.
+ * 
+ * @param {Array} controlValues Values to set.
+ * @returns {undefined}
+ */
+Fact.prototype.setControlValues = function(controlValues) {
+    if (controlValues !== undefined) {
+        this.controlValues = controlValues;        
+    } else if (this.reportMeta.controls !== undefined) {
+        this.controlValues = [];
+        for (var i = 0, iMax = this.reportMeta.controls.length; i < iMax; i++) {
+            this.controlValues.push(this.reportMeta.controls[i].defaultValue);
+        }
+    }    
 };

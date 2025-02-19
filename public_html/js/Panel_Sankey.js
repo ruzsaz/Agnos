@@ -669,8 +669,7 @@ panel_sankey.prototype.drawLabels = function (graph, trans) {
                 return d.uniqueId;
             });
     
-    gLabels.exit()
-            //.transition(trans).attr("opacity", 0)
+    gLabels.exit()            
             .remove();
     
     gLabels = gLabels.enter().append("svg:text")            
@@ -688,6 +687,7 @@ panel_sankey.prototype.drawLabels = function (graph, trans) {
             .text(function(d) {
                 return d.name;
             })
+            .attr("transform", null)
             .attr("fill", function (d) {
                 return global.readableColor(global.color(d.id));
             });
@@ -703,7 +703,7 @@ panel_sankey.prototype.drawLabels = function (graph, trans) {
                 return ((d.y1-d.y0) < global.fontSizeSmall * 0.9 ) ? 0 : 1;                
             });
 
-    // A szövegek összenyomása, hogy elférjenek.    
+    // A szövegek összenyomása, hogy elférjenek.  
     global.cleverCompress(gLabels, that.sankey.nodeWidth() / that.rzscale, 0.9, undefined, false, false, 80);       
 };
 
@@ -743,6 +743,9 @@ panel_sankey.prototype.doChangeValue = function (panelId, value, ratio) {
     if (panelId === undefined || panelId === that.panelId) {
         if (value !== undefined) {
             that.valToShow = (value === -1) ? (that.valToShow + 1) % that.localMeta.indicators.length : value;
+            while (!that.localMeta.indicators[that.valToShow].isShown) {
+                that.valToShow = (that.valToShow + 1) % that.localMeta.indicators.length;
+            }
             that.actualInit.val = that.valToShow;
         }
         if (ratio !== undefined) {

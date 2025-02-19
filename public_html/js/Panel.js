@@ -527,10 +527,10 @@ Panel.prototype.panic = function(panic, reason) {
             // Mindent kitakaró téglalap a rétegre.
             gPanic.append("svg:g")
                     .append("svg:rect")
-                    .attr("width", that.w)
+                    .attr("width", that.w - 20) // Let the close button appear
                     .attr("height", that.h)
-                    .attr("rx", global.rectRounding)
-                    .attr("ry", global.rectRounding);
+                    .attr("rx", 16)
+                    .attr("ry", 16);
 
             // Szöveg a pánikrétegre.
             gPanic.selectAll("text").data([{tooltip: reason || that.defaultPanicText}])

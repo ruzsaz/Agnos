@@ -1777,6 +1777,9 @@ panel_barline.prototype.doChangeValue = function(panelId, value, ratio, targetId
             if (value === -1 && that.singleValMode) {
                 anythingchanged = true;
                 var newVal = (that.legendArray[0].id + 1) % that.localMeta.indicators.length;
+                while (!that.localMeta.indicators[newVal].isShown) {
+                    newVal = (newVal + 1) % that.localMeta.indicators.length;
+                }
                 if (that.valBarNumber === 1) {
                     that.valBarsToShow[0] = newVal;
                 }

@@ -20,7 +20,7 @@ function panel_map(init) {
     this.isColorsLocked = (that.actualInit.range !== undefined);
 
     Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], false, true, 0, 0); // A Panel konstruktorának meghívása.
-    //
+    
     // Ha a kért dimenzió nem ábrázolható, keresünk egy olyat, ami igen.
     if (that.localMeta.dimensions[that.actualInit.dim].is_territorial !== 1) {
         for (var d = 0, dMax = that.localMeta.dimensions.length; d < dMax; d++) {
@@ -1030,6 +1030,9 @@ panel_map.prototype.doChangeValue = function (panelId, value, ratio) {
     if (panelId === undefined || panelId === that.panelId) {
         if (value !== undefined) {
             that.valToShow = (value === -1) ? (that.valToShow + 1) % that.localMeta.indicators.length : value;
+            while (!that.localMeta.indicators[that.valToShow].isShown) {
+                that.valToShow = (that.valToShow + 1) % that.localMeta.indicators.length;
+            }
             that.actualInit.val = that.valToShow;
         }
         if (ratio !== undefined) {
