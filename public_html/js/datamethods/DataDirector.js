@@ -384,12 +384,29 @@ DataDirector.prototype.applyFunction = function(data, controlValues, func, index
  * @returns {undefined} 
  */
 DataDirector.prototype.localizeNewData = function(newData) {
+
+    
     for (var i = 0, iMax = newData.length; i < iMax; i++) {
-        const rows = newData[i].response.rows;
+        
+        const panelData = newData[i];
+        
+        const currentLang = String.locale;
+        const dimIndexKey = panelData.name.split(":");
+        const dictToUse = [];
+        for (var dki = 0, dkiMax = dimIndexKey.length; dki < dkiMax; dki++) {
+            if(dimIndexKey[dki] === '1') {
+                const origLang = global.facts[this.side].reportMeta.dimensions[dki].lang;                                
+                dictToUse.push(global.dictionaries[this.side].getDictionary(origLang, currentLang));
+            }
+        }        
+        
+        const rows = panelData.response.rows;
         for (var r = 0, rMax = rows.length; r < rMax; r++) {
             const dims = rows[r].dims;
             for (var d = 0, dMax = dims.length; d < dMax; d++) {
-                dims[d].name = _(dims[d].name);            
+                const name = dims[d].name;
+                const lookup = dictToUse[d][name];
+                dims[d].name = (lookup === undefined) ? _(dims[d].name) : lookup;            
             }
         }
     }   

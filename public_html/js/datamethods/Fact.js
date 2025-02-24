@@ -53,8 +53,8 @@ Fact.prototype.enrichReportMeta = function(startObject) {
     // Ha van térkép, a térképkód kinyerése;
     for (var i = 0, iMax = this.reportMeta.dimensions.length; i < iMax; i++) {
         const dimType = this.reportMeta.dimensions[i].type;
-        if (typeof dimType === "string" && dimType.search("map") !== -1) {
-            this.reportMeta.mapKey = dimType.replace("map(", "").replace(")", "");
+        if (typeof dimType === "string" && dimType.length > 0) {
+            this.reportMeta.mapKey = dimType;
             break;
         }
     }
@@ -101,6 +101,7 @@ Fact.prototype.getLocalMeta = function() {
                 'id': d.id,
                 'is_territorial': (d.type === "" || d.type === null) ? 0 : 1,
                 'levels': d.allowedDepth + 1,
+                'lang': d.lang,
                 'top_level_caption': global.getFirstValidString(localLabel.topLevelString, defaultLabel.topLevelString)
             };
             this.localMeta.dimensions.push(dimension);

@@ -3,6 +3,7 @@
 'use strict';
 
 var piechartpanel = panel_pie;
+
 /**
  * A tortadiagram konstruktora.
  * 
@@ -14,14 +15,14 @@ function panel_pie(init) {
 
     this.constructorName = "panel_pie";
 
-    // Inicializáló objektum beolvasása, feltöltése default értékekkel.
+    // Reading the initializer object, populating it with default values.
     this.defaultInit = {group: 0, position: undefined, dim: 0, val: 0, ratio: false, mag: 1, frommg: 1, sortbyvalue: false};
     this.actualInit = global.combineObjects(that.defaultInit, init);
 
     Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, false, 0, 0); // A Panel konstruktorának meghívása.
 
-    this.valMultiplier = 1;						// A mutatott érték szorzója.
-    this.fracMultiplier = 1;						// A mutatott érték szorzója.
+    this.valMultiplier = 1;						// The multiplier of the displayed value.
+    this.fracMultiplier = 1;					// The multiplier of the fraction.
     this.dimToShow = that.actualInit.dim;		// A mutatott dimenzió.
     this.valToShow = that.actualInit.val;		// Az ennyiedik mutatót mutatja.
     this.valFraction = that.actualInit.ratio;	// Hányadost mutasson, vagy abszolútértéket?
@@ -88,7 +89,7 @@ function panel_pie(init) {
     });
     that.mediatorIds.push({"channel": "changeDimension", "id": med.id});
 
-    // Panel regisztrálása a nyilvántartóba.
+    // Registering the panel into the registry.
     that.mediator.publish("register", that, that.panelId, [that.dimToShow], that.preUpdate, that.update, that.getConfig);
 }
 

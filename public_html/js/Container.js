@@ -10,6 +10,8 @@
  */
 function Container() {
     global.mapStore = new MapStore();
+    global.dictionaries = [new Dictionaries(), new Dictionaries()];
+    
     this.dataDirector = [];
     var that = this;
     var topdiv = d3.select("body").append("html:div")
@@ -312,8 +314,14 @@ Container.prototype.newReport = function(side, reportSuperMeta, startObject) {
     const that = this;
     global.mediators[side].remove("killListeners");
     that.isSideInUse[side] = true;
-    that.updateHelp(side, reportSuperMeta);    
-    that.loadAllMapsAsync(reportSuperMeta).then(function(result) {
+    that.updateHelp(side, reportSuperMeta);
+    
+    const promises = [
+        that.loadAllMapsAsync(reportSuperMeta),
+        that.loadAllDictsAsync(side, reportSuperMeta)
+    ];
+    
+    Promise.all(promises).then(function(result) {
         global.facts[side] = new Fact(reportSuperMeta, side, that.newReportReady, that, startObject);
         that.newReportReady(side, reportSuperMeta);
     });
@@ -334,6 +342,10 @@ Container.prototype.loadAllMapsAsync = async function(reportSuperMeta){
         }
     }
     return global.mapStore.loadAllAsync(mapNames);
+};
+
+Container.prototype.loadAllDictsAsync = async function(side, reportSuperMeta) {
+    return global.dictionaries[side].loadAllAsync(reportSuperMeta.dictionaries);
 };
 
 /**
@@ -405,6 +417,9 @@ Container.prototype.navigateTo = function(startObject) {
         }
         if (sideInit.v) { // Visualizatzions
             var reportMeta = global.getFromArrayByProperty(global.superMeta, 'name', sideInit.c); // A reporthoz tartozó meta.
+            if(reportMeta === undefined) {
+                throw new Error("No access to the selected report.");
+            }
             sideInit.v = global.minifyInits(sideInit.v, true).split(';'); // A panelek indító konstruktorai.
             for (var i = 0, iMax = sideInit.v.length; i < iMax; i++) {
                 sideInit.v[i] = {'initString' : sideInit.v[i]};

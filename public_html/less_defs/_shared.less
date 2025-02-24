@@ -148,6 +148,9 @@
 @loginButtonColor: @mainToolbarActiveColor;
 @loginButtonHoverColor: @mainToolbarHoverColor;
 
+/* Control elements' color*/
+@accentColor: @scrollbarColor;
+
 /* Report-kártyák */
 @cardGap: 20px;
 @cardRounding: calc(~"0.8 * " @rounding);
@@ -212,6 +215,7 @@
     font-family: arial, sans-serif;
     background-size: cover;
     -webkit-tap-highlight-color: transparent;
+    accent-color: @accentColor;
 }
 
 body.mobile .hideForMobile {
@@ -2183,7 +2187,8 @@ body.embedded .titleButton1:hover ~ .titleText1 {
     position: relative;
     left: 4em;
     pointer-events: all !important;
-    
+    width: 8em;
+    max-height: 15px;    
 }
 
 .control.radio {

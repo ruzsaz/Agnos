@@ -43,6 +43,7 @@ and open the template in the editor.
 /* Ennyi bejegyzés lehet a legend-ben. */
 /* Panel nagyító fül */
 /* Kilépés, belépés gomb */
+/* Control elements' color*/
 /* Report-kártyák */
 @import url('../data/fonts/fontawesome.css');
 @import url('../data/fonts/solid.css');
@@ -181,6 +182,7 @@ and open the template in the editor.
   font-family: arial, sans-serif;
   background-size: cover;
   -webkit-tap-highlight-color: transparent;
+  accent-color: rgba(255, 207, 144, 0.7);
 }
 body.mobile .hideForMobile {
   display: none !important;
@@ -2791,6 +2793,8 @@ body.embedded .titleButton1:hover ~ .titleText1 {
   position: relative;
   left: 4em;
   pointer-events: all !important;
+  width: 8em;
+  max-height: 15px;
 }
 .control.radio {
   display: inline-flex;

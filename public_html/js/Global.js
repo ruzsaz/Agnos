@@ -30,7 +30,7 @@ var _ = function (string) {
 /**
  * A globális változók elérését biztosító namespace. (Valójában property-tömb.)
  * 
- * @type _L101.Anonym$8
+ * @type Object
  */
 var global = function () {
 
@@ -2044,6 +2044,7 @@ var global = function () {
         saveToBookmarkRequired: agnosConfig.saveToBookmarkRequired, // Írja-e bookmarkba a pillanatnyi állapotot?
         facts: [], // Az adatokat tartalmazó 2 elemű tömb.
         mapStore: undefined,
+        dictionaries: [],
         maxPanelCount: 6, // Egy oldalon levő panelek maximális száma.		
         panelNumberOnScreen: undefined, // Megjelenítendő panelszám soronként.
         oldPanelNumberOnScreen: undefined, // Megjelenítendő panelszám soronként.        

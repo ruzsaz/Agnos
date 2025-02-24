@@ -1,0 +1,33 @@
+{
+    "fromLanguage": "en",
+    "toLanguage": "hu",
+    "dictionary": {
+        "Austria": "Ausztria",
+        "Belgium": "Belgium",
+        "Bulgaria": "Bulgária",
+        "Croatia": "Horvátország",
+        "Cyprus": "Ciprus",
+        "Czech Republic": "Csehország",
+        "Denmark": "Dánia",
+        "Estonia": "Észtország",
+        "Finland": "Finnország",
+        "France": "Franciaország",
+        "Germany": "Németország",
+        "Greece": "Görögország",
+        "Hungary": "Magyarország",
+        "Ireland": "Írország",
+        "Italy": "Olaszország",
+        "Latvia": "Lettország",
+        "Lithuania": "Litvánia",
+        "Luxembourg": "Luxemburg",
+        "Malta": "Málta",
+        "Netherlands": "Hollandia",
+        "Poland": "Lengyelország",
+        "Portugal": "Portugália",
+        "Romania": "Románia",
+        "Slovakia": "Szlovákia",
+        "Slovenia": "Szlovénia",
+        "Spain": "Spanyolország",
+        "Sweden": "Svédország"
+    }
+}

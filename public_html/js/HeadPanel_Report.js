@@ -252,7 +252,7 @@ function HeadPanel_Report(init, reportMeta, startScale) {
     }
     
 
-    // Érték tábla feltöltése a meta alapján
+   // Filling the value table based on the meta
     var newValRow = that.valTable.selectAll(".row").data(that.meta.indicators)
             .enter().append("html:div")
             .attr("class", function (d) {
@@ -532,7 +532,7 @@ HeadPanel_Report.prototype.prepareData = function (data) {
 
     // Dimenziók aktuális értékeinek elkészítése.
     for (var i = 0, iMax = (global.baseLevels[that.panelSide]).length; i < iMax; i++) {
-        var baseDim = (global.baseLevels[that.panelSide])[i];        
+        var baseDim = (global.baseLevels[that.panelSide])[i];
         var pathString = that.localMeta.dimensions[i].top_level_caption;
         for (var d = 0, dMax = baseDim.length; d < dMax; d++) {
             pathString = pathString + that.dimLevelsSeparator + baseDim[d].name.trim();
