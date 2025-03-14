@@ -47,7 +47,6 @@ and open the template in the editor.
 /* Report-kártyák */
 @import url('../data/fonts/fontawesome.css');
 @import url('../data/fonts/solid.css');
-@import url('../data/fonts/blue.css');
 #less .panelWidth {
   width: 600px;
 }
@@ -58,49 +57,49 @@ and open the template in the editor.
   width: 6px;
 }
 #less .elementBorderSize {
-  width: 1px;
+  width: 0px;
 }
 #less .rounding {
-  width: 5px;
+  width: 10px;
 }
 #less .writeOnDimColor {
-  color: #000;
+  color: white;
 }
 #less .writeOnValColor {
-  color: #000;
+  color: black;
 }
 #less .writeOnValColor2 {
   color: white;
 }
 #less .highlightColor {
-  color: #ffe;
+  color: white;
 }
 #less .dimHighlightColor {
-  color: #ffe;
+  color: black;
 }
 #less .panelWriteColor {
-  color: #000;
+  color: white;
 }
 #less .panelBackgroundColor {
-  color: #f8f8f8;
+  color: #343434;
 }
 #less .switchColor {
-  color: #003f61;
+  color: #40bddf;
 }
 #less .oddColor {
-  color: #6ED1FF;
+  color: #555;
 }
 #less .evenColor {
-  color: rgba(221, 221, 221, 0.842);
+  color: #666;
 }
 #less .stripeWidth {
   width: 8px;
 }
 #less .axisTextOpacity {
-  opacity: 0.4;
+  opacity: 1;
 }
 #less .fontSizeSmall {
-  width: 14px;
+  width: 12px;
 }
 #less .fontSizeTiny {
   width: 11px;
@@ -112,67 +111,67 @@ and open the template in the editor.
   width: 12px;
 }
 #less .valColorNA {
-  color: #dbdada;
+  color: grey;
 }
 #less .valColor20 {
-  color: #fffc5f;
+  color: #0885a4;
 }
 #less .valColor19 {
-  color: #169dd3;
+  color: #7d9c53;
 }
 #less .valColor18 {
-  color: #13b313;
+  color: #c2b211;
 }
 #less .valColor17 {
-  color: #e2e042;
+  color: #badb8e;
 }
 #less .valColor16 {
-  color: #33abc0;
+  color: #b8bf5a;
 }
 #less .valColor15 {
-  color: #94ff94;
+  color: #f7e306;
 }
 #less .valColor14 {
-  color: #c7ff46;
+  color: #bfe8f6;
 }
 #less .valColor13 {
-  color: #a1f1ff;
+  color: #9ccf61;
 }
 #less .valColor12 {
-  color: #eeff00;
+  color: #80d4e9;
 }
 #less .valColor11 {
-  color: #24b424;
+  color: #3db8a3;
 }
 #less .valColor10 {
-  color: #1ad1d1;
+  color: #d4cc4c;
 }
 #less .valColor9 {
-  color: #56eb56;
+  color: #43b57c;
 }
 #less .valColor8 {
-  color: #e0eb45;
+  color: #9eb060;
 }
 #less .valColor7 {
-  color: #48cc0b;
+  color: #00a6d3;
 }
 #less .valColor6 {
-  color: #36bcfa;
+  color: #faeb4c;
 }
 #less .valColor5 {
-  color: #0a84c5;
+  color: #85c222;
 }
 #less .valColor4 {
-  color: #0f9ce7;
+  color: #22ada6;
 }
 #less .valColor3 {
-  color: #2db6ff;
+  color: #8c8014;
 }
 #less .valColor2 {
-  color: #57c4ff;
+  color: #bad642;
 }
 #less .valColor1 {
-  color: #9dddff;
+  color: #40bddf;
 }
 * {
   -moz-user-select: -moz-none;
@@ -183,7 +182,7 @@ and open the template in the editor.
   font-family: arial, sans-serif;
   background-size: cover;
   -webkit-tap-highlight-color: transparent;
-  accent-color: #3b91e8;
+  accent-color: #40bddf;
 }
 body.mobile .hideForMobile {
   display: none !important;
@@ -209,11 +208,11 @@ body {
   padding: 0px;
   overflow-x: hidden;
   overflow-y: hidden;
-  background: #fdfdfd;
-  color: #000;
+  background: black;
+  color: white;
 }
 body::backdrop {
-  background-color: #fdfdfd;
+  background-color: black;
 }
 svg {
   overflow: hidden;
@@ -224,7 +223,7 @@ svg {
 #topdiv {
   width: 100%;
   overflow: hidden;
-  background-image: url('../data/pictures/blue.jpg');
+  background-image: none;
 }
 #progressDiv {
   position: absolute;
@@ -279,8 +278,8 @@ svg {
   overflow: hidden;
 }
 .panel:not(.cardPanelHolder) {
-  box-shadow: 0px 0px 0px 1px #aaa, 3px 3px 6px 2px #666;
-  border-radius: 5px;
+  box-shadow: 0px 0px 0px 0px white;
+  border-radius: 10px;
   padding: 0px;
   float: left;
   width: 600px;
@@ -313,14 +312,14 @@ svg {
   padding: 0px 8px 5px 8px;
 }
 .mainTitle {
-  color: #000;
+  color: white;
   text-align: center;
-  font-size: 28px;
+  font-size: 20px;
   padding-top: 16px;
   padding-bottom: 0px;
 }
 .panelMask {
-  background: #f8f8f8;
+  background: #343434;
   width: 100%;
   height: 100%;
   position: absolute;
@@ -335,47 +334,47 @@ svg {
 /* Ez azért kell, hogy az elmentett panel-képen is ott legyen a háttér */
 .backgroundForSave {
   opacity: 1;
-  rx: 5px;
-  fill: #f8f8f8;
+  rx: 10px;
+  fill: #343434;
 }
 /* Panel */
 .panic rect {
-  fill: #f8f8f8;
+  fill: #343434;
 }
 /* Panel */
 .panic text {
-  fill: #000;
+  fill: black;
 }
 .panel.double:not(.cardPanelHolder) {
   width: 600px;
   overflow: hidden;
   position: relative;
   height: auto;
-  background: #f8f8f8;
+  background: #343434;
 }
 .label {
-  fill: #000;
-  font-size: 14px;
+  fill: white;
+  font-size: 12px;
   font-weight: bold;
 }
 div.tooltip {
   position: absolute;
   text-align: center;
-  color: #444;
+  color: white;
   min-width: 30px;
   min-height: 8px;
   max-width: 45vw;
   padding: 6px 12px;
-  background: #fdfdfd;
-  border: 1px solid #aaa;
-  border-radius: 5px;
+  background: black;
+  border: 0px solid white;
+  border-radius: 10px;
   pointer-events: none;
   font-size: 16px;
   z-index: 500;
   text-align: left;
 }
 div.tooltip em {
-  font-size: 18px;
+  font-size: 16px;
 }
 div.tooltip ul {
   list-style-position: inside;
@@ -389,18 +388,18 @@ div.tooltip h4 {
   margin: 2px 0px;
 }
 .bordered {
-  stroke-width: 1px;
-  stroke: #555;
+  stroke-width: 0px;
+  stroke: black;
 }
 .axis path,
 .axis line {
   fill: none;
-  stroke: #000;
+  stroke: white;
   stroke-width: 2;
 }
 /* Panel_Pie */
 .pieTicks {
-  stroke: #000;
+  stroke: white;
 }
 /* Panel_Pie */
 .pieTicks,
@@ -421,7 +420,7 @@ div.tooltip h4 {
 }
 /* Panel_Map */
 .subunit {
-  stroke: #555;
+  stroke: black;
 }
 /* Panel_Map */
 mask path {
@@ -430,7 +429,7 @@ mask path {
 /* Panel_Map */
 .gPoiLegend rect {
   opacity: 0.6;
-  fill: #fdfdfd;
+  fill: black;
 }
 /* Panel_Map */
 .poiLegend rect {
@@ -438,12 +437,12 @@ mask path {
 }
 /* Panel_Map */
 .poiLegend:not(.inactive) text {
-  fill: #000;
+  fill: white;
 }
 /* Panel_Map */
 .poiLegend.inactive path,
 .poiLegend.inactive text {
-  fill: #999;
+  fill: #6d6d6d;
 }
 /* Panel_Map */
 .gPoi.inactive {
@@ -456,87 +455,87 @@ mask path {
 }
 /* Panel_Sankey */
 g.sankey_links .link {
-  stroke: #000;
+  stroke: white;
   fill: none;
   clip-path: border-box;
 }
 g.sankey_nodes_shadow .nodeShadow {
-  fill: #f8f8f8;
+  fill: #343434;
 }
 .gPoi.noText text {
   display: none;
   opacity: 0;
 }
 .gPoi text {
-  text-shadow: 0px 0px 3px #000;
+  text-shadow: 0px 0px 3px white;
 }
 .units {
-  font-size: 14px;
-  fill: #000;
+  font-size: 12px;
+  fill: white;
 }
 .axisY text {
   font-size: 11px;
   font-weight: normal;
-  fill: #000;
+  fill: white;
 }
 .dimensionLabel {
   font-size: 11px;
   font-weight: normal;
-  fill: #000;
+  fill: white;
   opacity: 0.6;
 }
 /* Panel_Table2D, Panel_Table1D */
 .svgRowHeadLabel {
-  font-size: 14px;
-  fill: #000;
+  font-size: 12px;
+  fill: white;
   text-anchor: beginning;
 }
 /* Panel_Table2D, Panel_Table1D */
 .svgTableCell,
 .svgColumnHeadLabel {
-  font-size: 14px;
-  fill: #000;
+  font-size: 12px;
+  fill: white;
   text-anchor: middle;
 }
 /* Panel_Table2D */
 .svgTableHolder rect {
   stroke-width: 1;
-  stroke: #f8f8f8;
+  stroke: #343434;
 }
 /* Panel_Table2D */
 .alterColored[parity="0"] > .backgroundRect {
-  fill: rgba(221, 221, 221, 0.842);
+  fill: #666;
 }
 /* Panel_Table2D */
 .alterColored[parity="1"] > .backgroundRect {
-  fill: #6ED1FF;
+  fill: #555;
 }
 /* Panel_Table2D */
 .alterColored[parity="1"] > .alterColored[parity="0"] > .backgroundRect,
 .alterColored[parity="0"] > .alterColored[parity="1"] > .backgroundRect {
-  fill: #bbb;
+  fill: #606060;
 }
 /* Panel_Table1D */
 .svgColumnHead.showValue text,
 .svgTableCell.showValue text {
-  fill: #000;
+  fill: black;
 }
 /* Panel_BarLine */
 .avg_group text {
-  font-size: 14px;
+  font-size: 12px;
   font-style: italic;
 }
 .value {
-  font-size: 14px;
-  fill: #78bbdf;
+  font-size: 12px;
+  fill: #c2b211;
 }
 .legend {
-  font-size: 14px;
+  font-size: 12px;
 }
 .titleText {
-  font-size: 28px;
+  font-size: 20px;
   font-weight: bold;
-  fill: #000;
+  fill: black;
 }
 /* Panel_BarLine */
 .lineChart {
@@ -549,7 +548,7 @@ g.sankey_nodes_shadow .nodeShadow {
 }
 /* Panel_BarLine */
 .top_10_holder {
-  fill: #eee;
+  fill: #444;
 }
 /* universal */
 .noEvents {
@@ -557,13 +556,13 @@ g.sankey_nodes_shadow .nodeShadow {
 }
 /* Panel_BarLine */
 .lineSymbol {
-  stroke-width: 1px;
-  stroke: #555;
+  stroke-width: 0px;
+  stroke: black;
 }
 /* Panel_BarLine */
 .shadow {
-  fill: #f8f8f8;
-  stroke: #f8f8f8;
+  fill: #343434;
+  stroke: #343434;
 }
 .divTableBase {
   margin: 0px 4px 16px;
@@ -590,13 +589,13 @@ g.sankey_nodes_shadow .nodeShadow {
   z-index: 1;
 }
 .card {
-  color: #000;
+  color: white;
   position: relative;
-  width: calc(300px -  20px);
+  width: calc(300px - 20px);
   height: 200px;
-  background: #f8f8f8;
-  border-radius: calc(0.8 *  5px);
-  box-shadow: 0px 0px 0px 1px #aaa, 3px 3px 6px 2px #666;
+  background: #343434;
+  border-radius: calc(0.8 * 10px);
+  box-shadow: 0px 0px 0px 0px white;
   flex-grow: 1;
   padding: 0px 0px;
   overflow: hidden;
@@ -623,7 +622,7 @@ g.sankey_nodes_shadow .nodeShadow {
 }
 .cardCell.kpi {
   font-size: 50px;
-  color: #000;
+  color: white;
   position: absolute;
   height: 100%;
   align-content: center;
@@ -647,7 +646,7 @@ g.sankey_nodes_shadow .nodeShadow {
   width: 30%;
   margin-left: 70%;
   margin-right: 0%;
-  color: #000;
+  color: black;
   top: 6px;
 }
 .card.collector > .cardCell.kpi > span {
@@ -661,7 +660,7 @@ g.sankey_nodes_shadow .nodeShadow {
   width: 100%;
   justify-content: space-evenly;
   display: inline-flex;
-  background-color: #6ED1FF;
+  background-color: #555;
   padding-left: 1ex;
   padding-right: 1ex;
   box-sizing: border-box;
@@ -683,19 +682,19 @@ g.sankey_nodes_shadow .nodeShadow {
   position: absolute;
   font-size: 1.6em;
   color: black;
-  height: calc(100% -  28px);
-  top: calc(-8px +  28px);
+  height: calc(100% - 28px);
+  top: calc(-8px + 28px);
   box-sizing: content-box;
 }
 .card.collector > .cardCell.name {
-  color: #000;
+  color: black;
 }
 .cardCell.hrule {
   position: absolute;
-  bottom: calc(6px + 3 *  14px);
+  bottom: calc(6px + 3 * 12px);
   width: 50%;
   height: 1px;
-  background: #000;
+  background: white;
   padding: 0px;
   margin-left: 0.6rem;
 }
@@ -711,11 +710,11 @@ g.sankey_nodes_shadow .nodeShadow {
 }
 .cardCell.description {
   position: absolute;
-  font-size: 14px;
-  line-height: calc(2px +  14px);
-  height: calc(4px + 2 *  14px);
-  color: #78bbdf;
-  top: calc(100% -  calc(6px + 3 *  14px));
+  font-size: 12px;
+  line-height: calc(2px + 12px);
+  height: calc(4px + 2 * 12px);
+  color: #c2b211;
+  top: calc(100% - calc(6px + 3 * 12px));
   margin-left: 0.6rem;
   margin-right: 1.6rem;
   overflow: hidden;
@@ -730,9 +729,9 @@ g.sankey_nodes_shadow .nodeShadow {
   left: calc(50% - 1em);
   bottom: 0px;
   box-sizing: border-box;
-  font-size: 14px;
-  color: #fdfdfd;
-  line-height: 14px;
+  font-size: 12px;
+  color: black;
+  line-height: 12px;
   font-style: italic;
 }
 .cardCell.time text {
@@ -758,12 +757,12 @@ g.sankey_nodes_shadow .nodeShadow {
 }
 /* HeadPanel */
 .halfHead .table {
-  color: #000;
+  color: white;
 }
 /* HeadPanel */
 .table {
   display: table;
-  color: #000;
+  color: white;
   border-spacing: 0px 8px;
   width: 200%;
 }
@@ -818,10 +817,10 @@ g.sankey_nodes_shadow .nodeShadow {
   width: calc(297px - 20px / 2);
   padding: 0 10px;
   height: 40px;
-  color: #000;
-  background: #f8f8f8;
-  border: 1px solid #000;
-  border-radius: 5px;
+  color: white;
+  background: #343434;
+  border: 0px solid white;
+  border-radius: 10px;
   -moz-outline-radius: 3px;
   box-sizing: border-box;
   z-index: 2;
@@ -839,7 +838,7 @@ g.sankey_nodes_shadow .nodeShadow {
   justify-content: center;
   position: fixed;
   top: 42px;
-  font-size: 28px;
+  font-size: 20px;
   margin: auto;
   z-index: -1;
 }
@@ -854,24 +853,24 @@ g.sankey_nodes_shadow .nodeShadow {
   width: 160px;
   height: 40px;
   text-align: center;
-  color: #90e0ef;
+  color: #000000;
   cursor: pointer;
   font-size: 26px;
-  border-radius: 5px;
-  border: 1px solid #aaa;
+  border-radius: 10px;
+  border: 0px solid white;
   align-content: center;
-  background-color: #005481;
+  background-color: #bad642;
   box-shadow: inset 0px -24px 24px -12px rgba(0, 0, 0, 0.2), 3px 3px 9px rgba(0, 0, 0, 0.75);
   -webkit-box-shadow: inset 0px -24px 24px -12px rgba(0, 0, 0, 0.2), 3px 3px 9px rgba(0, 0, 0, 0.75);
   -moz-box-shadow: inset 0px -24px 24px -12px rgba(0, 0, 0, 0.2), 3px 3px 9px rgba(0, 0, 0, 0.75);
   z-index: 2;
 }
 .greetingBadge .logoutLink:hover {
-  color: #fff;
-  border-color: #fff;
+  color: #ffffff;
+  border-color: #ffffff;
 }
 .greetingBadge.loggedin .logoutLink {
-  background-color: #003f61;
+  background-color: #40bddf;
 }
 .singleWidth .greetingBadge .greeting {
   top: 88px;
@@ -899,16 +898,16 @@ g.sankey_nodes_shadow .nodeShadow {
 .dimTable .tableText0,
 .dimTable .tableText1,
 .dimTable .backgroundCell {
-  color: #000;
+  color: white;
 }
 .valTable .tableText0,
 .valTable .tableText1,
 .valTable .tableText2,
 .valTable .backgroundCell {
-  color: #000;
+  color: black;
 }
 .heading .cell {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
 }
 .valTable .realText {
@@ -960,18 +959,18 @@ g.sankey_nodes_shadow .nodeShadow {
 }
 /* HeadPanel */
 .alterColored[parity="0"] .backgroundCell {
-  background: rgba(221, 221, 221, 0.842);
+  background: #666;
 }
 /* HeadPanel */
 .alterColored[parity="1"] .backgroundCell {
-  background: #6ED1FF;
+  background: #555;
 }
 .row .backgroundCell {
-  border-radius: 5px;
-  border: 1px solid black;
-  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.55);
-  -webkit-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.55);
-  -moz-box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.55);
+  border-radius: 10px;
+  border: 0px solid white;
+  box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.75);
+  -webkit-box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.75);
+  -moz-box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.75);
 }
 /* HeadPanel */
 .alterColored[parity="hidden"] {
@@ -984,7 +983,7 @@ g.sankey_nodes_shadow .nodeShadow {
 }
 @media (pointer: fine) {
   .hoverable:hover text {
-    color: #ffe;
+    color: white;
   }
 }
 .hoverable:active text {
@@ -993,7 +992,7 @@ g.sankey_nodes_shadow .nodeShadow {
   -moz-transition: color 0s linear !important;
   -ms-transition: color 0s linear !important;
   -o-transition: color 0s linear !important;
-  color: #ffe !important;
+  color: white !important;
 }
 .hoverable text {
   transition: color 0.01s linear;
@@ -1005,8 +1004,8 @@ g.sankey_nodes_shadow .nodeShadow {
 /* Cointainer, drag réteg */
 .dragCircle {
   background: lightGrey;
-  border-radius: 5px;
-  border: 2px solid #fdfdfd;
+  border-radius: 10px;
+  border: 2px solid black;
   z-index: 900;
   position: absolute;
   display: none;
@@ -1022,7 +1021,7 @@ g.sankey_nodes_shadow .nodeShadow {
   pointer-events: none;
   color: red;
   width: 400px;
-  box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.55);
+  box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.75);
 }
 .button {
   display: inline-block;
@@ -1042,15 +1041,15 @@ g.sankey_nodes_shadow .nodeShadow {
   cursor: default;
 }
 .titleRect {
-  stroke-width: 1px;
+  stroke-width: 0px;
   opacity: 0;
-  fill: #57c4ff;
+  fill: #aaaaaa;
 }
 /* ha fölötte van az egér */
 @media (pointer: fine) {
   .titleButton0:hover ~ .titleText0,
   .titleButton1:hover ~ .titleText1 {
-    fill: #ffe;
+    fill: white;
   }
 }
 .titleButton0:active ~ .titleText0,
@@ -1060,7 +1059,7 @@ g.sankey_nodes_shadow .nodeShadow {
   -moz-transition: fill 0s linear !important;
   -ms-transition: fill 0s linear !important;
   -o-transition: fill 0s linear !important;
-  fill: #ffe !important;
+  fill: white !important;
 }
 .titleText {
   dy: 0.35em;
@@ -1074,10 +1073,10 @@ g.sankey_nodes_shadow .nodeShadow {
   -o-transition: fill 0.01s linear;
 }
 body {
-  -ms-scrollbar-face-color: #3b91e8;
-  -ms-scrollbar-track-color: #fdfdfd;
-  -ms-scrollbar-arrow-color: #3b91e8;
-  -ms-scrollbar-shadow-color: #3b91e8;
+  -ms-scrollbar-face-color: #40bddf;
+  -ms-scrollbar-track-color: black;
+  -ms-scrollbar-arrow-color: #40bddf;
+  -ms-scrollbar-shadow-color: #40bddf;
 }
 ::-webkit-scrollbar {
   width: 12px;
@@ -1085,21 +1084,21 @@ body {
 }
 /* Track */
 ::-webkit-scrollbar-track {
-  -webkit-border-radius: 0px;
-  border-radius: 0px;
-  background: #fdfdfd;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  background: black;
 }
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  -webkit-border-radius: 0px;
-  border-radius: 0px;
-  background: #3b91e8;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  background: #40bddf;
   box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5);
   -moz-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5);
 }
 ::-webkit-scrollbar-thumb:window-inactive {
-  background: #3b91e8;
+  background: #40bddf;
 }
 p {
   margin: 20px 0 0;
@@ -1115,24 +1114,24 @@ p.submit {
 }
 :-moz-placeholder {
   color: #c9c9c9 !important;
-  font-size: 18px;
+  font-size: 16px;
 }
 ::-webkit-input-placeholder {
-  color: #000;
-  font-size: 18px;
+  color: #555;
+  font-size: 16px;
 }
 input {
-  font-size: 18px;
+  font-size: 16px;
 }
 input[type=text],
 input[type=password] {
   width: 278px;
   padding: 0 10px;
   height: 34px;
-  color: #000;
-  background: #dbdada;
-  border: 1px solid #000;
-  border-radius: 5px;
+  color: #343434;
+  background: white;
+  border: 0px solid white;
+  border-radius: 10px;
   -moz-outline-radius: 3px;
 }
 input[type=text],
@@ -1152,9 +1151,9 @@ input[type=submit]:focus,
 button:focus,
 textarea:focus {
   outline: none;
-  box-shadow: 0 0 10px #ffe;
-  -webkit-box-shadow: 0 0 10px #ffe;
-  -moz-box-shadow: 0 0 10px #ffe;
+  box-shadow: 0 0 10px white;
+  -webkit-box-shadow: 0 0 10px white;
+  -moz-box-shadow: 0 0 10px white;
 }
 input[type=submit],
 button {
@@ -1162,10 +1161,10 @@ button {
   padding: 0 18px;
   height: 29px;
   font-size: 16px;
-  color: #000;
-  background: #6ED1FF;
-  border: 1px solid #aaa;
-  border-radius: 5px;
+  color: white;
+  background: #555;
+  border: 0px solid white;
+  border-radius: 10px;
 }
 /* universal */
 text {
@@ -2122,7 +2121,7 @@ text {
 #mainToolbar nav ul ul {
   padding: 0;
   top: 100%;
-  border-radius: 5px;
+  border-radius: 10px;
   display: block;
   opacity: 0;
   position: absolute;
@@ -2135,7 +2134,7 @@ body.mobile #mainToolbar nav ul ul {
   right: -0.6em;
 }
 #mainToolbar nav ul {
-  background: #3b91e8;
+  background: #888888;
   padding: 0 20px;
   margin-top: 0px;
 }
@@ -2143,8 +2142,8 @@ body.mobile #mainToolbar nav ul ul {
   height: 1em;
   width: 100vw;
   padding: 0px;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 #mainToolbar nav ul li {
   float: left;
@@ -2165,15 +2164,15 @@ svg.plusButtonHelp {
   min-width: 1em;
   max-width: 1.375em;
   width: 5%;
-  border-bottom-left-radius: 5px;
-  background: #003f61;
+  border-bottom-left-radius: 10px;
+  background: #40bddf;
 }
 #mainToolbar > nav > ul > li#mainMinusButton,
 svg.minusButtonHelp {
   min-width: 1em;
   max-width: 1.375em;
   width: 5%;
-  background: #005481;
+  background: #bad642;
 }
 #mainToolbar > nav > ul > li#mainCloseButton,
 svg.closeButtonHelp {
@@ -2181,8 +2180,8 @@ svg.closeButtonHelp {
   min-width: 1em;
   max-width: 1.375em;
   width: 5%;
-  border-bottom-right-radius: 5px;
-  background: #003f61;
+  border-bottom-right-radius: 10px;
+  background: #40bddf;
 }
 #mainToolbar > nav > ul > li#mainSwitchButton,
 #mainToolbar > nav > ul > li#fullScreenButton,
@@ -2191,7 +2190,7 @@ svg.switchButtonHelp {
   min-width: 1em;
   max-width: 1.375em;
   width: 5%;
-  background: #005481;
+  background: #bad642;
 }
 #mainToolbar > nav > ul > li.languageSwitch,
 #mainToolbar > nav > ul > li.cssSwitch {
@@ -2201,8 +2200,8 @@ svg.switchButtonHelp {
   height: 1em;
   width: 100vw;
   padding: 0px;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 #mainToolbar nav ul li > span {
   width: 100%;
@@ -2211,19 +2210,19 @@ svg.switchButtonHelp {
 #mainToolbar nav ul li:not(:hover) > span > svg > *,
 #mainToolbar nav ul li:hover:not(.inactive) > span:not(:hover):not(.inactive) > svg > *,
 .helpContent svg * {
-  stroke: #90e0ef;
+  stroke: #000000;
 }
 /* Egy nem inaktív ikon fölé menve váltson aktív színre. */
 @media (pointer: fine) {
   #mainToolbar nav ul li:hover:not(.inactive) > span:hover:not(.inactive) > svg > *:not(.nohover) {
-    stroke: #fff !important;
+    stroke: #ffffff !important;
   }
 }
 /* Mobilon, ha nyitva van az almenü, a főmenü színe maradjon világos */
 @media (pointer: coarse) {
   #mainToolbar nav ul li.switch:hover,
   #mainToolbar nav ul li.newpanel:hover {
-    stroke: #fff !important;
+    stroke: #ffffff !important;
   }
 }
 /* Mobilon múljon el a gomb színezése a klikk után. */
@@ -2234,7 +2233,7 @@ svg.switchButtonHelp {
   #mainToolbar nav ul li#fullScreenButton:hover:not(.inactive) > span:hover:not(.inactive) > svg > *:not(.nohover),
   #mainToolbar nav ul li#mainCloseButton:hover:not(.inactive) > span:hover:not(.inactive) > svg > *:not(.nohover),
   #mainToolbar nav ul li.save:hover:not(.inactive) > span:hover:not(.inactive) > svg > *:not(.nohover) {
-    stroke: #90e0ef;
+    stroke: #000000;
   }
 }
 #mainToolbar nav ul li:active:not(.inactive) > span:active:not(.inactive) > svg > *:not(.nohover) {
@@ -2243,7 +2242,7 @@ svg.switchButtonHelp {
   -moz-transition: stroke 0s linear !important;
   -ms-transition: stroke 0s linear !important;
   -o-transition: stroke 0s linear !important;
-  stroke: #fff !important;
+  stroke: #ffffff !important;
 }
 /* Az ikonok svg-rajzolási stílusa. */
 #mainToolbar svg *,
@@ -2260,7 +2259,7 @@ svg.switchButtonHelp {
 /* Inaktív ikon szín és viselkedés-megadása. */
 #mainToolbar nav ul li.inactive > span,
 #mainToolbar nav ul li > span.inactive {
-  stroke: #90e0ef;
+  stroke: #000000;
   opacity: 0.2;
   cursor: default;
   pointer-events: none;
@@ -2272,7 +2271,7 @@ svg.switchButtonHelp {
 }
 #mainToolbar nav ul li span {
   display: block;
-  color: #90e0ef;
+  color: #000000;
   text-decoration: none;
   text-align: center;
   height: 1em;
@@ -2280,10 +2279,10 @@ svg.switchButtonHelp {
   margin: auto;
 }
 #mainToolbar nav ul ul li {
-  background: #3b91e8;
+  background: #888888;
   float: none;
-  border-top: 1px solid #bbb;
-  border-bottom: 1px solid #999;
+  border-top: 1px solid #a0a0a0;
+  border-bottom: 1px solid #6d6d6d;
   position: relative;
   width: 180px;
   display: flex;
@@ -2292,46 +2291,46 @@ svg.switchButtonHelp {
 #mainToolbar nav ul li.switch li:not(:hover) text,
 #mainToolbar nav ul li.switch li:hover:not(.inactive) > span:not(:hover):not(.inactive) {
   stroke-width: 0.5;
-  fill: #90e0ef;
-  color: #90e0ef;
+  fill: #000000;
+  color: #000000;
 }
 /* Egy nem inaktív ikon fölé menve váltson aktív színre. */
 #mainToolbar nav ul li.switch li:hover:not(.inactive) > span:not(.inactive) {
   stroke-width: 0.5;
-  fill: #fff;
-  color: #fff;
+  fill: #ffffff;
+  color: #ffffff;
 }
 #mainToolbar nav ul li.switch ul span {
   margin: 0px;
-  font-size: 28px;
+  font-size: 20px;
 }
 #mainToolbar nav ul ul li:first-child {
-  background: top, #3b91e8 0%, #3b91e8 50%;
-  background: linear-gradient(top, #3b91e8 0%, #3b91e8 50%);
-  background: -moz-linear-gradient(top, #3b91e8 0%, #3b91e8 50%);
-  background: -webkit-linear-gradient(top, #3b91e8 0%, #3b91e8 50%);
-  background: -ms-linear-gradient(top, #3b91e8 0%, #3b91e8 50%);
-  background: -o-linear-gradient(top, #3b91e8 0%, #3b91e8 50%);
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
+  background: top, #a0a0a0 0%, #888888 50%;
+  background: linear-gradient(top, #a0a0a0 0%, #888888 50%);
+  background: -moz-linear-gradient(top, #a0a0a0 0%, #888888 50%);
+  background: -webkit-linear-gradient(top, #a0a0a0 0%, #888888 50%);
+  background: -ms-linear-gradient(top, #a0a0a0 0%, #888888 50%);
+  background: -o-linear-gradient(top, #a0a0a0 0%, #888888 50%);
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 #mainToolbar nav ul ul li:last-child {
-  background: top, #3b91e8 50%, #3b91e8 100%;
-  background: linear-gradient(top, #3b91e8 50%, #3b91e8 100%);
-  background: -moz-linear-gradient(top, #3b91e8 50%, #3b91e8 100%);
-  background: -webkit-linear-gradient(top, #3b91e8 50%, #3b91e8 100%);
-  background: -ms-linear-gradient(top, #3b91e8 50%, #3b91e8 100%);
-  background: -o-linear-gradient(top, #3b91e8 50%, #3b91e8 100%);
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  background: top, #888888 50%, #6d6d6d 100%;
+  background: linear-gradient(top, #888888 50%, #6d6d6d 100%);
+  background: -moz-linear-gradient(top, #888888 50%, #6d6d6d 100%);
+  background: -webkit-linear-gradient(top, #888888 50%, #6d6d6d 100%);
+  background: -ms-linear-gradient(top, #888888 50%, #6d6d6d 100%);
+  background: -o-linear-gradient(top, #888888 50%, #6d6d6d 100%);
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
 }
 #mainToolbar nav ul ul li span {
   padding: 9px 0px;
   height: 32px;
   line-height: 32px;
-  color: #90e0ef;
-  border-left: 1px solid #bbb;
-  border-right: 1px solid #999;
+  color: #000000;
+  border-left: 1px solid #a0a0a0;
+  border-right: 1px solid #6d6d6d;
   width: 50%;
 }
 #mainToolbar nav ul ul li span:only-child {
@@ -2358,8 +2357,8 @@ svg.switchButtonHelp {
   width: 100vw;
   height: 1em;
   background: rgba(0, 0, 0, 0);
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
   box-shadow: inset 0px -24px 24px -12px rgba(0, 0, 0, 0.2), 3px 3px 9px rgba(0, 0, 0, 0.75);
   -webkit-box-shadow: inset 0px -24px 24px -12px rgba(0, 0, 0, 0.2), 3px 3px 9px rgba(0, 0, 0, 0.75);
   -moz-box-shadow: inset 0px -24px 24px -12px rgba(0, 0, 0, 0.2), 3px 3px 9px rgba(0, 0, 0, 0.75);
@@ -2370,12 +2369,12 @@ svg.switchButtonHelp {
 }
 /* Nagyító-fül. */
 .panelControlButton * {
-  stroke: #aaa;
+  stroke: #000000;
 }
 /* Nagyító-fül, ha fölötte van az egér */
 @media (pointer: fine) {
   .panelControlButton:hover * {
-    stroke: #90e0ef;
+    stroke: #ffffff;
   }
 }
 .panelControlButton * {
@@ -2396,7 +2395,7 @@ svg.switchButtonHelp {
   -moz-transition: stroke 0s linear !important;
   -ms-transition: stroke 0s linear !important;
   -o-transition: stroke 0s linear !important;
-  stroke: #90e0ef !important;
+  stroke: #ffffff !important;
 }
 /* Nagyító fül levétele 1 oszlopos mód esetén */
 .singleWidth .magnifyPanelButton {
@@ -2406,13 +2405,13 @@ svg.switchButtonHelp {
   opacity: 0;
 }
 .svgScrollbarTrack {
-  fill: #fdfdfd;
+  fill: black;
   box-shadow: 0px 0px 0px 1px #343434;
   -webkit-box-shadow: 0px 0px 0px 1px #343434;
   -moz-box-shadow: 0px 0px 0px 1px #343434;
 }
 .svgScrollbarThumb {
-  fill: #57c4ff;
+  fill: #aaaaaa;
 }
 .svgScrollbar::-webkit-scrollbar-track {
   box-shadow: 0px 0px 0px 1px #343434;
@@ -2426,10 +2425,10 @@ svg.switchButtonHelp {
   width: 100vw;
   height: 100vh;
   display: none;
-  background-color: #fdfdfd;
+  background-color: black;
   background-size: cover;
   background-repeat: no-repeat;
-  color: #000;
+  color: white;
   opacity: 0;
   z-index: 150;
   transition: opacity 0.2s linear;
@@ -2442,7 +2441,7 @@ svg.switchButtonHelp {
   margin-bottom: 0px;
 }
 #dialogPanel {
-  font-size: 28px;
+  font-size: 20px;
   left: 50vw;
   top: 35vh;
   overflow: hidden;
@@ -2452,26 +2451,26 @@ svg.switchButtonHelp {
   transform: translateX(-50%) translateY(-50%);
   padding: 20px 20px 20px;
   width: 310px;
-  border-radius: 5px;
-  background: #f8f8f8;
-  border: 1px solid #444;
+  border-radius: 10px;
+  background: #343434;
+  border: 0px solid white;
 }
 #dialogPanel h1 {
   margin: -20px -20px 21px;
   height: 40px;
   line-height: 40px;
-  font-size: 18px;
-  color: #000;
-  fill: #dbdada;
+  font-size: 16px;
+  color: white;
+  fill: #e7e7e7;
   stroke-width: 0px;
   text-align: center;
-  background: #6ED1FF;
-  border-radius: 5px 5px 0 0;
+  background: #555;
+  border-radius: 10px 10px 0 0;
 }
 #dialogMask {
   z-index: 150;
-  background-image: url('../data/pictures/blue.jpg');
-  background-color: #3b91e8;
+  background-image: none;
+  background-color: rgba(0, 0, 0, 0.9);
 }
 #dialogMessage {
   margin: 5px;
@@ -2525,25 +2524,25 @@ svg.switchButtonHelp {
   overflow: hidden;
   margin: 10px 10px 15px 10px;
   width: 272px;
-  background-color: #dbdada;
-  border: 4px solid #dbdada;
-  border-radius: 5px;
+  background-color: #e7e7e7;
+  border: 4px solid #e7e7e7;
+  border-radius: 10px;
   padding: 0px;
   outline: none;
 }
 #dialogPanel #saveTextArea::selection {
-  background: #dbdada;
+  background: #aaaaaa;
 }
 #dialogPanel #saveTextArea::-moz-selection {
-  background: #dbdada;
+  background: #aaaaaa;
 }
 #dialogPanel input#loginName {
   margin: 4px 0px 18px 0px !important;
-  background-color: #dbdada;
+  background-color: #e7e7e7;
 }
 #dialogPanel input#loginPassword {
   margin: 4px 0px 0px 0px !important;
-  background-color: #dbdada;
+  background-color: #e7e7e7;
 }
 #dialogButtonHolder {
   margin-top: 26px;
@@ -2553,13 +2552,13 @@ svg.switchButtonHelp {
   display: block;
   position: absolute;
   z-index: 150;
-  width: calc(100% - 2 *  6px);
-  height: calc(100% - 2 *  6px);
+  width: calc(100% - 2 * 6px);
+  height: calc(100% - 2 * 6px);
   opacity: 1;
   top: 0px;
   overflow: hidden;
   margin: 6px;
-  border-radius: 5px;
+  border-radius: 10px;
 }
 #helpScrollPane {
   position: relative;
@@ -2598,21 +2597,21 @@ svg.switchButtonHelp {
   font-style: italic;
   display: inline-block;
   padding: 10px 20px;
-  color: #90e0ef;
-  background: rgba(59, 145, 232, 0.3);
-  background: linear-gradient(top, #3b91e8 0%, #3b91e8 30px, #3b91e8 100%);
-  background: -moz-linear-gradient(top, #3b91e8 0%, #3b91e8 30px, #3b91e8 100%);
-  background: -webkit-linear-gradient(top, #3b91e8 0%, #3b91e8 30px, #3b91e8 100%);
-  background: -o-linear-gradient(top, #3b91e8 0%, #3b91e8 30px, #3b91e8 100%);
-  background: -ms-linear-gradient(top, #3b91e8 0%, #3b91e8 30px, #3b91e8 100%);
-  border: 1px solid #aaa;
-  border-radius: 5px;
+  color: #000000;
+  background: #888888;
+  background: linear-gradient(top, #a0a0a0 0%, #888888 30px, #6d6d6d 100%);
+  background: -moz-linear-gradient(top, #a0a0a0 0%, #888888 30px, #6d6d6d 100%);
+  background: -webkit-linear-gradient(top, #a0a0a0 0%, #888888 30px, #6d6d6d 100%);
+  background: -o-linear-gradient(top, #a0a0a0 0%, #888888 30px, #6d6d6d 100%);
+  background: -ms-linear-gradient(top, #a0a0a0 0%, #888888 30px, #6d6d6d 100%);
+  border: 0px solid white;
+  border-radius: 10px;
 }
 .helpContent .indent {
   padding-left: 20px;
 }
 .tooltip em {
-  color: #3b91e8;
+  color: #c2b211;
 }
 .helpContent.h3,
 .helpContent.h4 {
@@ -2627,12 +2626,12 @@ svg.switchButtonHelp {
 #helpControl {
   white-space: nowrap;
   overflow: auto;
-  background: rgba(59, 145, 232, 0.3);
-  background: linear-gradient(top, #3b91e8 0%, #3b91e8 30px, #3b91e8 100%);
-  background: -moz-linear-gradient(top, #3b91e8 0%, #3b91e8 30px, #3b91e8 100%);
-  background: -webkit-linear-gradient(top, #3b91e8 0%, #3b91e8 30px, #3b91e8 100%);
-  background: -o-linear-gradient(top, #3b91e8 0%, #3b91e8 30px, #3b91e8 100%);
-  background: -ms-linear-gradient(top, #3b91e8 0%, #3b91e8 30px, #3b91e8 100%);
+  background: #888888;
+  background: linear-gradient(top, #a0a0a0 0%, #888888 30px, #6d6d6d 100%);
+  background: -moz-linear-gradient(top, #a0a0a0 0%, #888888 30px, #6d6d6d 100%);
+  background: -webkit-linear-gradient(top, #a0a0a0 0%, #888888 30px, #6d6d6d 100%);
+  background: -o-linear-gradient(top, #a0a0a0 0%, #888888 30px, #6d6d6d 100%);
+  background: -ms-linear-gradient(top, #a0a0a0 0%, #888888 30px, #6d6d6d 100%);
   box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.75);
   -webkit-box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.75);
   -moz-box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.75);
@@ -2650,7 +2649,7 @@ svg.switchButtonHelp {
 }
 #helpControl nav {
   height: 100%;
-  min-height: calc(15 *  32px);
+  min-height: calc(15 * 32px);
   /* 30*help-elemszám px */
 }
 #helpControl nav ul {
@@ -2665,10 +2664,10 @@ svg.switchButtonHelp {
 }
 #helpControl nav span {
   display: block;
-  color: #90e0ef;
+  color: #000000;
   height: 32px;
   line-height: 32px;
-  padding-left: calc(24px -  8px);
+  padding-left: calc(24px - 8px);
   padding-right: 16px;
   cursor: pointer;
   border-left: rgba(0, 0, 0, 0) 8px solid;
@@ -2677,10 +2676,10 @@ svg.switchButtonHelp {
   padding-left: 32px;
 }
 #helpControl nav span:hover {
-  color: #fff;
+  color: #ffffff;
 }
 #helpControl nav span.activeHelp {
-  border-left-color: #003f61;
+  border-left-color: #40bddf;
 }
 .helpContent img {
   float: left;
@@ -2700,7 +2699,7 @@ svg.switchButtonHelp {
   margin-bottom: 1em;
 }
 .helpToolbar ul li svg:not([class]) {
-  background: rgba(59, 145, 232, 0.3);
+  background: #888888;
 }
 .helpToolbar ul li svg {
   float: none;
@@ -2726,8 +2725,8 @@ svg.switchButtonHelp {
   border-right: 1px solid #6d6d6d;
   display: inline-block;
   vertical-align: middle;
-  border-radius: 5px;
-  background: rgba(59, 145, 232, 0.3);
+  border-radius: 10px;
+  background: #888888;
   width: 63px;
   height: 38px;
   box-shadow: 3px 3px 9px rgba(0, 0, 0, 0.75);
@@ -2781,7 +2780,7 @@ body.embedded #headPanelP0 {
 }
 body.embedded .titleButton0:hover ~ .titleText0,
 body.embedded .titleButton1:hover ~ .titleText1 {
-  fill: #000;
+  fill: black;
 }
 /****************************/
 /* Control elements         */
@@ -2826,9 +2825,6 @@ and open the template in the editor.
     Description:
         Purpose of the stylesheet follows.
 */
-* {
-  font-family: 'Roboto', arial, sans-serif;
-}
 /* A háttérszín */
 /* Párbeszédablakok háttere */
 /* A panel, és az arra írás színe */
@@ -2836,20 +2832,12 @@ and open the template in the editor.
 /* Kerekítettség */
 /* Árnyékok */
 /* A dimenziók válatakozó színei */
-/* Az értékek jelölésére szolgáló színpaletta */
+/* Értékek színei */
 /* Elemek körüli határ */
 /* Input mezők színezése */
 /* Fejléc színei, árnyékolása */
 /* Scrollbar */
 /* Help színezése */
-#helpMask {
-  background-image: url('../data/pictures/blue.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
-  color: #000;
-}
-#helpPanel {
-  background-color: rgba(255, 255, 255, 0.5);
-}
 /* Tooltip */
+/*# sourceMappingURL=blue.less.map */
 /*# sourceMappingURL=blue.css.map */

@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
+<html xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/1999/xhtml" lang="hu">
     <head>
         <title class="loc">Agnos</title>
 
@@ -12,7 +12,7 @@
 
         <!-- Ha nem sikerült a rendes átirányítás ../agnos/  -ra, csak ../agnos  lett,
         akkor átirányít a jó helyre, hogy stimmeljenek a relatív linkek -->
-        <script>
+        <script type="text/javascript">
             const loc = window.location;
             if (!loc.pathname.endsWith("html") && !loc.pathname.endsWith("/")) {
                 window.location.pathname = loc.pathname + "/";
@@ -21,10 +21,10 @@
         
         
         <!-- A kezdő stílusfájl betöltése: url-ből, ha nincs cookie-ból, ha nincs default -->
-        <script src="js/libs/lz-string-1.3.0/lz-string.min.js"></script>
-        <script>                                                
-            var version = "";
-            const defaultCss = version + "css/black.css"; // default érték
+        <script type="text/javascript" src="js/libs/lz-string-1.3.0/lz-string.min.js"></script>
+        <script type="text/javascript">
+            const version = "";
+            const defaultCss = version + "css/black.css";
     
             let isEmbedded = false;
             
@@ -36,8 +36,8 @@
              */
             function reloadWithQueryAsHashtag() {
                 if (window.location.search.length > 0) {
-                    var baseUrl = window.location.href.replace(/\?.*/g, '');
-                    var newHash = window.location.search.replace(/.*=/g, '').replace(/#.*/g, '');                    
+                    const baseUrl = window.location.href.replace(/\?.*/g, '');
+                    const newHash = window.location.search.replace(/.*=/g, '').replace(/#.*/g, '');
                     window.location = baseUrl + "#" + newHash;
                 }
             }
@@ -46,12 +46,12 @@
             /**
              * Injektál egy css-fájlt a dokumentumba.
              * 
-             * @param {type} fileName Az injektálandó css fájl.
+             * @param {String} fileName Az injektálandó css fájl.
              * @returns {undefined}
              */
             function applyCssFile(fileName) {
-                var link = document.createElement("link");                
-                link.href = version + fileName.substr(fileName.indexOf("css/"));
+                const link = document.createElement("link");
+                link.href = version + fileName.substring(fileName.indexOf("css/"));
                 link.id = "cssLink";
                 link.type = "text/css";
                 link.rel = "stylesheet";
@@ -65,15 +65,15 @@
              *  - normál mód esetén cookie-ból
              *  - ha nincs más, az alapértelmezett.
              * 
-             * @param {type} defaultCssFile Alapértelmezett css fájl.
-             * @returns {.JSON@call;parse.s}
+             * @param {String} defaultCssFile Alapértelmezett css fájl.
+             * @returns {String}
              */
             function determineCssFileToApply(defaultCssFile) {
                 
                 // Css kiolvasása a queryparam-ból, ha van ott
                 try {
                     const startString = window.location.href.replace(/.*#/g, '');
-                    var startObject = JSON.parse(LZString.decompressFromEncodedURIComponent(startString));
+                    const startObject = JSON.parse(LZString.decompressFromEncodedURIComponent(startString));
                                 
                     if (startObject && startObject.e && startObject.s) {
                         isEmbedded = true;
@@ -87,10 +87,10 @@
                 // Css kiolvasása cookie-ból, ha van ott
                 try {
                     const cssPrefix = "css=";
-                    var decodedCookie = decodeURIComponent(document.cookie);
-                    var ca = decodedCookie.split(';');
-                    for (var i = 0; i < ca.length; i++) {
-                        var c = ca[i];
+                    const decodedCookie = decodeURIComponent(document.cookie);
+                    const ca = decodedCookie.split(';');
+                    for (let i = 0; i < ca.length; i++) {
+                        let c = ca[i];
                         while (c.charAt(0) === ' ') {
                             c = c.substring(1);
                         }
@@ -98,9 +98,7 @@
                             return c.substring(cssPrefix.length, c.length);
                         }
                     }
-                } catch (error) { } 
-                
-                // Ha sehol nem találtunk, akkor a default
+                } catch (error) { }
                 return defaultCssFile;
             }
             
@@ -114,28 +112,27 @@
         <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
         <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
         <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-        <link rel="manifest" href="manifest.json">
+        <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
         <link rel="mask-icon" href="safari-pinned-tab.svg" color="#40bddf">
         <meta name="theme-color" content="#ffffff">
 
         <!-- A betöltést és a beléptetést végző függvények. -->
-        <script>
+        <script type = "text/javascript">
             'use strict';
-            var numberOfLoadedResources = 0;	// A már betöltött külső js-ek száma.
-            var numberOfResources = 37;			// Az összes betöltendő külső js-ek száma.
-            var finalThreads = 3;				// Ennyi betöltési szálnak kell lefutnia az elinduláshoz.
-            var version = "";
-            var min = "";           // "" vagy "min." attól függően, hogy a minify-s verziók kellenek-e?     
-            var keycloak;            
+            let numberOfLoadedResources = 0;	// A már betöltött külső js-ek száma.
+            const numberOfResources = 38;			// Az összes betöltendő külső js-ek száma.
+            let finalThreads = 3;				// Ennyi betöltési szálnak kell lefutnia az elinduláshoz.
+            const min = "";           // "" vagy "min." attól függően, hogy a minify-s verziók kellenek-e?
+            let keycloak = undefined;
 
             /**
              * A betöltöttséget jelző panel betöltöttségi szintjét beállítja a kért értékre.
              * 
-             * @param {Integer} to Az aktuális betöltöttségi szint [0,100]-ból.
+             * @param {Number} to Az aktuális betöltöttségi szint [0,100]-ból.
              * @returns {undefined}
              */
             function updateStatus(to) {
-                var span = document.getElementById("loginReadyPercentage");
+                const span = document.getElementById("loginReadyPercentage");
                 while (span.firstChild) {
                     span.removeChild(span.firstChild);
                 }
@@ -144,7 +141,7 @@
                 // Ha elérte a 100%-ot, akkor változik a szöveg, eléhetővé válik a belépés gomb.
                 // Opcionálisan automatikusan beléptet.
                 if (to === 100) {
-                    var button = document.getElementById("dialogSecondButton");
+                    const button = document.getElementById("dialogSecondButton");
                     button.disabled = false;
                     button.removeAttribute("class");
                     button.removeChild(button.firstChild);
@@ -153,7 +150,7 @@
                     if (button === document.activeElement) {
                         login();
                     }
-                    var loginLoadingText = document.getElementById("loginLoadingText");
+                    let loginLoadingText = document.getElementById("loginLoadingText");
                     loginLoadingText.removeChild(loginLoadingText.firstChild);
                     loginLoadingText.appendChild(document.createTextNode("Application loaded"));
 
@@ -171,8 +168,8 @@
              * @returns {undefined}
              */
             function loadScript(source, callBack, acceptErrors) {
-                var isReady = false;
-                var scriptElement = document.createElement('script');
+                let isReady = false;
+                const scriptElement = document.createElement('script');
                 scriptElement.type = 'text/javascript';
                 scriptElement.src = version + source;
                 scriptElement.onload = scriptElement.onreadystatechange = function () {
@@ -194,7 +191,7 @@
                         alert('Key files are missing. Applicaion failed.');
                     }
                 };
-                var firstRealScript = document.getElementsByTagName('script')[0];
+                const firstRealScript = document.getElementsByTagName('script')[0];
                 firstRealScript.parentNode.insertBefore(scriptElement, firstRealScript);
             }
 
@@ -206,9 +203,9 @@
              * @param {Boolean} acceptErrors Ha true, akkor hiba esetén is továbblép.
              * @returns {undefined}
              */
-            function loadResourcesAsync(resourceArray, callBack, acceptErrors) {
-                var j = 0, jMax = resourceArray.length - 1;
-                var succesFunction = function () {
+            function loadResourcesAsync(resourceArray, callBack, acceptErrors = false) {
+                let j = 0, jMax = resourceArray.length - 1;
+                const successFunction = function () {
                     if (j < jMax) {
                         j++;
                     } else {
@@ -217,8 +214,8 @@
                         }
                     }
                 };
-                for (var i = 0, iMax = resourceArray.length; i < iMax; i++) {
-                    loadScript(resourceArray[i], succesFunction, acceptErrors);
+                for (let i = 0, iMax = resourceArray.length; i < iMax; i++) {
+                    loadScript(resourceArray[i], successFunction, acceptErrors);
                 }
             }
 
@@ -283,7 +280,8 @@
                     "js/Panel_Bar2D." + min + "js",
                     "js/Panel_Line2D." + min + "js",
                     "js/Panel_Table2D." + min + "js",
-                    "js/Panel_Sankey." + min + "js"
+                    "js/Panel_Sankey." + min + "js",
+                    "js/Panel_Bubble." + min + "js",
                 ], loadLevelLast);
             }
 
@@ -624,6 +622,22 @@
             <ellipse cx="7.5" cy="15.5" ry="2" rx="2"/>
             <ellipse cx="16.5" cy="24.5" ry="2" rx="2"/>
             <ellipse cx="25.5" cy="6.5" ry="2" rx="2"/>
+            </g>
+
+            <g id="icon_panel_bubble">
+                <path d="M1,1 L1,31 L31,31"/>
+                <ellipse cx="7.5" cy="15.5" ry="2" rx="2"/>
+                <ellipse cx="16.5" cy="24.5" ry="3" rx="3"/>
+                <ellipse cx="24.5" cy="7.5" ry="5" rx="5"/>
+            </g>
+
+            <g id="icon_panel_scatterplot">
+                <path d="M1,1 L1,31 L31,31"/>
+                <ellipse cx="7.5" cy="15.5" ry="1" rx="1"/>
+                <ellipse cx="16.5" cy="13.5" ry="1" rx="1"/>
+                <ellipse cx="25.5" cy="6.5" ry="1" rx="1"/>
+                <ellipse cx="11.5" cy="5.5" ry="1" rx="1"/>
+                <ellipse cx="11.5" cy="23.5" ry="1" rx="1"/>
             </g>
 
             <g id="icon_panel_top10_bar">

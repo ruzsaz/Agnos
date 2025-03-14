@@ -263,27 +263,22 @@ panel_map.prototype.setColorRange = function (dMin, dMed, dMax) {
 /**
  * Megkeresi egy zoomszinthez tartozó térképi elemeket.
  * 
- * @param {Integer} level A zoomszint.
- * @returns {Json} Hozzá tartozó térképi elemkupac.
+ * @param {Number} level A zoomszint.
+ * @returns {Object} Hozzá tartozó térképi elemkupac.
  */
 panel_map.prototype.topoLevel = function (level) {
     
     switch (level) {
         case 1:
             return (this.maxDepth >= 1) ? this.topology.objects.level1 : this.topology.objects.level0;
-            break;
         case 2:
             return (this.maxDepth >= 2) ? this.topology.objects.level2 : this.topology.objects.level1;
-            break;
         case 3:
             return (this.maxDepth >= 3) ? this.topology.objects.level3 : this.topology.objects.level2;
-            break;
         case 4:
             return this.topology.objects.level3;
-            break;
         default:
             return this.topology.objects.level0;
-            break;
     }
 };
 
@@ -298,13 +293,17 @@ panel_map.prototype.getParent = function (dataRows) {
     if (dataRows.length > 0) {
         // Vesszük az adatkupac első elemét. Ha az épp N/A, akkor a másodikat. TODO: Itt most gányolás van!!! Ki kéne javítani.
         var shapeId = (dataRows[0].dims[0].id !== "N/A") ? dataRows[0].dims[0].id : (dataRows.length > 1) ? dataRows[1].dims[0].id : undefined;
-        for (var level = 0; level <= 3; level++) { // TODO: 3 helyett ahány van kéne...
-            var thisObj = topojson.feature(this.topology, this.topoLevel(level)).features.filter(function (d) {
-                return shapeId == d.properties.shapeid;
+        for (let level = 0; level <= 3; level++) { // TODO: 3 helyett ahány van kéne...
+            const currentTopoLevel = this.topoLevel(level);
+            if (currentTopoLevel === undefined) {
+                return undefined;
+            }
+            const thisObj = topojson.feature(this.topology, currentTopoLevel).features.filter(function (d) {
+                return shapeId === d.properties.shapeid;
             });
             if (thisObj.length > 0) {
                 parentObj = topojson.feature(this.topology, this.topoLevel(level - 1)).features.filter(function (d) {
-                    return thisObj[0].properties.parentid == d.properties.shapeid;
+                    return thisObj[0].properties.parentid === d.properties.shapeid;
                 });
                 break;
             }
@@ -712,7 +711,7 @@ panel_map.prototype.drawLabels = function (currentFeatures, trans) {
     var that = this;
 
     var labels = that.gLabelHolder.selectAll(".mapLabel").data(currentFeatures.data, function (d) {
-        return d.id + "N" + d.name;
+        return d.id;// + "N" + d.name;
     })
             .moveToFront();
 
@@ -739,11 +738,14 @@ panel_map.prototype.drawLabels = function (currentFeatures, trans) {
                 return global.readableColor(that.colorLinear(d.value));
             })
             .attr("opacity", 0)
+            .style("font-size", (that.mapLabelSize / currentFeatures.scale) + "px")
+            .merge(labels)
+            .attr("opacity", function (d){
+                return (d.name === d3.select(this).text()) ? that.mapLabelOpacity : 0;
+            })
             .text(function (d) {
                 return d.name;
             })
-            .style("font-size", (that.mapLabelSize / currentFeatures.scale) + "px")
-            .merge(labels)
             .transition(trans)
             .attr("opacity", that.mapLabelOpacity);
 };
@@ -987,7 +989,7 @@ panel_map.prototype.drawLegend = function (trans) {
 /**
  * Poi-k ki és bekapcsolása.
  * 
- * @param {Integer} i A ki/bekapcsolandó poi sorszáma.
+ * @param {Number} i A ki/bekapcsolandó poi sorszáma.
  * @returns {undefined}
  */
 panel_map.prototype.tooglePoi = function (i) {

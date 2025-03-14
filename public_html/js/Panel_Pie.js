@@ -271,18 +271,18 @@ panel_pie.prototype.preUpdate = function (drill) {
  * @returns {Array} Az új megjelenési tortaadatok.
  */
 panel_pie.prototype.prepareData = function (oldPieData, newDataRows, drill) {
-    var that = this;
-    var level = (global.baseLevels[that.panelSide])[this.dimToShow].length;
+    const that = this;
+    const level = (global.baseLevels[that.panelSide])[this.dimToShow].length;
     
-    var comparator = that.getSortingComparator();
-    var newPieData = d3.pie()
+    const comparator = that.getSortingComparator();
+    const newPieData = d3.pie()
             .sort(comparator) 	// Használjuk a sorbarendezést [null: nincs rendezés, egész kihagyása: érték szerinti]
             .value(function (d) {
                 return that.valueToShow(d).value;
             })(newDataRows);
 
-    var total = 0; // A mutatott összérték meghatározása.
-    for (var i = 0, iMax = newDataRows.length; i < iMax; i++) {
+    let total = 0; // A mutatott összérték meghatározása.
+    for (let i = 0, iMax = newDataRows.length; i < iMax; i++) {
         total += that.valueToShow(newDataRows[i]).value;
     }
 
@@ -538,7 +538,7 @@ panel_pie.prototype.drawLabels = function (preparedData, trans) {
 };
 
 //////////////////////////////////////////////////
-// // Irányítást végző függvények
+// Control functions
 //////////////////////////////////////////////////
 
 /**
@@ -563,7 +563,7 @@ panel_pie.prototype.drill = function (d) {
  * A mutató- és hányadosválasztást végrehajtó függvény.
  * 
  * @param {String} panelId A váltást végrehajtó panel azonosítója. Akkor vált, ha az övé, vagy ha undefined.
- * @param {Integer} value Az érték, amire váltani kell. Ha -1 akkor a következőre vált, ha undefined, nem vált.
+ * @param {Number} value Az érték, amire váltani kell. Ha -1 akkor a következőre vált, ha undefined, nem vált.
  * @param {boolean} ratio Hányadost mutasson-e. Ha -1 akkor a másikra ugrik, ha undefined, nem vált.
  * @returns {undefined}
  */
@@ -590,16 +590,16 @@ panel_pie.prototype.doChangeValue = function (panelId, value, ratio) {
  * A dimenzióváltást végrehajtó függvény.
  * 
  * @param {String} panelId A dimenzióváltást kapó panel ID-ja.
- * @param {Integer} newDimId A helyére bejövő dimenzió ID-ja.
+ * @param {Number} newDimId A helyére bejövő dimenzió ID-ja.
  * @returns {undefined}
  */
 panel_pie.prototype.doChangeDimension = function (panelId, newDimId) {
-    var that = this;
+    let that = this;
     if (panelId === that.panelId) {
         that.dimToShow = newDimId;
         that.actualInit.dim = that.dimToShow;
         that.mediator.publish("register", that, that.panelId, [that.dimToShow], that.preUpdate, that.update, that.getConfig);
         global.tooltip.kill();
-        this.mediator.publish("drill", {dim: -1, direction: 0, toId: undefined});
+        that.mediator.publish("drill", {dim: -1, direction: 0, toId: undefined});
     }
 };

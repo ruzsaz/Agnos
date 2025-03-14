@@ -148,7 +148,7 @@ function panel_line2d(init) {
             .attr("fill", "black");
 
     // Feliratkozás az értékváltás mediátorra.
-    var med;
+    let med;
     med = that.mediator.subscribe("changeValue", function (id, val, ratio) {
         that.doChangeValue(id, val, ratio);
     });
@@ -266,7 +266,7 @@ panel_line2d.prototype.getCmpFunction = function () {
  * 
  * @param {Object} a Egy adatelem.
  * @param {Object} b Egy másik adatelem.
- * @returns {boolean} Az összehasonlítás eredménye.
+ * @returns {Number} Az összehasonlítás eredménye.
  */
 panel_line2d.prototype.simpleCmp = function (a, b) {
     return global.realCompare(a.name, b.name);
@@ -275,9 +275,9 @@ panel_line2d.prototype.simpleCmp = function (a, b) {
 /**
  * Adott magasságú és helyzetű vízszintes vonalat készít path-ként.
  * 
- * @param {type} x0 Kezdőpont x koordinátája.
- * @param {type} x1 Végpont x koordinátája.
- * @param {type} y A vonal y koordinátája.
+ * @param {Number} x0 Kezdőpont x koordinátája.
+ * @param {Number} x1 Végpont x koordinátája.
+ * @param {Number} y A vonal y koordinátája.
  * @returns {String} A vonalat leíró path.
  */
 panel_line2d.prototype.horizontalLine = function (x0, x1, y) {
@@ -321,18 +321,18 @@ panel_line2d.prototype.extrapolate = function (coord, last, prev) {
  * @param {Object} a Bal szélső pont (jellemzően {x: , y: , isFake: } típusú).
  * @param {Object} b Középső pont.
  * @param {Object} c Jobb szélső pont.
- * @param {Integer} i Az aktuális osztópont sorszáma.
- * @param {Integer} iMax Az osztópontok száma.
+ * @param {Number} i Az aktuális osztópont sorszáma.
+ * @param {Number} iMax Az osztópontok száma.
  * @returns {Number} Az interpolált érték.
  */
 panel_line2d.prototype.interpolate = function (coord, a, b, c, i, iMax) {
     if (a === null || b === null || c === null || i === null || iMax === null || a === undefined || b === undefined || c === undefined || i === undefined || iMax === undefined || isNaN(a[coord]) || isNaN(b[coord]) || isNaN(c[coord]) || isNaN(i)) {
         return 1000;
     }
-    var bb = b[coord];
-    var aa = (a.isFake) ? 2 * a[coord] - bb : a[coord];
-    var cc = (c.isFake) ? 2 * c[coord] - bb : c[coord];
-    var x = (i / iMax) - 0.5;
+    const bb = b[coord];
+    const aa = (a.isFake) ? 2 * a[coord] - bb : a[coord];
+    let cc = (c.isFake) ? 2 * c[coord] - bb : c[coord];
+    let x = (i / iMax) - 0.5;
     if (x < 0) {
         x = -x;
         cc = aa;
@@ -349,7 +349,7 @@ panel_line2d.prototype.interpolate = function (coord, a, b, c, i, iMax) {
  * @returns {undefined}
  */
 panel_line2d.prototype.setYScale = function (scale) {
-    var actualScaleDomain = (this.valFraction) ? this.actualInit.domainr : this.actualInit.domain;
+    const actualScaleDomain = (this.valFraction) ? this.actualInit.domainr : this.actualInit.domain;
     if ((actualScaleDomain instanceof Array) && actualScaleDomain.length === 2) {
         this.yScale.domain(actualScaleDomain);
     } else {
@@ -369,8 +369,8 @@ panel_line2d.prototype.setYScale = function (scale) {
  * @returns {undefined}
  */
 panel_line2d.prototype.preUpdate = function (drill) {
-    var that = this;
-    var oldPreparedData = this.preparedData;
+    const that = this;
+    const oldPreparedData = this.preparedData;
 
     if (drill.dim === that.dimXToShow && that.dimXToShow === that.dimYToShow) { // Ha az X és Y dimenzióban ugyanaz van, és amentén fúrunk
 
@@ -532,29 +532,29 @@ panel_line2d.prototype.preUpdate = function (drill) {
  * @returns {Object} Az új megjelenítendő adatok.
  */
 panel_line2d.prototype.prepareData = function (oldPreparedData, newDataRows, drill) {
-    var that = this;
-    var levelX = (global.baseLevels[that.panelSide])[that.dimXToShow].length;
-    var levelY = (global.baseLevels[that.panelSide])[that.dimYToShow].length;
+    const that = this;
+    const levelX = (global.baseLevels[that.panelSide])[that.dimXToShow].length;
+    const levelY = (global.baseLevels[that.panelSide])[that.dimYToShow].length;
 
     newDataRows.sort(that.getCmpFunction());	// Elemi adatok sorbarendezése.
 
     var dimYArray = [];		// Értékek az Y dimenzió mentén. (Azért kell, mert az adatok az X mentén kerülnek tárolásra.)
-    var dataArray = [];		// Az adatok tömbje, az X dimenzió mentén tárolva, azon belül pedig az Y mentén.
+    const dataArray = [];		// Az adatok tömbje, az X dimenzió mentén tárolva, azon belül pedig az Y mentén.
 
     // Maximális oszlophossz meghatározása, oszlop x, y helyének adatbaírása
     var currentXDimId;
     var currentXPosition = -1;
 
     // Első végigfutás: alapértékek beállítása, a maximumok meghatározása, és az y dimenziók feltöltése.
-    for (var i = 0; i < newDataRows.length; i++) {
-        var d = newDataRows[i];
+    for (let i = 0; i < newDataRows.length; i++) {
+        const d = newDataRows[i];
 
         // Ha új X-dimenzióbeli elemről van szó, létrehozunk egy új üres element.
         if (d.dims[that.dimX].id !== currentXDimId) {
             currentXDimId = d.dims[that.dimX].id;
-            var currentYDimId = d.dims[that.dimY].id;
+            const currentYDimId = d.dims[that.dimY].id;
             currentXPosition++;
-            var Xelement = {};
+            const Xelement = {};
             Xelement.index = currentXPosition;
             Xelement.id = currentXDimId;
             Xelement.uniqueId = levelX + "L" + currentYDimId;
@@ -565,17 +565,16 @@ panel_line2d.prototype.prepareData = function (oldPreparedData, newDataRows, dri
             dataArray.push(Xelement);
         }
 
-        var dimY = d.dims[that.dimY];
-        var index = global.positionInArrayByProperty(dimYArray, "id", dimY.id);
+        const dimY = d.dims[that.dimY];
+        let index = global.positionInArrayByProperty(dimYArray, "id", dimY.id);
 
         // Y dimenzió hozzáadása, ha még nem volt benne.
         if (index === -1) {
             index = dimYArray.length;
-            var dimYElement = {
+            const dimYElement = {
                 index: index,
                 id: dimY.id,
                 uniqueId: levelY + "L" + dimY.id,
-                id: dimY.id,
                 name: dimY.name.trim(),
                 parentId: dimY.parentId,
                 tooltip: "<html>" + dimY.name.trim() + "</html>"
@@ -584,9 +583,9 @@ panel_line2d.prototype.prepareData = function (oldPreparedData, newDataRows, dri
         }
 
         // Az utolsó x-dimenzióhoz tartozó rekeszbe beleírjuk az y dimenzió szerinti értéket.
-        var Xelement = dataArray[dataArray.length - 1];
-        var val = that.valueToShow(d);
-        var YElement = {
+        const Xelement = dataArray[dataArray.length - 1];
+        const val = that.valueToShow(d);
+        const YElement = {
             index: index,
             value: val.value,
             originalValue: val.originalValue,
@@ -602,7 +601,7 @@ panel_line2d.prototype.prepareData = function (oldPreparedData, newDataRows, dri
     }
 
     // X irányú lefúrás esetén: ebből a régi elemből kell kinyitni mindent.
-    var openFromXElement = (drill.dim === that.dimXToShow && drill.direction === -1 && oldPreparedData !== undefined) ? global.getFromArrayByProperty(oldPreparedData.dataArray, 'id', drill.toId) : null;
+    const openFromXElement = (drill.dim === that.dimXToShow && drill.direction === -1 && oldPreparedData !== undefined) ? global.getFromArrayByProperty(oldPreparedData.dataArray, 'id', drill.toId) : null;
     var oldX = (openFromXElement) ? openFromXElement.x : 0; // Az új elemek kinyitásának kezdőpozíciója.
 
     // X irányú felfúrás esetén: annak az elemnek az indexe az új adatokban, amit előzőleg kibontva mutattunk.
@@ -638,8 +637,8 @@ panel_line2d.prototype.prepareData = function (oldPreparedData, newDataRows, dri
     }
 
     // A valódi elemek berakása.
-    for (var i = 0, iMax = dataArray.length; i < iMax; i++) {
-        var Xelement = dataArray[i];
+    for (let i = 0, iMax = dataArray.length; i < iMax; i++) {
+        let Xelement = dataArray[i];
 
         //var oldElement = (oldPreparedData !== undefined) ? global.getFromArrayByProperty(oldPreparedData.dataArray, 'id', Xelement.id) : undefined;
 
@@ -683,7 +682,7 @@ panel_line2d.prototype.prepareData = function (oldPreparedData, newDataRows, dri
 
     // A két kamu végpont koordinátáinak kiszámolása.
     for (var j = 0; j < lines; j++) {
-        var line = lineArray[j];
+        const line = lineArray[j];
         var realPoints = line.length - 2;
         line[0].x = (realPoints > 1) ? that.extrapolate("x", line[1], line[2]) : 0;
         line[0].y = (realPoints > 1) ? that.extrapolate("y", line[1], line[2]) : line[1].y;
@@ -693,8 +692,8 @@ panel_line2d.prototype.prepareData = function (oldPreparedData, newDataRows, dri
 
     // Régi koordináták kiszámolása
     var openFromXIndex = (drill.dim === that.dimXToShow && drill.direction === -1 && openFromXElement) ? openFromXElement.index + 1 : undefined;
-    for (var j = 0; j < lines; j++) {
-        line = lineArray[j];
+    for (let j = 0; j < lines; j++) {
+        const line = lineArray[j];
 
         if (drill.dim === that.dimXToShow && that.dimXToShow === that.dimYToShow) { // Ha az X és Y dimenzióban ugyanaz van, és amentén fúrunk
             for (var point = 0, pointMax = line.length; point < pointMax; point++) {
@@ -790,7 +789,7 @@ panel_line2d.prototype.prepareData = function (oldPreparedData, newDataRows, dri
  * @returns {undefined}
  */
 panel_line2d.prototype.update = function (data, drill) {
-    var that = this;
+    const that = this;
     that.data = data || that.data;
     drill = drill || {dim: -1, direction: 0};
 
@@ -804,19 +803,19 @@ panel_line2d.prototype.update = function (data, drill) {
         that.valFraction = true;
     }
 
-    var tweenDuration = (drill.duration === undefined) ? global.getAnimDuration(-1, that.panelId) : drill.duration;
+    const tweenDuration = (drill.duration === undefined) ? global.getAnimDuration(-1, that.panelId) : drill.duration;
     if (that.data.rows.length > that.maxEntries) {
         that.panic(true, _("<html>A panel nem képes ") + that.data.rows.length + _(" értéket megjeleníteni.<br />A maximálisan megjeleníthető értékek száma ") + that.maxEntries + _(".</html>"));
         that.preparedData = undefined;
     } else {
         that.preparedData = that.prepareData(that.preparedData, that.data.rows, drill);
-        var maxInDim = Math.max(that.preparedData.dimYArray.length, Math.ceil(that.data.rows.length / that.preparedData.dimYArray.length));
+        const maxInDim = Math.max(that.preparedData.dimYArray.length, Math.ceil(that.data.rows.length / that.preparedData.dimYArray.length));
         if (maxInDim > that.maxEntries1D) {
             that.panic(true, _("<html>A panel nem képes ") + maxInDim + " értéket egy dimenzió mentén megjeleníteni.<br />A maximálisan megjeleníthető értékek száma " + that.maxEntries1D + ".</html>");
             that.preparedData = undefined;
         } else {
             that.panic(false);
-            var trans = d3.transition().duration(tweenDuration);
+            const trans = d3.transition().duration(tweenDuration);
             that.drawAxes(that.preparedData, trans);
             that.drawLines(that.preparedData, trans, (drill.dim !== -1));
             that.drawLegend(that.preparedData, trans);
@@ -835,7 +834,7 @@ panel_line2d.prototype.update = function (data, drill) {
  * @returns {undefined}
  */
 panel_line2d.prototype.drawLines = function (preparedData, trans, isClearRequired) {
-    var that = this;
+    const that = this;
 
     // Ha kell, letöröljük a meglevő vonalakat.
     if (isClearRequired) {

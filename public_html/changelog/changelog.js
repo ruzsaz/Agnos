@@ -5,6 +5,8 @@ var changelog = [
     {
         "language": "hu",
         "history": [
+            {"entity": "Agnos", "date": "2025-03-12", "change": "Pontszórás- és buborékdiagram."},
+            {"entity": "Agnos", "date": "2025-03-08", "change": "Kontrol elemek és számított mutatók."},
             {"entity": "Agnos", "date": "2025-01-14", "change": "Mutatók opcionális szín meghatározása."},
             {"entity": "AgnosServer", "date": "2025-01-12", "change": "Memória-korlátozás és cache-mentés."},
             {"entity": "Agnos", "date": "2024-12-02", "change": "Kártyás report-elrendezés."},
@@ -35,11 +37,13 @@ var changelog = [
             {"entity": "AgnosCSVImporter", "date": "2017-10-24", "change": "Rögzített formájú .xls és .xlsx fájlok automatikus betöltése."},
             {"entity": "Agnos", "date": "2017-11-02", "change": "Panelek képként mentése elérhető."}
         ],
-        "updated": "2024-08-23"
+        "updated": "2025-03-14"
     },
     {
         "language": "en",
         "history": [
+            {"entity": "Agnos", "date": "2025-03-12", "change": "Scatter and bubble chart."},
+            {"entity": "Agnos", "date": "2025-03-08", "change": "Control elements and calculated measures."},
             {"entity": "Agnos", "date": "2025-01-14", "change": "Optional color for indicators."},
             {"entity": "AgnosServer", "date": "2025-01-12", "change": "Memory-restriction and cache preserving."},
             {"entity": "Agnos", "date": "2024-12-02", "change": "Show available reports as cards."},
@@ -71,6 +75,6 @@ var changelog = [
             {"entity": "Agnos", "date": "2017-11-02", "change": "Save panels as pictures."}
             
         ],
-        "updated": "2024-08-23"
+        "updated": "2025-03-14"
     }
 ];

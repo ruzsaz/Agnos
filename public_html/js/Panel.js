@@ -16,7 +16,7 @@
  * @returns {Panel} Az elkészült panel.
  */
 function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequired, leftOffset, rightOffset, topOffset, bottomOffset) {
-    var that = this;
+    const that = this;
     leftOffset = leftOffset || 0;
     rightOffset = rightOffset || 0;
     topOffset = topOffset || 0;
@@ -37,6 +37,7 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     this.data;
     this.dimsToShow = [];
     this.sortByValue = panelInitString.sortbyvalue || false;
+    this.htmlTagStarter = "<html lang=" + String.locale + ">";
     
     this.valMultiplier = 1;		// Ennyiszeresét
     this.fracMultiplier = 1;		// Ennyiszeresét
@@ -593,6 +594,7 @@ Panel.prototype.drill = function() {
  * @returns {undefined}
  */
 Panel.prototype.langSwitch = function() {
+    this.htmlTagStarter = "<html lang=" + String.locale + ">";
     return;
 };
 
@@ -605,14 +607,14 @@ Panel.prototype.langSwitch = function() {
  * @param {String} targetId A célpont-elem osztály-azonosítója (classname).
  * @returns {undefined}
  */
-Panel.prototype.hoverOn = function(gHovered, targetId) {
+Panel.prototype.hoverOn = function(gHovered, targetId = undefined) {
     if (global.dragDropManager.draggedId !== null) {
         var rectObj = d3.select(gHovered).select("rect"); // A g-ben levő ELSŐ téglalap kiválasztása.
         var transform = (rectObj.attr("transform") !== null) ? rectObj.attr("transform") : d3.select(gHovered).attr("transform");
         var that = this;
         global.dragDropManager.targetObject = gHovered;
         global.dragDropManager.targetPanelId = that.panelId;
-        global.dragDropManager.targetId = targetId;// || 0;
+        global.dragDropManager.targetId = targetId;
         global.dragDropManager.targetSide = parseInt(that.panelId.replace(/(^.+\D)(\d+)(\D.+$)/i, '$2'));
 
         // Ha ejthető a dolog, akkor bevonalkázza a célpontot.
@@ -655,9 +657,9 @@ Panel.prototype.hoverOff = function() {
 Panel.prototype.getConfig = function() {
     var panelConfigString = this.constructorName + "({";
     var prefix = "";
-    for (var propName in this.actualInit) {
-        var propValue = this.actualInit[propName];
-        var defaultValue = this.defaultInit[propName];
+    for (let propName in this.actualInit) {
+        const propValue = this.actualInit[propName];
+        const defaultValue = this.defaultInit[propName];
         if (this.actualInit.hasOwnProperty(propName) && propValue !== undefined && propName !== "position" && JSON.stringify(propValue) !== JSON.stringify(defaultValue)) {
             if (propValue instanceof Array) {
                 panelConfigString = panelConfigString + prefix + propName + ": [" + propValue + "]";

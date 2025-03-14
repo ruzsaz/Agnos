@@ -5,22 +5,23 @@
 /**
  * Egy panel fejléce. A fejléc az épp aktuális mutatót, és a mértékegységet tartalmazza,
  * ráklikkelésre megváltozik. Ez a konstruktor.
- * 
+ *
  * @param {Object} parentSVG A panel svg-je.
  * @param {String} panelId A panel html-beli id-je.
- * @param {Mediator} mediator A panel mediátora.
+ * @param {Object} mediator Mediator to communicate with.
+ * @param {Number} magLevel Magnification level.
  * @returns {TitleBox}
  */
 function TitleBox(parentSVG, panelId, mediator, magLevel) {
-    var that = this;
+    const that = this;
 
     this.panelId = panelId;		// Panel id-je.
     this.panelSide = parseInt(panelId.split("#panel")[1]);    
     this.mediator = mediator;	// A panel mediátora, ezen át kommunikál a fejléc a panellel.
-    this.currentId;				// Épp kijelzett mutató id-je, tömb ha többet mutat.
-    this.currentRatio;			// Éppen hányadost jelez-e?
-    this.currentText;           // A teljes kijelzett szöveg.
-    this.magLevel = magLevel || 1; // A panel nagyításának mértéke
+    this.currentId = undefined;	// Épp kijelzett mutató id-je, tömb ha többet mutat.
+    this.currentRatio = undefined;  // Éppen hányadost jelez-e?
+    this.currentText = undefined;   // A teljes kijelzett szöveg.
+    this.magLevel = magLevel || 1;  // A panel nagyításának mértéke
     this.titleBoxWidth = global.panelWidth * that.magLevel - 2 * global.legendOffsetX; // Fejléc szélessége
 
     // Fejlécet tartalmazó konténer.
@@ -84,10 +85,10 @@ TitleBox.prototype.titleSplitRatio = 0.6;
  * @returns {undefined}
  */
 TitleBox.prototype.update = function (idA, nameA, szUnitA, ratioUnitA, isRatio, tweenDuration) {
-    var that = this;
+    const that = this;
 
-    var id, name, szUnit, ratioUnit;	// A kijelzésre kerülő értékek.
-    var trans = d3.transition().duration(tweenDuration);
+    let id, name, szUnit, ratioUnit;	// A kijelzésre kerülő értékek.
+    const trans = d3.transition().duration(tweenDuration);
 
     // Ha tömböket kaptunk, összefűzzük őket.
     if (idA instanceof Array) {
@@ -122,26 +123,26 @@ TitleBox.prototype.update = function (idA, nameA, szUnitA, ratioUnitA, isRatio, 
                 .remove();
 
         // Új szöveg az értéknévnek.
-        var valNameLabel = that.gContainer.append("svg:text")
-                .attr("class", (id instanceof Array) ? "titleText" : "titleText titleText0")
-                .attr("x", global.legendOffsetX + that.titleBoxWidth * that.titleSplitRatio / 2)
-                .attr("y", global.legendOffsetY + 15)
-                .attr("dy", ".35em")
-                .attr("dx", "-.15em")
-                .text(name)
-                .transition(trans)
-                .style("opacity", 1);
+        const valNameLabel = that.gContainer.append("svg:text")
+            .attr("class", (id instanceof Array) ? "titleText" : "titleText titleText0")
+            .attr("x", global.legendOffsetX + that.titleBoxWidth * that.titleSplitRatio / 2)
+            .attr("y", global.legendOffsetY + 15)
+            .attr("dy", ".35em")
+            .attr("dx", "-.15em")
+            .text(name)
+            .transition(trans)
+            .style("opacity", 1);
 
         // Új szöveg a mértékegységnek.
-        var valUnitLabel = that.gContainer.append("svg:text")
-                .attr("class", "titleText titleText1")
-                .attr("x", global.legendOffsetX + that.titleBoxWidth * (that.titleSplitRatio + 1) / 2)
-                .attr("y", global.legendOffsetY + 15)
-                .attr("dy", ".35em")
-                .attr("dx", ".15em")
-                .text((isRatio) ? ratioUnit : szUnit)
-                .transition(trans)
-                .style("opacity", 1);
+        const valUnitLabel = that.gContainer.append("svg:text")
+            .attr("class", "titleText titleText1")
+            .attr("x", global.legendOffsetX + that.titleBoxWidth * (that.titleSplitRatio + 1) / 2)
+            .attr("y", global.legendOffsetY + 15)
+            .attr("dy", ".35em")
+            .attr("dx", ".15em")
+            .text((isRatio) ? ratioUnit : szUnit)
+            .transition(trans)
+            .style("opacity", 1);
 
         // Szövegek összenyomása, hogy kiférjen.
         global.cleverCompress(valNameLabel, that.gContainer.select(".titleRect"), that.titleSplitRatio - 0.07, undefined);

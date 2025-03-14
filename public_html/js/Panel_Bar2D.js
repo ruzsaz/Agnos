@@ -2,7 +2,7 @@
 
 'use strict';
 
-var bar2panel = panel_bar2d;
+const bar2panel = panel_bar2d;
 /**
  * A 2 dimenzió mentén ábrázoló oszlopdiagram konstruktora.
  * 
@@ -10,7 +10,7 @@ var bar2panel = panel_bar2d;
  * @returns {panel_bar2d}
  */
 function panel_bar2d(init) {
-    var that = this;
+    const that = this;
 
     this.constructorName = "panel_bar2d";
 
@@ -18,7 +18,7 @@ function panel_bar2d(init) {
     this.defaultInit = {group: 0, position: undefined, dimx: 0, dimy: 1, val: 0, multiplier: 1, ratio: false, streched: false, domain: [], domainr: [], mag: 1, frommg: 1, sortbyvalue: false};
     this.actualInit = global.combineObjects(that.defaultInit, init);
 
-    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], !that.actualInit.streched, true, global.numberOffset, 0); // A Panel konstruktorának meghívása.
+    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, true, global.numberOffset, 0); // A Panel konstruktorának meghívása.
 
     this.valToShow = that.actualInit.val;					// Az ennyiedik mutatót mutatja.
     this.valFraction = that.actualInit.ratio;				// Hányadost mutasson, vagy abszolútértéket?
@@ -29,10 +29,11 @@ function panel_bar2d(init) {
     this.dimX = (that.dimXToShow <= that.dimYToShow) ? 0 : 1;// Az x tengelyen megjelenítendő dimenzió sorszáma (a data-n belül).
     this.dimY = (that.dimXToShow < that.dimYToShow) ? 1 : 0;// Az oszloposztásban megjelenítendő dimenzió sorszáma (a data-n belül).
 
-    this.preparedData;										// A feldolgozott adat.
+    this.preparedData = undefined;							// A feldolgozott adat.
     this.maxEntries = global.maxEntriesIn2D;                // A panel által maximálisan megjeleníthető adatok száma.
     this.maxEntries1D = global.maxEntriesIn1D;              // A panel által 1 dimenzióban maximálisan megjeleníthető adatok száma.
-    this.shadowTimeout;										// A háttértéglalapokat létrehozó időzítés.
+    this.shadowTimeout = undefined;							// A háttértéglalapokat létrehozó időzítés.
+    this.sortByYDimIndex = 0;
 
     // Vízszintes skála.
     this.xScale = d3.scaleLinear()
@@ -66,7 +67,7 @@ function panel_bar2d(init) {
                 that.drill(that.dimX);
             })
             .on('mouseover', function () {
-                that.hoverOn(this, 0);
+                that.hoverOn(this, "0");
             })
             .on('mouseout', function () {
                 that.hoverOff();
@@ -130,7 +131,8 @@ function panel_bar2d(init) {
             .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");
 
     // Feliratkozás az értékváltás mediátorra.
-    var med;
+
+    let med;
     med = that.mediator.subscribe("changeValue", function (id, val, ratio) {
         that.doChangeValue(id, val, ratio);
     });
@@ -144,6 +146,7 @@ function panel_bar2d(init) {
 
     // Panel regisztrálása a nyilvántartóba.
     that.mediator.publish("register", that, that.panelId, [that.dimXToShow, that.dimYToShow], that.preUpdate, that.update, that.getConfig);
+
 }
 
 //////////////////////////////////////////////////
@@ -153,7 +156,6 @@ function panel_bar2d(init) {
 {
     panel_bar2d.prototype = global.subclassOf(Panel); // A Panel metódusainak átvétele.
     panel_bar2d.prototype.barPadding = 0.1;			// Az oszlopok közötti rés az oszlopok szélességében.
-    panel_bar2d.prototype.xAxisTectColor = global.panelBackgroundColor; // A vízszintes dimenziókra írás színe.
 }
 
 //////////////////////////////////////////////////
@@ -164,13 +166,13 @@ function panel_bar2d(init) {
  * Egy adatsorból meghatározza a megmutatandó értéket.
  * 
  * @param {Object} d Nyers adatsor.
- * @returns {Number} Az értékek.
+ * @returns {Object} Az értékek.
  */
 panel_bar2d.prototype.valueToShow = function (d) {
-    var that = this;
+    let that = this;
     if (d !== undefined && d.vals !== undefined) {
-        var val = (that.valFraction) ? that.fracMultiplier * d.vals[that.valToShow].sz / d.vals[that.valToShow].n : that.valMultiplier * d.vals[that.valToShow].sz;
-        var origVal = val;
+        let val = (that.valFraction) ? that.fracMultiplier * d.vals[that.valToShow].sz / d.vals[that.valToShow].n : that.valMultiplier * d.vals[that.valToShow].sz;
+        let origVal = val;
         if (!isFinite(parseFloat(val))) {
             val = 0;
         }
@@ -191,9 +193,8 @@ panel_bar2d.prototype.valueToShow = function (d) {
  * @returns {String} A megjelenítendő tooltip.
  */
 panel_bar2d.prototype.getTooltip = function (xElement, yElement) {
-    var that = this;
-    //var xUnitProperty = (xElement.value === 1) ? "unit" : "unitPlural";
-    var yUnitProperty = (yElement.value === 1) ? "unit" : "unitPlural";
+    const that = this;
+    const yUnitProperty = (yElement.value === 1) ? "unit" : "unitPlural";
     return that.createTooltip(
             [{
                     name: that.localMeta.dimensions[that.dimXToShow].description,
@@ -218,7 +219,7 @@ panel_bar2d.prototype.getTooltip = function (xElement, yElement) {
  * @returns {Function} Az összehasonlító-függvény.
  */
 panel_bar2d.prototype.getCmpFunction = function () {
-    var that = this;
+    const that = this;
     return function (a, b) {
         return global.realCompare2d(a.dims[that.dimX].name, a.dims[that.dimY].name, b.dims[that.dimX].name, b.dims[that.dimY].name);
     };
@@ -229,7 +230,7 @@ panel_bar2d.prototype.getCmpFunction = function () {
  * 
  * @param {Object} a Egy adatelem.
  * @param {Object} b Egy másik adatelem.
- * @returns {boolean} Az összehasonlítás eredménye.
+ * @returns {Number} Az összehasonlítás eredménye.
  */
 panel_bar2d.prototype.simpleCmp = function (a, b) {
     return global.realCompare(a.name, b.name);    
@@ -244,7 +245,7 @@ panel_bar2d.prototype.simpleCmp = function (a, b) {
  * @returns {undefined}
  */
 panel_bar2d.prototype.setYScale = function (scale) {
-    var actualScaleDomain = (this.valFraction) ? this.actualInit.domainr : this.actualInit.domain;
+    const actualScaleDomain = (this.valFraction) ? this.actualInit.domainr : this.actualInit.domain;
     if ((actualScaleDomain instanceof Array) && actualScaleDomain.length === 2) {
         this.yScale.domain(actualScaleDomain);
     } else {
@@ -266,8 +267,8 @@ panel_bar2d.prototype.setYScale = function (scale) {
  * @returns {undefined}
  */
 panel_bar2d.prototype.preUpdate = function (drill) {
-    var that = this;
-    var oldPreparedData = this.preparedData;
+    const that = this;
+    const oldPreparedData = this.preparedData;
 
     // Ha az X dimenzió mentén történik valami.
     if (drill.dim === that.dimXToShow) {
@@ -310,13 +311,13 @@ panel_bar2d.prototype.preUpdate = function (drill) {
                     .remove();
 
             // Az oszlopok átlagértékének meghatározása.
-            var avgValues = [];
-            var levelY = (global.baseLevels[that.panelSide])[that.dimYToShow].length;
-            for (var j = 0, jMax = oldPreparedData.dimYArray.length; j < jMax; j++) {
-                var avgHeight = d3.mean(oldPreparedData.dataArray, function (d) {
+            const avgValues = [];
+            const levelY = (global.baseLevels[that.panelSide])[that.dimYToShow].length;
+            for (let j = 0, jMax = oldPreparedData.dimYArray.length; j < jMax; j++) {
+                const avgHeight = d3.mean(oldPreparedData.dataArray, function (d) {
                     return (d.values[j] === undefined) ? undefined : d.values[j].height;
                 });
-                var avgY = d3.mean(oldPreparedData.dataArray, function (d) {
+                const avgY = d3.mean(oldPreparedData.dataArray, function (d) {
                     return (d.values[j] === undefined) ? undefined : d.values[j].y;
                 });
                 avgValues.push({dimYId: oldPreparedData.dimYArray[j].id, dimYUniqueId: levelY + "L" + oldPreparedData.dimYArray[j].id, height: avgHeight, y: avgY, startOpacity: 1});
@@ -328,7 +329,7 @@ panel_bar2d.prototype.preUpdate = function (drill) {
                     .remove();
 
             // Átlaghoz tartozó oszlopelem kirajzolása.
-            var levelX = (global.baseLevels[that.panelSide])[that.dimXToShow].length;
+            const levelX = (global.baseLevels[that.panelSide])[that.dimXToShow].length;
             that.gBars.selectAll(".bar").data([{id: drill.fromId, uniqueId: levelX + "L" + drill.fromId}])
                     .enter().append("svg:g")
                     .attr("class", "bar bordered darkenable")
@@ -355,6 +356,7 @@ panel_bar2d.prototype.preUpdate = function (drill) {
 
         // Ha az lefúrás, mindent, kivéve amibe fúrunk, törlünk.
         if (drill.direction === -1) {
+            that.resetSort();
 
             // Jelkulcstéglalapok és feliratok: nem kellőek letörlése.
             that.gLegend.selectAll(".legendEntry")
@@ -376,6 +378,7 @@ panel_bar2d.prototype.preUpdate = function (drill) {
 
         // Ha felfúrás.		
         else if (drill.direction === 1) {
+            that.resetSort();
 
             // Mindent jelkulcsot törlünk.
             that.gLegend.selectAll(".legendEntry")
@@ -412,28 +415,28 @@ panel_bar2d.prototype.preUpdate = function (drill) {
  * @returns {Object} Az új megjelenítendő adatok.
  */
 panel_bar2d.prototype.prepareData = function (oldPreparedData, newDataRows, drill) {
-    var that = this;
-    var levelX = (global.baseLevels[that.panelSide])[that.dimXToShow].length;
-    var levelY = (global.baseLevels[that.panelSide])[that.dimYToShow].length;
+    const that = this;
+    const levelX = (global.baseLevels[that.panelSide])[that.dimXToShow].length;
+    const levelY = (global.baseLevels[that.panelSide])[that.dimYToShow].length;
 
     newDataRows.sort(that.getCmpFunction());	// Elemi adatok sorbarendezése.
 
-    var dimYArray = [];		// Értékek az Y dimenzió mentén. (Azért kell, mert az adatok az X mentén kerülnek tárolásra.)
-    var dataArray = [];		// Az adatok tömbje, az X dimenzió mentén tárolva, azon belül pedig az Y mentén.
+    let dimYArray = [];		// Értékek az Y dimenzió mentén. (Azért kell, mert az adatok az X mentén kerülnek tárolásra.)
+    const dataArray = [];		// Az adatok tömbje, az X dimenzió mentén tárolva, azon belül pedig az Y mentén.
 
     // Maximális oszlophossz meghatározása, oszlop x, y helyének adatbaírása
-    var currentXDimId;
-    var currentXPosition = -1;
+    let currentXDimId = undefined;
+    let currentXPosition = -1;
 
     // Első végigfutás: alapértékek beállítása, a maximumok meghatározása, és az y dimenziók feltöltése.
-    for (var i = 0; i < newDataRows.length; i++) {
-        var d = newDataRows[i];
+    for (let i = 0; i < newDataRows.length; i++) {
+        const d = newDataRows[i];
 
         // Ha új X-dimenzióbeli elemről van szó, létrehozunk egy új üres element.
         if (d.dims[that.dimX].id !== currentXDimId) {
             currentXDimId = d.dims[that.dimX].id;
             currentXPosition++;
-            var element = {};
+            const element = {};
             element.index = currentXPosition;
             element.id = currentXDimId;
             element.uniqueId = levelX + "L" + element.id;
@@ -443,26 +446,26 @@ panel_bar2d.prototype.prepareData = function (oldPreparedData, newDataRows, dril
             dataArray.push(element);
         }
 
-        var dimY = d.dims[that.dimY];
-        var index = global.positionInArrayByProperty(dimYArray, "id", dimY.id);
+        const dimY = d.dims[that.dimY];
+        let index = global.positionInArrayByProperty(dimYArray, "id", dimY.id);
 
         // Y dimenzió hozzáadása, ha még nem volt benne.
         if (index === -1) {
             index = dimYArray.length;
-            var dimYElement = {
+            const dimYElement = {
                 index: index,
                 id: dimY.id,
                 uniqueId: levelY + "L" + dimY.id,
                 name: dimY.name.trim(),
                 parentId: dimY.parentId,
-                tooltip: "<html>" + dimY.name.trim() + "</html>"
+                tooltip: that.htmlTagStarter + dimY.name.trim() + "</html>"
             };
             dimYArray.push(dimYElement);
         }
 
         // Az utolsó x-dimenzióhoz tartozó rekeszbe beleírjuk az y dimenzió szerinti értéket.
-        var element = dataArray[dataArray.length - 1];
-        var val = that.valueToShow(d);
+        const element = dataArray[dataArray.length - 1];
+        const val = that.valueToShow(d);
         element.values.push({
             index: index,
             value: val.value,
@@ -474,25 +477,36 @@ panel_bar2d.prototype.prepareData = function (oldPreparedData, newDataRows, dril
     }
     
     if (that.sortByValue) {
-        dataArray.sort(function (a, b) {
-            if (a.sumValues < b.sumValues) return 1;
-            if (a.sumValues > b.sumValues) return -1;
-            return 0;
-        });
+        if (that.isStretched) {
+            dataArray.sort(function (a, b) {
+                if (a.values[that.sortByYDimIndex].value /a.sumValues < b.values[that.sortByYDimIndex].value/b.sumValues) return 1;
+                if (a.values[that.sortByYDimIndex].value /a.sumValues> b.values[that.sortByYDimIndex].value/b.sumValues) return -1;
+                return 0;
+            });
+            for (let i = 0, iMax = dataArray.length; i < iMax; i++) {
+                dataArray[i].values = global.circularShift(dataArray[i].values, that.sortByYDimIndex);
+            }
+        } else {
+            dataArray.sort(function (a, b) {
+                if (a.sumValues < b.sumValues) return 1;
+                if (a.sumValues > b.sumValues) return -1;
+                return 0;
+            });
+        }
     }
     
     // X irányú lefúrás esetén: ebből a régi elemből kell kinyitni mindent.
-    var openFromXElement = (drill.dim === that.dimXToShow && drill.direction === -1 && oldPreparedData !== undefined) ? global.getFromArrayByProperty(oldPreparedData.dataArray, 'id', drill.toId) : null;
-    var oldX = (openFromXElement) ? openFromXElement.x : 0; // Az új elemek kinyitásának kezdőpozíciója.
+    const openFromXElement = (drill.dim === that.dimXToShow && drill.direction === -1 && oldPreparedData !== undefined) ? global.getFromArrayByProperty(oldPreparedData.dataArray, 'id', drill.toId) : null;
+    let oldX = (openFromXElement) ? openFromXElement.x : 0; // Az új elemek kinyitásának kezdőpozíciója.
 
     // X irányú felfúrás esetén: annak az elemnek az indexe az új adatokban, amit előzőleg kibontva mutattunk.
-    var openToXElementIndex = (drill.dim === that.dimXToShow && drill.direction === 1) ? global.positionInArrayByProperty(dataArray, 'id', drill.fromId) : null;
+    const openToXElementIndex = (drill.dim === that.dimXToShow && drill.direction === 1) ? global.positionInArrayByProperty(dataArray, 'id', drill.fromId) : null;
 
-    var onlyOneBarX = that.xScale.range()[1];	// Ha csak 1 diagramelem van, az ilyen széles a paddinggal együtt.
-    var onlyOneBarWidth = onlyOneBarX * (1 - that.barPadding); // Ha csak 1 diagramelem van, az ilyen széles.
+    const onlyOneBarX = that.xScale.range()[1];	// Ha csak 1 diagramelem van, az ilyen széles a paddinggal együtt.
+    const onlyOneBarWidth = onlyOneBarX * (1 - that.barPadding); // Ha csak 1 diagramelem van, az ilyen széles.
 
-    var oldDataMax = that.yScale.domain()[1]; // Az Y skála régi végpontja.
-    var dataMax = d3.max(dataArray, function (d) {
+    const oldDataMax = that.yScale.domain()[1]; // Az Y skála régi végpontja.
+    const dataMax = d3.max(dataArray, function (d) {
         return d.sumValues;
     });
 
@@ -501,19 +515,19 @@ panel_bar2d.prototype.prepareData = function (oldPreparedData, newDataRows, dril
     that.setYScale([0, dataMax]);
 
     // A régi és az új Y skála közötti arány.
-    var yMagRatio = ((that.isStretched) ? 1 : that.yScale.domain()[1] / oldDataMax);
+    const yMagRatio = ((that.isStretched) ? 1 : that.yScale.domain()[1] / oldDataMax);
 
     // Identikus skála; ha széthúzott üzemmódban vagyunk, akkor minden egyes elemnél átalakítjuk.
-    var strechScale = d3.scaleLinear()
+    const strechScale = d3.scaleLinear()
             .domain([0, dataMax])
             .range([0, dataMax]);
 
-    var elementWidth = that.xScale(1 - that.barPadding); // Az új elemek végső szélessége.
+    const elementWidth = that.xScale(1 - that.barPadding); // Az új elemek végső szélessége.
 
     // Második végigfutás: a kirajzoláshoz szükséges értékek meghatározása.
-    for (var i = 0, iMax = dataArray.length; i < iMax; i++) {
-        var element = dataArray[i];
-        var oldElement = (oldPreparedData !== undefined) ? global.getFromArrayByProperty(oldPreparedData.dataArray, 'id', element.id) : undefined;
+    for (let i = 0, iMax = dataArray.length; i < iMax; i++) {
+        const element = dataArray[i];
+        const oldElement = (oldPreparedData !== undefined) ? global.getFromArrayByProperty(oldPreparedData.dataArray, 'id', element.id) : undefined;
         if (that.isStretched) { // Ha 100%-ra széthúzott módban vagyunk, az oszlopok skáláját hozzáigazítjuk.
             strechScale.domain([0, element.sumValues]);
         }
@@ -535,12 +549,12 @@ panel_bar2d.prototype.prepareData = function (oldPreparedData, newDataRows, dril
             element.oldWidth = element.width;
         }
 
-        var values = element.values;
+        const values = element.values;
 
         // Az elemi téglalapok új y koordinátáinak meghatározása.
-        var accumulation = 0;
-        for (var j = 0, jMax = values.length; j < jMax; j++) {
-            var d = element.values[j];
+        let accumulation = 0;
+        for (let j = 0, jMax = values.length; j < jMax; j++) {
+            const d = element.values[j];
             d.height = that.yScale(strechScale(0)) - that.yScale(strechScale(d.value));
             d.y = that.yScale(strechScale(d.value + accumulation));
             d.tooltip = that.getTooltip(element, d);
@@ -549,42 +563,42 @@ panel_bar2d.prototype.prepareData = function (oldPreparedData, newDataRows, dril
 
         // A régi y koordináta-értékek meghatározása.
         if (drill.dim === that.dimXToShow && drill.direction === -1 && openFromXElement) { // Ha X mentén való lefúrás történt.
-            for (var j = 0, jMax = values.length; j < jMax; j++) {
-                var d = element.values[j];
+            for (let j = 0, jMax = values.length; j < jMax; j++) {
+                const d = element.values[j];
                 d.oldY = openFromXElement.values[j].y;
                 d.oldHeight = openFromXElement.values[j].height;
                 d.startOpacity = 1;
             }
         } else if (drill.dim === that.dimXToShow && drill.direction === 1) { // Ha X mentén való felfúrás történt.
-            for (var j = 0, jMax = values.length; j < jMax; j++) {
-                var d = element.values[j];
+            for (let j = 0, jMax = values.length; j < jMax; j++) {
+                const d = element.values[j];
                 d.oldY = global.orZero(that.height * (1 - yMagRatio) + yMagRatio * d.y);
                 d.oldHeight = global.orZero(yMagRatio * d.height);
                 d.startOpacity = (i === openToXElementIndex) ? 1 : 0;
             }
         } else if (drill.dim === that.dimYToShow && drill.direction === -1 && oldElement !== undefined) { // Ha Y mentén való lefúrás történt.
-            var openFromYElement = global.getFromArrayByProperty(oldElement.values, 'dimYId', drill.toId);
-            var oldY = openFromYElement.y + openFromYElement.height;
-            for (var j = 0, jMax = values.length; j < jMax; j++) {
-                var d = element.values[j];
+            const openFromYElement = global.getFromArrayByProperty(oldElement.values, 'dimYId', drill.toId);
+            let oldY = openFromYElement.y + openFromYElement.height;
+            for (let j = 0, jMax = values.length; j < jMax; j++) {
+                const d = element.values[j];
                 d.oldHeight = openFromYElement.height / jMax;
                 oldY = oldY - d.oldHeight;
                 d.oldY = oldY;
                 d.startOpacity = 1;
             }
         } else if (drill.dim === that.dimYToShow && drill.direction === 1 && oldElement !== undefined) { // Ha Y mentén való felfúrás történt.
-            var oldValues = oldElement.values;
-            var openToYElementIndex = global.positionInArrayByProperty(values, "dimYId", drill.fromId);
-            var yHeightRatio = (oldValues[0].y - oldValues[oldValues.length - 1].y + oldValues[0].height) / values[openToYElementIndex].height;
-            for (var j = 0, jMax = values.length; j < jMax; j++) {
-                var d = element.values[j];
+            const oldValues = oldElement.values;
+            const openToYElementIndex = global.positionInArrayByProperty(values, "dimYId", drill.fromId);
+            const yHeightRatio = (oldValues[0].y - oldValues[oldValues.length - 1].y + oldValues[0].height) / values[openToYElementIndex].height;
+            for (let j = 0, jMax = values.length; j < jMax; j++) {
+                const d = element.values[j];
                 d.oldY = (that.isStretched) ? (openToYElementIndex - j) * that.height : (d.y - values[openToYElementIndex].y) * yHeightRatio + oldValues[oldValues.length - 1].y || that.height;
                 d.oldHeight = (that.isStretched) ? that.height : d.height * yHeightRatio || 0;
                 d.startOpacity = (j === openToYElementIndex) ? 1 : 0;
             }
         } else { // Különben.
-            for (var j = 0, jMax = values.length; j < jMax; j++) {
-                var d = element.values[j];
+            for (let j = 0, jMax = values.length; j < jMax; j++) {
+                const d = element.values[j];
                 d.oldY = that.height;
                 d.oldHeight = 0;
                 d.startOpacity = 1;
@@ -594,11 +608,14 @@ panel_bar2d.prototype.prepareData = function (oldPreparedData, newDataRows, dril
 
     // Az y dimenzió mentén a jelkulcstömb pozíciókkal való kiegészítése.
     dimYArray.sort(that.simpleCmp);
-    var openFromLegendElement = (drill.dim === that.dimYToShow && drill.direction === -1 && oldElement !== undefined) ? global.getFromArrayByProperty(oldPreparedData.dimYArray, 'id', drill.toId) : null;
-    var openToLegendIndex = (drill.dim === that.dimYToShow && drill.direction === 1) ? global.positionInArrayByProperty(dimYArray, 'id', drill.fromId) : null;
-    var l_width = that.legendWidth / dimYArray.length;
-    for (var i = 0, iMax = dimYArray.length; i < iMax; i++) {
-        var yElement = dimYArray[i];
+    if (that.sortByValue && that.isStretched) {
+        dimYArray = global.circularShift(dimYArray, that.sortByYDimIndex);
+    }
+    const openFromLegendElement = (drill.dim === that.dimYToShow && drill.direction === -1) ? global.getFromArrayByProperty(oldPreparedData.dimYArray, 'id', drill.toId) : null;
+    const openToLegendIndex = (drill.dim === that.dimYToShow && drill.direction === 1) ? global.positionInArrayByProperty(dimYArray, 'id', drill.fromId) : null;
+    const l_width = that.legendWidth / dimYArray.length;
+    for (let i = 0, iMax = dimYArray.length; i < iMax; i++) {
+        const yElement = dimYArray[i];
         yElement.x = i * l_width;
         yElement.width = l_width;
         if (drill.dim === that.dimXToShow && drill.direction === -1) { // Ha X mentén való lefúrás történt.
@@ -609,7 +626,7 @@ panel_bar2d.prototype.prepareData = function (oldPreparedData, newDataRows, dril
             yElement.oldX = yElement.x;
             yElement.oldWidth = yElement.width;
             yElement.startOpacity = 0;
-        } else if (drill.dim === that.dimYToShow && drill.direction === -1 && oldElement !== undefined) { // Ha Y mentén való lefúrás történt.
+        } else if (drill.dim === that.dimYToShow && drill.direction === -1) { // Ha Y mentén való lefúrás történt.
             yElement.oldX = openFromLegendElement.x + i * openFromLegendElement.width / iMax;
             yElement.oldWidth = openFromLegendElement.width / iMax;
             yElement.startOpacity = 1;
@@ -635,7 +652,7 @@ panel_bar2d.prototype.prepareData = function (oldPreparedData, newDataRows, dril
  * @returns {undefined}
  */
 panel_bar2d.prototype.update = function (data, drill) {
-    var that = this;
+    const that = this;
     that.data = data || that.data;
     drill = drill || {dim: -1, direction: 0};
 
@@ -649,25 +666,25 @@ panel_bar2d.prototype.update = function (data, drill) {
         that.valFraction = true;
     }
 
-    var tweenDuration = (drill.duration === undefined) ? global.getAnimDuration(-1, that.panelId) : drill.duration;
+    const tweenDuration = (drill.duration === undefined) ? global.getAnimDuration("-1", that.panelId) : drill.duration;
     if (that.data.rows.length > that.maxEntries) {
-        that.panic(true, _("<html>A panel nem képes ") + that.data.rows.length + _(" értéket megjeleníteni.<br />A maximálisan megjeleníthető értékek száma ") + that.maxEntries + _(".</html>"));
+        that.panic(true, _(that.htmlTagStarter + "A panel nem képes ") + that.data.rows.length + _(" értéket megjeleníteni.<br />A maximálisan megjeleníthető értékek száma ") + that.maxEntries + _(".</html>"));
         that.preparedData = undefined;
     } else {
         that.preparedData = that.prepareData(that.preparedData, that.data.rows, drill);
-        var maxInDim = Math.max(that.preparedData.dimYArray.length, Math.ceil(that.data.rows.length / that.preparedData.dimYArray.length));
+        const maxInDim = Math.max(that.preparedData.dimYArray.length, Math.ceil(that.data.rows.length / that.preparedData.dimYArray.length));
         if (maxInDim > that.maxEntries1D) {
-            that.panic(true, _("<html>A panel nem képes ") + maxInDim + " értéket egy dimenzió mentén megjeleníteni.<br />A maximálisan megjeleníthető értékek száma " + that.maxEntries1D + ".</html>");
+            that.panic(true, _(that.htmlTagStarter +"A panel nem képes ") + maxInDim + " értéket egy dimenzió mentén megjeleníteni.<br />A maximálisan megjeleníthető értékek száma " + that.maxEntries1D + ".</html>");
             that.preparedData = undefined;
         } else {
             that.panic(false);
-            var trans = d3.transition().duration(tweenDuration);
+            const trans = d3.transition().duration(tweenDuration);
             that.drawAxes(that.preparedData, trans);
             that.drawBars(that.preparedData, trans);
             that.drawLegend(that.preparedData, trans);
         }
     }
-    var titleMeta = that.localMeta.indicators[that.valToShow];
+    const titleMeta = that.localMeta.indicators[that.valToShow];
     that.titleBox.update(that.valToShow, titleMeta.caption, titleMeta.value.unitPlural, titleMeta.fraction.unitPlural, that.valFraction, tweenDuration);
 };
 
@@ -679,10 +696,10 @@ panel_bar2d.prototype.update = function (data, drill) {
  * @returns {undefined}
  */
 panel_bar2d.prototype.drawBars = function (preparedData, trans) {
-    var that = this;
+    const that = this;
 
     // Egy téglalap konténere, és a hozzá tartozó adat hozzácsapása.
-    var gBar = that.gBars.selectAll(".bar")
+    let gBar = that.gBars.selectAll(".bar")
             .data(preparedData.dataArray, function (d) {
                 return d.uniqueId;
             });
@@ -707,8 +724,8 @@ panel_bar2d.prototype.drawBars = function (preparedData, trans) {
             });
 
     // Elemi oszlopelemek megrajzolása, kilépők letörlése.
-    var oldWidth = (preparedData.dataArray.length > 0) ? preparedData.dataArray[0].oldWidth : 0; // A régi téglalapszélesség; ki kell szedni, hogy minden elemhez használhassuk.
-    var barRect = gBar.selectAll("rect")
+    const oldWidth = (preparedData.dataArray.length > 0) ? preparedData.dataArray[0].oldWidth : 0; // A régi téglalapszélesség; ki kell szedni, hogy minden elemhez használhassuk.
+    const barRect = gBar.selectAll("rect")
             .data(function (d) {
                 return d.values;
             }, function (d) {
@@ -765,11 +782,11 @@ panel_bar2d.prototype.drawBars = function (preparedData, trans) {
  * @returns {undefined}
  */
 panel_bar2d.prototype.drawLegend = function (preparedData, trans) {
-    var that = this;
-    var legendArray = preparedData.dimYArray;
+    const that = this;
+    const legendArray = preparedData.dimYArray;
 
     // Egy elem tartó g-je, ebbe kerül a téglalp, és rá a szöveg.
-    var legend = that.gLegend.selectAll(".legendEntry")
+    let legend = that.gLegend.selectAll(".legendEntry")
             .data(legendArray, function (d) {
                 return d.uniqueId;
             });
@@ -782,7 +799,7 @@ panel_bar2d.prototype.drawLegend = function (preparedData, trans) {
             .remove();
 
     // Új elemek létrehozása.
-    var legend_new = legend.enter().insert("svg:g", ".bar_group")
+    const legend_new = legend.enter().insert("svg:g", ".bar_group")
             .attr("transform", function (d) {
                 return "translate(" + (d.oldX + that.legendOffsetX) + ", " + (that.h - global.legendHeight - global.legendOffsetY) + ")";
             })
@@ -871,7 +888,7 @@ panel_bar2d.prototype.drawLegend = function (preparedData, trans) {
             .attr("opacity", 1);
 
     // A szövegek összenyomása, hogy elférjenek.
-    var legendText = legend.selectAll("text");
+    const legendText = legend.selectAll("text");
     global.cleverCompress(legendText, that.legendWidth / legendArray.length - 0.5 * that.legendOffsetX, 1, undefined, false, true, that.legendWidth / legendArray.length);
 };
 
@@ -883,11 +900,11 @@ panel_bar2d.prototype.drawLegend = function (preparedData, trans) {
  * @returns {undefined}
  */
 panel_bar2d.prototype.drawAxes = function (preparedData, trans) {
-    var that = this;
+    const that = this;
 
     that.xAxisTextColor = global.readableColor(global.colorValue(0, that.panelSide));
-    var shadowSize = global.axisTextSize(that.xScale(1));	// A vízszintes tengely betűje mögötti klikk-téglalap mérete.
-    var axisTextSize = (shadowSize < 6) ? 0 : shadowSize;	// A vízszintes tengely betűmérete.
+    const shadowSize = global.axisTextSize(that.xScale(1));	// A vízszintes tengely betűje mögötti klikk-téglalap mérete.
+    const axisTextSize = (shadowSize < 6) ? 0 : shadowSize;	// A vízszintes tengely betűmérete.
 
     // Függőleges tengely kirajzolása, animálása.
     if (that.gAxisY.selectAll("path").nodes().length > 0) {
@@ -914,7 +931,7 @@ panel_bar2d.prototype.drawAxes = function (preparedData, trans) {
                 y: global.captionDistance});    
 
     // Feliratok a vízszintes tengelyre, és a hozzá tartozó adat.
-    var axisLabelX = that.gAxisX.selectAll("text")
+    let axisLabelX = that.gAxisX.selectAll("text")
             .data(preparedData.dataArray, function (d) {
                 return d.id + d.name;
             });
@@ -925,16 +942,14 @@ panel_bar2d.prototype.drawAxes = function (preparedData, trans) {
             .remove();
 
     // Belépő feliratok elhelyezése.
-    var axisLabelXText = axisLabelX.enter()
+    const axisLabelXText = axisLabelX.enter()
             .append("svg:text")
             .attr("class", "shadowedLabel")
             .attr("font-size", axisTextSize)
             .attr("opacity", function (d) {
                 return (global.valueInRange(d.oldX, 0, that.w)) ? 0 : global.axisTextOpacity;
             })
-            .attr("transform", function (d) {
-                return "rotate(-90)";
-            })
+            .attr("transform", "rotate(-90)")
             .attr("x", -that.height + 0.26 * axisTextSize)
             .attr("y", function (d) {
                 return d.oldX + d.oldWidth / 2 + 0.35 * axisTextSize;
@@ -1001,16 +1016,43 @@ panel_bar2d.prototype.drawAxes = function (preparedData, trans) {
 // Irányítást végző függvények
 //////////////////////////////////////////////////
 
+panel_bar2d.prototype.sortSwitch = function() {
+    const that = this;
+    global.tooltip.kill();
+    if (that.isStretched){
+        if (that.sortByValue === false) {
+            that.sortByValue = true;
+            that.sortByYDimIndex = 0;
+        } else {
+            that.sortByYDimIndex = that.sortByYDimIndex + 1;
+            if (that.sortByYDimIndex === that.preparedData.dimYArray.length) {
+                that.sortByValue = false;
+            }
+        }
+    } else {
+        that.sortByValue = !that.sortByValue;
+    }
+    that.update();
+    that.actualInit.sortbyvalue = that.sortByValue;
+    global.getConfig2();
+};
+
+panel_bar2d.prototype.resetSort = function() {
+    this.sortByValue = false;
+    this.actualInit.sortbyvalue = this.sortByValue;
+    global.getConfig2();
+}
+
 /**
  * Valamely dimenzióban történő le vagy felfúrást kezdeményező függvény.
  * 
- * @param {Integer} dim A lefúrás dimenziója (0 vagy 1).
+ * @param {Number} dim A lefúrás dimenziója (0 vagy 1).
  * @param {Object} d Lefúrás esetén a lefúrás céleleme. Ha undefined, akkor felfúrásról van szó.
  * @returns {undefined}
  */
 panel_bar2d.prototype.drill = function (dim, d) {
     global.tooltip.kill();
-    var drill = {
+    const drill = {
         dim: (dim === this.dimX) ? this.dimXToShow : this.dimYToShow,
         direction: (d === undefined) ? 1 : -1,
         toId: (d === undefined) ? undefined : d.id,
@@ -1023,12 +1065,12 @@ panel_bar2d.prototype.drill = function (dim, d) {
  * A mutató- és hányadosválasztást végrehajtó függvény.
  * 
  * @param {String} panelId A váltást végrehajtó panel azonosítója. Akkor vált, ha az övé, vagy ha undefined.
- * @param {Integer} value Az érték, amire váltani kell. Ha -1 akkor a következőre vált, ha undefined, nem vált.
- * @param {boolean} ratio Hányadost mutasson-e. Ha -1 akkor a másikra ugrik, ha undefined, nem vált.
+ * @param {Number} value Az érték, amire váltani kell. Ha -1 akkor a következőre vált, ha undefined, nem vált.
+ * @param {Number} ratio Hányadost mutasson-e. Ha -1 akkor a másikra ugrik, ha undefined, nem vált.
  * @returns {undefined}
  */
 panel_bar2d.prototype.doChangeValue = function (panelId, value, ratio) {
-    var that = this;
+    const that = this;
     if (panelId === undefined || panelId === that.panelId) {
         if (value !== undefined) {
             that.valToShow = (value === -1) ? (that.valToShow + 1) % that.localMeta.indicators.length : value;
@@ -1050,12 +1092,12 @@ panel_bar2d.prototype.doChangeValue = function (panelId, value, ratio) {
  * A dimenzióváltást végrehajtó függvény.
  * 
  * @param {String} panelId A dimenzióváltást kapó panel ID-ja.
- * @param {Integer} newDimId A helyére bejövő dimenzió ID-ja.
- * @param {Integer} dimToChange A megváltoztatandó dimenzió sorszáma (0 vagy 1).
+ * @param {Number} newDimId A helyére bejövő dimenzió ID-ja.
+ * @param {Number} dimToChange A megváltoztatandó dimenzió sorszáma (0 vagy 1).
  * @returns {undefined}
  */
 panel_bar2d.prototype.doChangeDimension = function (panelId, newDimId, dimToChange) {
-    var that = this;
+    const that = this;
     if (panelId === that.panelId) {
         if (dimToChange === 0) {
             that.dimXToShow = newDimId;
@@ -1063,6 +1105,7 @@ panel_bar2d.prototype.doChangeDimension = function (panelId, newDimId, dimToChan
         } else {
             that.dimYToShow = newDimId;
             that.actualInit.dimy = that.dimYToShow;
+            that.sortByYDimIndex = 0;
         }
         that.dimX = (that.dimXToShow <= that.dimYToShow) ? 0 : 1; // Az x tengelyen megjelenítendő dimenzió sorszáma (a data-n belül).
         that.dimY = (that.dimXToShow < that.dimYToShow) ? 1 : 0; // Az oszloposztásban megjelenítendő dimenzió sorszáma (a data-n belül).

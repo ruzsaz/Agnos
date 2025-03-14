@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="hu">
     <body>
         <nav>
             <ul class="dropdown">
                 <li id="mainPlusButton">
                     <span class="tloc" tooltip="<h4>Nagyítás</h4>" onclick="global.mainToolbar_magnify(-1);">
-                        <svg class="magnifiable" version="1.1" x="0px" y="0px" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                        <svg class="magnifiable" x="0px" y="0px" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                         <use xlink:href="#icon_plus" />						
                         </svg>
                     </span>
                 </li>
                 <li id="mainMinusButton">
                     <span class="tloc" tooltip="<h4>Kicsinyítés</h4>" onclick="global.mainToolbar_magnify(1)">
-                        <svg class="magnifiable" version="1.1" x="0px" y="0px" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                        <svg class="magnifiable" x="0px" y="0px" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                         <use xlink:href="#icon_minus" />	
                         </svg>
                     </span>
@@ -20,63 +20,55 @@
 
                 <li class="inactive onlyforreport newpanel">
                     <span class="tloc" tooltip="<h4>Új panel</h4>">
-                        <svg version="1.1" x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
+                        <svg x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
                         <use xlink:href="#icon_newpanel" />	
                         </svg>
                     </span>
                     <ul class="hidden">
-                        <!--
-                        <li><span class="tloc" tooltip="<h4>Kördiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('piechartpanel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                                <use xlink:href="#icon_panel_pie" />	
-                                </svg>
-                            </span>
-                        </li>
-                        -->
                         <li>
                             <span class="tloc" tooltip="<h4>Oszlopdiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('barpanel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_bar" />
                                 </svg>
                             </span>
                             <span class="tloc" tooltip="<h4>Széthúzott oszlopdiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('strechedbarpanel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_bar_streched" />
                                 </svg>								
                             </span>		
                         </li>
                         <li>							
                             <span class="tloc" tooltip="<h4>Vonaldiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('linepanel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_line" />
                                 </svg>
                             </span>
                             <span class="tloc" tooltip="<h4>Vonaldiagram jelölővel</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('markedlinepanel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_line_marker" />
                                 </svg>
                             </span>
                         </li>
                         <li>
                             <span class="tloc" tooltip="<h4>Top 10 oszlopdiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('top10Barpanel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_top10_bar" />
                                 </svg>
                             </span>
                             <span class="tloc" tooltip="<h4>Top 10 vonaldiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('top10Linepanel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_top10_line" />
                                 </svg>								
                             </span>		
                         </li>
                         <li>
                             <span class="tloc mappanelcreator" tooltip="<h4>Színezett térkép</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('mappanel');">
-                                <svg version="1.1" x="0px" y="0px" width="50px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 32">
+                                <svg x="0px" y="0px" width="50px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 32">
                                 <use xlink:href="#icon_panel_map" />
                                 </svg>
                             </span>
                             <span class="tloc" tooltip="<h4>Kördiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('piechartpanel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_pie" />	
                                 </svg>
                             </span>
@@ -90,71 +82,82 @@
                         </li>
                         <li>
                             <span class="tloc" tooltip="<h4>2 dimenziós oszlopdiagram</h4><ul><li>dimenziók: <em>2</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('bar2panel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_2d_bar" />
                                 </svg>
                             </span>
                             <span class="tloc" tooltip="<h4>Széthúzott 2 dimenziós oszlopdiagram</h4><ul><li>dimenziók: <em>2</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('strechedbar2panel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_2d_bar_streched" />
                                 </svg>
                             </span>
                         </li>
                         <li>
                             <span class="tloc" tooltip="<h4>2 dimenziós vonaldiagram</h4><ul><li>dimenziók: <em>2</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('line2panel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_2d_line" />
                                 </svg>
                             </span>
                             <span class="tloc" tooltip="<h4>2 dimenziós vonaldiagram jelölővel</h4><ul><li>dimenziók: <em>2</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('markedline2panel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_2d_line_marker" />
                                 </svg>
                             </span>
                         </li>
                         <li>
                             <span class="tloc" tooltip="<h4>Vízszintes oszlopdiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('horizontalbarpanel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_horizontalbar" />
                                 </svg>							
                             </span>
                             <span class="tloc" tooltip="<h4>Centrált vízszintes oszlopdiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('fixedhorizontalbarpanel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_horizontalbar_centered" />
                                 </svg>								
                             </span>
                         </li>	
                         <li>
                             <span class="tloc" tooltip="<h4>1 dimenziós táblázat</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>összes</em></ul>" onclick="global.mainToolbar_createNewPanel('Panel_Table1D');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_table_1d" />
                                 </svg>								
                             </span>
                             <span class="tloc" tooltip="<h4>2 dimenziós táblázat</h4><ul><li>dimenziók: <em>2</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('Panel_Table2D');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_table_2d" />
                                 </svg>	
                             </span>
                         </li>	
                         <li>
                             <span class="tloc" tooltip="<h4>2 oszlopos szalagdiagram</h4><ul><li>dimenziók: <em>2</em><li>mutatók: <em>1</em></ul>Csak a dimenziók mentén additív mutatóhoz!" onclick="global.mainToolbar_createNewPanel('sankey2panel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_sankey_2d" />
                                 </svg>								
                             </span>
                             <span class="tloc" tooltip="<h4>3 oszlopos szalagdiagram</h4><ul><li>dimenziók: <em>3</em><li>mutatók: <em>1</em></ul>Csak a dimenziók mentén additív mutatóhoz!" onclick="global.mainToolbar_createNewPanel('sankey3panel');">
-                                <svg version="1.1" x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_sankey_3d" />
                                 </svg>	
                             </span>
-                        </li>	
-
+                        </li>
+                        <li>
+                            <span class="tloc" tooltip="<h4>Buborékdiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>3</em></ul>" onclick="global.mainToolbar_createNewPanel('bubblepanel');">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <use xlink:href="#icon_panel_bubble" />
+                                </svg>
+                            </span>
+                            <span class="tloc" tooltip="<h4>Pontszórás diagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>2</em></ul>" onclick="global.mainToolbar_createNewPanel('scatterpanel');">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <use xlink:href="#icon_panel_scatterplot" />
+                                </svg>
+                            </span>
+                        </li>
                     </ul>
                 </li>
 
                 <li class="inactive onlyforreport hideForMobile save saveAsCsv">
                     <span class="tloc" tooltip='<h4>Adatok mentése</h4>' onclick="global.mainToolbar_save();">
-                        <svg version="1.1" x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
+                        <svg x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
                         <use xlink:href="#icon_save" />
                         </svg>
                     </span>
@@ -162,7 +165,7 @@
 
                 <li class="inactive onlyforreport hideForMobile save">
                     <span class="tloc" tooltip='<h4>Panelek mentése képként</h4>' onclick="global.mainToolbar_saveAllImages();">
-                        <svg version="1.1" x="0px" y="0px" width="1.25em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
+                        <svg x="0px" y="0px" width="1.25em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
                         <use xlink:href="#icon_save_png" />
                         </svg>
                     </span>
@@ -170,7 +173,7 @@
 
                 <li>
                     <span class="tloc" tooltip='<h4>Használati segédlet</h4>' onclick="global.mainToolbar_help(null);">
-                        <svg version="1.1" x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
+                        <svg x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
                         <use xlink:href="#icon_help" />
                         </svg>
                     </span>
@@ -179,7 +182,7 @@
                 <li class="inactive onlyforreport" id="mainCloseButton">
                     <span class="tloc" tooltip='<h4>Jelentés bezárása</h4>' onclick="if (this.parentNode.className.indexOf('inactive') === -1)
                                 global.mainToolbar_closeSide();">
-                        <svg version="1.1" x="0px" y="0px" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                        <svg x="0px" y="0px" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                         <use xlink:href="#icon_close" />
                         </svg>
                     </span>
@@ -187,7 +190,7 @@
 
                 <li class="hideForMobile" id="mainSwitchButton">
                     <span class="tloc" tooltip='<h4>1/2 oldal váltás</h4>' onclick="global.mainToolbar_switchSide();">
-                        <svg version="1.1" x="0px" y="0px" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                        <svg x="0px" y="0px" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                         <use xlink:href="#icon_switch" />
                         </svg>						
                     </span>
@@ -195,7 +198,7 @@
                 
                 <li class="hideForDesktop" id="fullScreenButton">
                     <span class="tloc" tooltip='<h4>Teljes képernyő</h4>' onclick="global.toogleFullscreen();">
-                        <svg version="1.1" x="0px" y="0px" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                        <svg x="0px" y="0px" width="1em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                         <use xlink:href="#icon_fullscreen" />
                         </svg>						
                     </span>
@@ -203,7 +206,7 @@
 
                 <li class="languageSwitch switch" style="display: none;">
                     <span class="tloc" tooltip="<h4>Nyelv választás</h4>">
-                        <svg version="1.1" x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
+                        <svg x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
                         <use xlink:href="#icon_flag" />	
                         </svg>
                     </span>
@@ -214,25 +217,19 @@
                         <li>
                             <span class="tloc" tooltip="<h4>Angol</h4>" onclick="global.mainToolbar_setLanguage('en');">English</span>
                         </li>
-                        <!--
-                        <li>
-                            <span class="tloc" tooltip="<h4>Orosz</h4>" onclick="global.mainToolbar_setLanguage('ru');">Pусский</span>
-                        </li>
-                        -->
-
                     </ul>
                 </li>               
 
                 <li class="cssSwitch switch">
                     <span class="tloc" tooltip="<h4>Színsémák</h4>">
-                        <svg version="1.1" x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
+                        <svg x="0px" y="0px" width="1.2em" height="1em" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32">
                         <use xlink:href="#icon_palette" />	
                         </svg>
                     </span>
                     <ul class="hidden">
                         <li>
                             <span class="tloc" tooltip="<h4>Sötét</h4>" onclick="global.changeCSS('css/black.css');">
-                                <svg version="1.1" class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
+                                <svg class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
                                 <use xlink:href="#icon_colorscheme_base"  style="fill: #343434; stroke: none; stroke-width: 1"/>
                                 <use xlink:href="#icon_colorscheme_color1" class="nohover" style="fill: #40bddf; stroke: #40bddf"/>
                                 <use xlink:href="#icon_colorscheme_color2" class="nohover" style="fill: #bad642; stroke: #bad642"/>
@@ -242,7 +239,7 @@
                             </span>
 
                             <span class="tloc" tooltip="<h4>Világos</h4>" onclick="global.changeCSS('css/white.css');">
-                                <svg version="1.1" class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
+                                <svg class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
                                 <use xlink:href="#icon_colorscheme_base"  style="fill: #fff; stroke: none; stroke-width: 1"/>
                                 <use xlink:href="#icon_colorscheme_color1" class="nohover" style="fill: #ff9090; stroke: #ff9090"/>
                                 <use xlink:href="#icon_colorscheme_color2" class="nohover" style="fill: #ffcf90; stroke: #ffcf90"/>
@@ -253,7 +250,7 @@
                         </li>
                         <li>
                             <span class="tloc" tooltip="<h4>Lila</h4>" onclick="global.changeCSS('css/purple.css');">
-                                <svg version="1.1" class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
+                                <svg class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
                                 <use xlink:href="#icon_colorscheme_base"  style="fill: #fdd; stroke: none; stroke-width: 1"/>
                                 <use xlink:href="#icon_colorscheme_color1" class="nohover" style="fill: #b87e7e; stroke: #b87e7e"/>
                                 <use xlink:href="#icon_colorscheme_color2" class="nohover" style="fill: #ffd9a6; stroke: #ffd9a6"/>
@@ -263,7 +260,7 @@
                             </span>
 
                             <span class="tloc" tooltip="<h4>Napsugár</h4>" onclick="global.changeCSS('css/napsugar.css');">
-                                <svg version="1.1" class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
+                                <svg class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
                                 <defs>
                                 <pattern id="napsugarPatternBackground" patternUnits="userSpaceOnUse" x="-236" y="3" width="800" height="60" patternTransform="scale(0.7)">
                                     <image xlink:href="data/pictures/_thumbs.png" x="0" y="0" width="800" height="60" />
@@ -279,7 +276,7 @@
                         </li>
                         <li>
                             <span class="tloc" tooltip="<h4>NégyKék</h4>" onclick="global.changeCSS('css/blue.css');">
-                                <svg version="1.1" class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
+                                <svg class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
                                 <defs>
                                 <pattern id="bluePatternBackground" patternUnits="userSpaceOnUse" x="-388" y="6" width="800" height="60" patternTransform="scale(0.4)">
                                     <image xlink:href="data/pictures/_thumbs.png" x="0" y="0" width="800" height="60" />
@@ -294,7 +291,7 @@
                             </span>
 
                             <span class="tloc" tooltip="<h4>Black & cyan</h4>" onclick="global.changeCSS('css/cyan.css');">
-                                <svg version="1.1" class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
+                                <svg class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
                                 <defs>
                                 <pattern id="cyanPatternBackground" patternUnits="userSpaceOnUse" x="-123" y="9" width="800" height="60" patternTransform="scale(0.5)">
                                     <image xlink:href="data/pictures/_thumbs.png" x="0" y="0" width="800" height="60" />
@@ -310,7 +307,7 @@
                         </li>
                         <li>
                             <span class="tloc" tooltip="<h4>Budapest</h4>" onclick="global.changeCSS('css/budapest.css');">
-                                <svg version="1.1" class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
+                                <svg class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
                                 <defs>
                                 <pattern id="budapestPatternBackground" patternUnits="userSpaceOnUse" x="-286" y="-10" width="800" height="60" patternTransform="scale(0.6)">
                                     <image xlink:href="data/pictures/_thumbs.png" x="0" y="0" width="800" height="60" />
@@ -325,7 +322,7 @@
                             </span>
 
                             <span class="tloc" tooltip="<h4>Felhős</h4>" onclick="global.changeCSS('css/cloudy.css');">
-                                <svg version="1.1" class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
+                                <svg class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
                                 <defs>
                                 <pattern id="cloudyPatternBackground" patternUnits="userSpaceOnUse" x="3" y="-12" width="800" height="60" patternTransform="scale(1)">
                                     <image xlink:href="data/pictures/_thumbs.png" x="0" y="0" width="800" height="60" />
@@ -342,7 +339,7 @@
                         </li>
                         <li>
                             <span class="tloc" tooltip="<h4>Covid</h4>" onclick="global.changeCSS('css/covid.css');">
-                                <svg version="1.1" class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
+                                <svg class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
                                 <use xlink:href="#icon_colorscheme_base"  style="fill: #8d8775; stroke: none; stroke-width: 1"/>
                                 <use xlink:href="#icon_colorscheme_color1" class="nohover" style="fill: #ff9090; stroke: #ff9090"/>
                                 <use xlink:href="#icon_colorscheme_color2" class="nohover" style="fill: #ffcf90; stroke: #ffcf90"/>
@@ -351,7 +348,7 @@
                                 </svg>
                             </span>
                             <span class="tloc" tooltip="<h4>Covid min</h4>" onclick="global.changeCSS('css/covid_minimal.css');">
-                                <svg version="1.1" class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
+                                <svg class="colorscheme" width="80px" height="60px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 32" style="position: relative; top: -14px;">
                                 <use xlink:href="#icon_colorscheme_base"  style="fill: rgb(187, 186, 186); stroke: none; stroke-width: 1"/>
                                 <use xlink:href="#icon_colorscheme_color1" class="nohover" style="fill: #fff; stroke: #fff"/>
                                 <use xlink:href="#icon_colorscheme_color2" class="nohover" style="fill: #d34d58; stroke: #d34d58"/>

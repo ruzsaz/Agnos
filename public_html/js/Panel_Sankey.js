@@ -106,7 +106,7 @@ function panel_sankey(init) {
     
     // Oszlopok alá a dimenzió ráírása.
     this.axisCaptions = that.svg.insert("svg:g", ".title_group")
-            .attr("class", "dimensionLabel noEvents")
+            .attr("class", "noEvents")
             .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ") ");    
 
 
@@ -642,7 +642,7 @@ panel_sankey.prototype.drawAxes = function (graph, trans) {
             .remove();        
             
     axisCaptions = axisCaptions.enter().append("svg:text")
-            .attr("class", "noEvents")
+            .attr("class", "dimensionLabel noEvents")
             .merge(axisCaptions);
     
     axisCaptions

@@ -286,6 +286,19 @@ var global = function () {
 // Globálisan használt függvények.
 //////////////////////////////////////////////////
 
+    var circularShift = function(arr, shift_index) {
+        var left = arr.slice(0, shift_index);
+        //console.log("left: ", left)
+
+        var right = arr.slice(shift_index, arr.length);
+        //console.log("right: ", right)
+
+        var circular_shift_arr = right.concat(left);
+
+        //console.log("circular_shift_arr: ", circular_shift_arr);
+        return circular_shift_arr;
+    }
+
     /**
      * Nyelvállítás előtt kell meghívni. A .loc osztályú tag-ekenél a
      * szöveget berakja egy 'origText' tag-be, hogy arra cuppanjon rá
@@ -894,6 +907,25 @@ var global = function () {
         return date.toLocaleDateString(String.locale, {year: "numeric"});
     };
 
+
+    const relaxExtent = function (extent) {
+        const min =  extent[0];
+        const max =  extent[1];
+        if (min === max) {
+            if (min < 0) {
+                return [11 * min / 10, 9 * max / 10];
+            }
+            return [9 * min / 10, 11 * max / 10];
+        }
+        if (min > 0 && min < max / 1.7) {
+            return [0, max];
+        }
+        if (max < 0 && max > min / 1.7) {
+            return [min, 0];
+        }
+        return extent;
+    }
+
     /**
      * Összehasonlít két sztringet lexikografikusan, illetve numerikusan, ha számok.
      * Figyelembe veszi, hogyha az egyik, vagy mindkét sztring szerepel a speciális
@@ -1350,7 +1382,7 @@ var global = function () {
      */
     var combineObjects = function (defaultObj, obj) {
         var keys = Object.keys(defaultObj);
-        var combined = [];
+        var combined = {};
         for (var i = 0; i < keys.length; i++) {
             if ((typeof obj !== "undefined") && (keys[i] in obj)) {
                 combined[keys[i]] = obj[keys[i]];
@@ -1380,6 +1412,7 @@ var global = function () {
             ['panel_table1d', 'PT1'],
             ['panel_table2d', 'PT2'],
             ['panel_sankey', 'PS'],
+            ['panel_bubble', 'PU'],
             ['group:', 'A:'],
             ['position:', 'B:'],
             ['dim:', 'C:'],
@@ -2078,6 +2111,7 @@ var global = function () {
         changeCSSInProgress: changeCSSInProgress,   // Folyamatban van-e egy css-csere?
         
         // Globálisan elérendő függvények.
+        circularShift: circularShift, // Körkörös eltolás egy tömbön.
         logout: logout, // Logs the current user out from the identity provider
         login: login, // Starts the login method of the identity provider
         reLogin: reLogin, // Logs out the current user, and starts the login method of the identity provider
@@ -2129,6 +2163,7 @@ var global = function () {
         cleverRound3: cleverRound3, // Szám rövid kijelzése kiíráshoz, max 4 számkarakterrel. (pl. 3.51 Mrd.)
         cleverRound5: cleverRound5, // Szám rövid kijelzése kiíráshoz, max 5 számkarakterrel. (pl. 34514 M.)
         cleverDate: cleverDate, // Egy dátumot ember által fogyasztható formában ír ki, a beállított locale-nak megfelelő nyelven.
+        relaxExtent: relaxExtent, // A megadott tartományt ésszerűen kiterjeszti egy közeli értékre.
         realCompare: realCompare, // Pótlás a picit hibásan működő localeCompare helyett.
         realCompare2d: realCompare2d, // 2 részből álló sztringpárt összehasonlít.
         cleverCompress: cleverCompress, // Betömörít kiírt feliratokat a megadott helyre.

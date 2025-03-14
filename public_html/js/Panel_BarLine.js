@@ -45,9 +45,9 @@ function panel_barline(init) {
     this.fracLineMultipliers = [];// Ennyiszeresét kell mutatni az értékeknek.
     this.fracAvgMultipliers = [];	// Ennyiszeresét kell mutatni az értékeknek.    
     this.isSymbolsRequired = that.actualInit.symbols;	// Rajzoljunk jelölőt a vonaldiagramra?
-    this.processedData;									// A megjelenítendő feldolgozott adat.
+    this.processedData = undefined;						// A megjelenítendő feldolgozott adat.
     this.maxEntries = (this.actualInit.top10) ? 999999999 : global.maxEntriesIn1D;    // A panel által maximálisan megjeleníthető adatok száma.    
-    this.shadowTimeout;									// A háttértéglalapokat létrehozó időzítés.
+    this.shadowTimeout = undefined;						// A háttértéglalapokat létrehozó időzítés.
     this.maskId = global.randomString(12);              // A maszk réteg id-je. Véletlen, nehogy kettő azonos legyen.
 
     // Az x tengely szövegszínének meghatározása.
@@ -67,10 +67,8 @@ function panel_barline(init) {
             .range([that.height, 0])
             .domain([0, 1]);
 
-    // A vízszintes tengely.
+    // Axes.
     this.xAxis = d3.axisBottom(that.xScale);    
-
-    // A függőleges tengelyt generáló függvény.
     this.yAxis = d3.axisLeft(that.yScale)
             .ticks(10)
             .tickFormat(global.cleverRound3);

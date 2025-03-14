@@ -37,14 +37,14 @@ function DataDirector(side, mediator) {
     });
     this.cubePreparationRequired = true;
     
-    this.currentData;
+    this.currentData = undefined;
 }
 
 /**
  * Regisztrál, vagy töröl egy panelt. Ha már regisztrálva van, felülírja az előző regisztrációt.
  * 
  * @param {Object} context A panel objektum. Ha undefined, akkor töröl.
- * @param {Integer} panelId A panel azonosítója.
+ * @param {int} panelId A panel azonosítója.
  * @param {Array} dimsToShow A panel által mutatott dimenziók. (0: nem mutatja, 1: mutatja.)
  * @param {Function} preUpdateFunction A panel klikkeléskor végrehajtandó függvénye.
  * @param {Function} updateFunction Az új adat megérkezésekor meghívandó függvény.
@@ -99,20 +99,20 @@ DataDirector.prototype.getFirstFreeIndex = function() {
 };
 
 /**
- * Megtippeli, hogy egy új panel számára melyik lehet a legalkalmasabb dimenzió.
- * Arra tippel, ami a már meglevő panelekben a legkevesebbszer szerepel.
- * 
- * @param {Number} exceptDim Ha megadjuk, ez a dimenzió az utolsó lesz a lehetségesek között.
- * Ezt 2 dimenziót ábrázoló panelek második dimenziójának megtippelésekor kell használni.
- * @returns {Number} A tippelt dimenzió sorszáma.
+ * Predicts the most suitable dimension for a new panel.
+ * It guesses the one that appears the least frequently among the existing panels.
+ *
+ * @param {Array} exceptions If specified, this dimensions will be the last among the possible ones.
+ * This should be used when predicting the second dimension for panels representing two dimensions.
+ * @returns {int} The index of the predicted dimension.
  */
-DataDirector.prototype.guessDimension = function(exceptDim) {
-    var meta = global.facts[this.side].localMeta;
-    var bestDim = -1;
-    var bestDimScore = 10000;
-    for (var d = 0, dMax = meta.dimensions.length; d < dMax; d++) {
-        var score = (d === exceptDim) ? 1000 + d / 100 : d / 100;
-        for (var p = 0, pMax = this.panelRoster.length; p < pMax; p++) {
+DataDirector.prototype.guessDimension = function(exceptions = []) {
+    const meta = global.facts[this.side].localMeta;
+    let bestDim = -1;
+    let bestDimScore = 10000;
+    for (let d = 0, dMax = meta.dimensions.length; d < dMax; d++) {
+        let score = (exceptions.indexOf(d) !== -1) ? 1000 + d / 100 : d / 100;
+        for (let p = 0, pMax = this.panelRoster.length; p < pMax; p++) {
             score += this.panelRoster[p].dimsToShow[d];
         }
         if (score < bestDimScore) {
@@ -124,14 +124,15 @@ DataDirector.prototype.guessDimension = function(exceptDim) {
 };
 
 /**
- * Keres egy ábrázolható value-t. (Aminek vagy a val-ja vagy a frac-ja nem hidden.)
- * 
- * @returns {Number} Egy ábrázolható value indexe, vagy 0 ha nincs ilyen.
+ * Looking for a representable value. (One whose val or frac is not hidden.)
+ *
+ * @param {Array} exceptions Value indexes to skip.
+ * @returns {int} A representable value's index, or 0 if there is none.
  */
-DataDirector.prototype.guessValue = function() {
-    var meta = global.facts[this.side].localMeta;
-    for (var i = 0, iMax = meta.indicators.length; i < iMax; i++) {
-        if (meta.indicators[i].isShown) {
+DataDirector.prototype.guessValue = function(exceptions = []) {
+    const meta = global.facts[this.side].localMeta;
+    for (let i = 0, iMax = meta.indicators.length; i < iMax; i++) {
+        if (meta.indicators[i].isShown && (exceptions === undefined || exceptions.indexOf(i) === -1)) {
             return i;
         }
     }
@@ -139,9 +140,9 @@ DataDirector.prototype.guessValue = function() {
 };
 
 /**
- * Visszaadja az épp használatban levő normál panelek számát.
+ * Returns the number of currently active normal panels.
  * 
- * @returns {Number} A haszálatban levő normál panelek száma.
+ * @returns {int} The number of normal panels in use.
  */
 DataDirector.prototype.getNumberOfPanels = function() {
     return this.panelRoster.length;
@@ -432,8 +433,8 @@ DataDirector.prototype.getPanelDrill = function(i, drill) {
 };
 
 /**
- * Lekérdezi az oldalon lévő panelek pillanatnyi konfigurációját létrehozó
- * konfigurációs parancsot.
+ * Retrieves the configuration command that generates the current configuration
+ * of the panels on the page.
  * 
  * @param {Function} callback A visszahívandó függvény. Ha undefined, a konzolra írja.
  * @returns {undefined}

@@ -533,6 +533,9 @@ g.sankey_nodes_shadow .nodeShadow {
 .legend {
   font-size: 12px;
 }
+.valLegend {
+  font-size: 11px !important;
+}
 .titleText {
   font-size: 26px;
   font-weight: bold;
