@@ -169,15 +169,15 @@ Fact.prototype.getLocalMeta = function() {
 /**
  * Create a javascript function from a string containing the function's body.
  * 
- * @param {String} functionDefinition Definition of the function, like "function (a) {return a}".
+ * @param {String} functionDefinition Definition of the function, like "return c[0]*v[1]".
  * @returns {Function} The created javascript function.
  */
 Fact.prototype.createFunction = function(functionDefinition) {
     if (functionDefinition === null || functionDefinition === undefined || functionDefinition.length === 0) {
         return undefined;
     }
-    var returnFunction;
-    eval("returnFunction = " + functionDefinition);
+    let returnFunction;
+    eval("returnFunction = function(D,c,v,d) {" + functionDefinition + "}");
     return returnFunction;    
 };
 
