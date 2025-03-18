@@ -67,7 +67,7 @@ function panel_bar2d(init) {
                 that.drill(that.dimX);
             })
             .on('mouseover', function () {
-                that.hoverOn(this, "0");
+                that.hoverOn(this, 0);
             })
             .on('mouseout', function () {
                 that.hoverOff();
