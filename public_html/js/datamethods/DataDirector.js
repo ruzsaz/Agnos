@@ -24,7 +24,7 @@ function DataDirector(side, mediator) {
     that.mediator.subscribe("drill", function(drill) {
         if (!that.drillLock || drill.onlyFor !== undefined) {
             that.drillLock = true;
-            that.drill(drill);            
+            that.drill(drill);
         }
     });
     that.mediator.subscribe("controlChange", function(duration) {
@@ -61,7 +61,7 @@ DataDirector.prototype.register = function(context, panelId, dimsToShow, preUpda
             oldPosition = this.panelRoster.length;
         }
         const ds = [];
-        for (let d = 0, dMax = global.facts[this.side].reportMeta.dimensions.length; d < dMax; d++) {
+        for (let d = 0, dMax = global.facts[this.side].reportMeta.dimensions.length + global.facts[this.side].reportMeta.controls.length; d < dMax; d++) {
             ds.push((dimsToShow.indexOf(d) > -1) ? 1 : 0);
         }
 
@@ -157,25 +157,40 @@ DataDirector.prototype.getNumberOfPanels = function() {
  */
 DataDirector.prototype.drill = function(drill) {
     const that = this;
+
     let isSuccessful = false;
     const dim = drill.dim;
-    const baseDim = (global.baseLevels[that.side])[dim];
-    if (drill.direction === -1) {
-        if (drill.toId !== undefined && baseDim.length < global.facts[that.side].localMeta.dimensions[dim].levels - 1) {
-            isSuccessful = true;
-            drill.fromId = (baseDim.length === 0) ? null : (baseDim[baseDim.length - 1]).id;
-            baseDim.push({id: drill.toId, name: drill.toName});
+
+    // If the drill is a control, then set the desired controls value
+    if (drill.dim > global.facts[that.side].reportMeta.dimensions.length - 1) {
+        if (drill.direction === -1) {
+            const controlNumber = drill.dim - global.facts[that.side].reportMeta.dimensions.length;
+            const headPanelId = "#panel" + that.side + "P-1";
+            const headPanel = (that.panelRoster.find(panel => panel.panelId === headPanelId)).context;
+            const controlObject = headPanel.controlElements[controlNumber];
+            controlObject.setValue(drill.toId);
+            that.initiatePreUpdates(drill);
         }
-    } else if (drill.direction === 1) {        
-        if (baseDim.length > 0) {
+    } else {
+        const baseDim = (global.baseLevels[that.side])[dim];
+        if (drill.direction === -1) {
+            if (drill.toId !== undefined && baseDim.length < global.facts[that.side].localMeta.dimensions[dim].levels - 1) {
+                isSuccessful = true;
+                drill.fromId = (baseDim.length === 0) ? null : (baseDim[baseDim.length - 1]).id;
+                baseDim.push({id: drill.toId, name: drill.toName});
+            }
+        } else if (drill.direction === 1) {
+            if (baseDim.length > 0) {
+                isSuccessful = true;
+                drill.fromId = (baseDim[baseDim.length - 1]).id;
+                baseDim.pop();
+                drill.toId = (baseDim.length === 0) ? null : (baseDim[baseDim.length - 1]).id;
+            }
+        } else if (drill.direction === 0) {
             isSuccessful = true;
-            drill.fromId = (baseDim[baseDim.length - 1]).id;
-            baseDim.pop();
-            drill.toId = (baseDim.length === 0) ? null : (baseDim[baseDim.length - 1]).id;
         }
-    } else if (drill.direction === 0) {
-        isSuccessful = true;
     }
+
     if (isSuccessful) {
         that.requestNewData(drill);
         that.initiatePreUpdates(drill);                
@@ -218,7 +233,6 @@ DataDirector.prototype.initiatePreUpdates = function(drill) {
  */
 DataDirector.prototype.requestNewData = function(drill) {
     const that = this;
-
     const baseVector = [];
     for (let d = 0, dMax = (global.baseLevels[that.side]).length; d < dMax; d++) {
         const baseVectorCoordinate = {};
@@ -229,11 +243,10 @@ DataDirector.prototype.requestNewData = function(drill) {
         }
         baseVector.push(baseVectorCoordinate);
     }
-
     const queriesStamp = [];
     const queries = [];
     for (let p = 0, pMax = this.panelRoster.length; p < pMax; p++) {
-        const elementStamp = this.panelRoster[p].dimsToShow.toString().replace(/,/g, ":");
+        const elementStamp = this.panelRoster[p].dimsToShow.slice(0, baseVector.length).toString().replace(/,/g, ":");
         queriesStamp.push(elementStamp);
         
         // If it is a new query according to the stamp, put it into the query array,
@@ -312,27 +325,111 @@ DataDirector.prototype.calculate = function(data) {
  * Calls the panels' registered update functions after a data change (drill or
  * calculation from a new input).
  * 
- * @param {Object} newData New data object.
+ * @param {Array} newData New data object.
  * @param {Object} drill The drill that started the data change.
  * @returns {undefined}
  */
-DataDirector.prototype.notifyAllPanelsOnChange = function(newData, drill) {            
+DataDirector.prototype.notifyAllPanelsOnChange = function(newData, drill) {
+    const realDimensions = global.facts[this.side].reportMeta.dimensions.length;
     for (let i = 0, iMax = this.panelRoster.length; i < iMax; i++) {
-        const pos = global.positionInArrayByProperty(newData, "name", this.panelRoster[i].dimsToShow.toString().replace(/,/g, ":"));
+        const pos = global.positionInArrayByProperty(newData, "name", this.panelRoster[i].dimsToShow.slice(0, realDimensions).toString().replace(/,/g, ":"));
         const data = newData[pos].response;
+        const enrichedData = this.enrichDataWithControlDimensions(data, this.panelRoster[i].dimsToShow);
+        this.calculate(enrichedData);
         if (drill.onlyFor === undefined || drill.onlyFor === this.panelRoster[i].panelId) {
-            this.panelRoster[i].updateFunction.call(this.panelRoster[i].context, data, this.getPanelDrill(i, drill));
+            this.panelRoster[i].updateFunction.call(this.panelRoster[i].context, enrichedData, this.getPanelDrill(i, drill));
         }
     }   
     global.getConfig2();    
 };
+
+DataDirector.prototype.enrichDataWithControlDimensions = function(data, dimsToShow) {
+    const that = this;
+    const meta = global.facts[this.side].reportMeta;
+    const headPanelId = "#panel" + that.side + "P-1";
+    const headPanel = (this.panelRoster.find(panel => panel.panelId === headPanelId)).context;
+    const controlsAsDim = [];
+    const controlsAsIndex = [];
+    for (let i = 0, iMax = meta.controls.length; i < iMax; i++) {
+        if (dimsToShow[meta.dimensions.length + i] === 1) {
+            controlsAsDim.push(meta.controls[i]);
+            controlsAsIndex.push(i);
+        }
+    }
+
+    for (let c = 0, cMax = controlsAsDim.length; c < cMax; c++) {
+        const controlObject = headPanel.controlElements[controlsAsIndex[c]];
+        const possibleControlValues = controlObject.getPossibleControlValuesAsArray();
+        const newData = {'rows': []};
+        for (let r = 0, rMax = data.rows.length; r < rMax; r++) {
+            const row = data.rows[r];
+            possibleControlValues.forEach(function(controlValue) {
+                const newRow = JSON.parse(JSON.stringify(row));
+                if (newRow.controls === undefined) {
+                    newRow.controls = [];
+                    for (let i = 0, iMax = global.facts[that.side].controlValues.length; i < iMax; i++) {
+                        newRow.controls[i] = global.facts[that.side].controlValues[i];
+                    }
+                }
+                newRow.controls[controlsAsIndex[c]] = controlValue.value;
+                newRow.dims.push({'id': controlValue.value + '', 'name': controlValue.label + ''}); // TODO: formázottan kéne sztringgé, legalább az egyiket?
+                newData.rows.push(newRow);
+            });
+        }
+        data = newData;
+    }
+
+    const localMeta = global.facts[this.side].localMeta;
+
+    for (let i = 0, iMax = localMeta.indicators.length; i < iMax; i++) {
+
+        const valueFunction = localMeta.indicators[i].value.function;
+        if (typeof valueFunction === "function") {
+            this.applyFunction2(data, valueFunction, i, "sz");
+        }
+        const fractionFunction = localMeta.indicators[i].fraction.function;
+        if (typeof fractionFunction === "function") {
+            this.applyFunction2(data, fractionFunction, i, "n");
+        }
+    }
+
+    return data;
+}
+
+DataDirector.prototype.getPossibleControlValuesAsArray = function(parameters) {
+    if (parameters === undefined) {
+        return [];
+    }
+    if (parameters.values !== undefined) {
+        return parameters.values;
+    }
+    if (parameters.min !== undefined || parameters.max !== undefined || parameters.step !== undefined) {
+        const values = [];
+        for (let i = parameters.min; i <= parameters.max; i += parameters.step) {
+            values.push(i);
+        }
+        return values;
+    }
+}
+
+DataDirector.prototype.applyFunction2 = function(data, func, index, position) {
+        for (let r = 0, rMax = data.rows.length; r < rMax; r++) {
+            const row = data.rows[r];
+            const D = row.dims;
+            const c = row.controls || global.facts[this.side].controlValues;
+            const v = row.origVals.map(element => element.sz);
+            const d = row.origVals.map(element => element.n);
+            row.vals[index][position] = func(D, c, v, d);
+        }
+};
+
 
 /**
  * Stores the original (without calculations applied) values of the indicators.
  * Should be called before applying the calculations. It modifies the received
  * data object.
  * 
- * @param {Object} data The data object to process.
+ * @param {Array} data The data object to process.
  * @returns {undefined}
  */
 DataDirector.prototype.storeOrigValues = function(data) {
@@ -356,10 +453,10 @@ DataDirector.prototype.storeOrigValues = function(data) {
  * values and c[] as the controls' values.
  * The result will be stored in the received data object.
  * 
- * @param {Object} data The data object to process.
+ * @param {Array} data The data object to process.
  * @param {Array} controlValues Array of the actual control values.
  * @param {Function} func Function to calculate the calculated value.
- * @param {Number} index Index of the value to calculate.
+ * @param {int} index Index of the value to calculate.
  * @param {String} position "sz" or "n" to calculate the számláló or nevező.
  * @returns {undefined}
  */
@@ -382,7 +479,7 @@ DataDirector.prototype.applyFunction = function(data, controlValues, func, index
  * Localizes the "name" dimension attributes in the raw data.
  * There is no return value, the input data is changed.
  * 
- * @param {type} newData New data to process
+ * @param {Array} newData New data to process
  * @returns {undefined} 
  */
 DataDirector.prototype.localizeNewData = function(newData) {
@@ -424,6 +521,7 @@ DataDirector.prototype.localizeNewData = function(newData) {
  */
 DataDirector.prototype.getPanelDrill = function(i, drill) {
     return {
+        initiator: drill.initiator,
         dim: drill.dim,
         direction: (this.panelRoster[i].dimsToShow[drill.dim] === 1) ? drill.direction : 0,
         fromId: drill.fromId,

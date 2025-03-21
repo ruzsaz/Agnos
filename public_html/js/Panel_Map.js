@@ -1023,12 +1023,12 @@ panel_map.prototype.drill = function (d) {
  * A mutató- és hányadosválasztást végrehajtó függvény.
  * 
  * @param {String} panelId A váltást végrehajtó panel azonosítója. Akkor vált, ha az övé, vagy ha undefined.
- * @param {Integer} value Az érték, amire váltani kell. Ha -1 akkor a következőre vált, ha undefined, nem vált.
+ * @param {int} value Az érték, amire váltani kell. Ha -1 akkor a következőre vált, ha undefined, nem vált.
  * @param {boolean} ratio Hányadost mutasson-e. Ha -1 akkor a másikra ugrik, ha undefined, nem vált.
  * @returns {undefined}
  */
 panel_map.prototype.doChangeValue = function (panelId, value, ratio) {
-    var that = this;
+    const that = this;
     if (panelId === undefined || panelId === that.panelId) {
         if (value !== undefined) {
             that.valToShow = (value === -1) ? (that.valToShow + 1) % that.localMeta.indicators.length : value;
@@ -1053,7 +1053,7 @@ panel_map.prototype.doChangeValue = function (panelId, value, ratio) {
  * A dimenzióváltást végrehajtó függvény.
  * 
  * @param {String} panelId A dimenzióváltást kapó panel ID-ja.
- * @param {Integer} newDimId A helyére bejövő dimenzió ID-ja.
+ * @param {int} newDimId A helyére bejövő dimenzió ID-ja.
  * @returns {undefined}
  */
 panel_map.prototype.doChangeDimension = function (panelId, newDimId) {

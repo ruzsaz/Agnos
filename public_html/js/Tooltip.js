@@ -8,7 +8,7 @@
  * @returns {Tooltip}
  */
 function Tooltip() {
-	var that = this;
+	const that = this;
 
 	this.screenSizeX = parseInt($(window).width());
 	this.screenSizeY = parseInt($(window).height());
@@ -109,8 +109,9 @@ Tooltip.prototype.hide = function() {
  * @returns {undefined}
  */
 Tooltip.prototype.show = function(html) {
-        const appearDelay = global.hasTouchScreen ? 100 : 1000;
-	var that = this;
+	const that = this;
+	const appearDelay = global.hasTouchScreen ? 100 : 1000;
+
 	that.screenSizeX = parseInt($(window).width());  // Újra lemérjük, hátha megváltozott.
 	that.screenSizeY = parseInt($(window).height()); // Újra lemérjük, hátha megváltozott.
 

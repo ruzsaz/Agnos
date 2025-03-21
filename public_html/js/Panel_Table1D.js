@@ -245,36 +245,47 @@ panel_table1d.prototype.getSortingComparator = function() {
  * @returns {undefined}
  */
 panel_table1d.prototype.preUpdate = function (drill) {
-    var that = this;
+    const that = this;
 
-    // Ha az X dimenzió mentén történik valami.
-    if (drill.dim === that.dimToShow) {
-
-        // Ha az lefúrás, mindent, kivéve amibe fúrunk, letörlünk.
-        if (drill.direction === -1) {
-
-            // Sorfejek: nem kellőek törlése.
-            that.gRowHeads.selectAll(".svgRowHead")
-                    .filter(function (d) {
-                        return (d.id !== drill.toId);
-                    })
-                    .remove();
-
-            // Táblázatsorok: nem kellőek törlése.
-            that.gTable.selectAll(".svgTableRow")
-                    .filter(function (d) {
-                        return (d.id !== drill.toId);
-                    })
-                    .remove();
+    // If it shows a control when clciked on, produce a blinking
+    if (drill.dim >= global.baseLevels[that.panelSide].length) {
+        if (drill.initiator === that.panelId) {
+            const transition = d3.transition().duration(global.blinkDuration);
+            that.gRowHeads.selectAll(".svgRowHead").filter(function(d) {
+                return (d.id === drill.toId);
+            }).selectAll("rect").call(that.applyBlinking, transition);
         }
+    } else {
 
-        // Ha felfúrás történik.
-        else if (drill.direction === 1) {
+        // Ha az X dimenzió mentén történik valami.
+        if (drill.dim === that.dimToShow) {
 
-            // Ha nem a legalsó szinten vagyunk, akkor minden sor törlése.
-            if ((global.baseLevels[that.panelSide])[that.dimToShow].length + 2 !== that.localMeta.dimensions[that.dimToShow].levels) {
-                that.gRowHeads.selectAll(".svgRowHead").remove();
-                that.gTable.selectAll(".svgTableRow").remove();
+            // Ha az lefúrás, mindent, kivéve amibe fúrunk, letörlünk.
+            if (drill.direction === -1) {
+
+                // Sorfejek: nem kellőek törlése.
+                that.gRowHeads.selectAll(".svgRowHead")
+                    .filter(function (d) {
+                        return (d.id !== drill.toId);
+                    })
+                    .remove();
+
+                // Táblázatsorok: nem kellőek törlése.
+                that.gTable.selectAll(".svgTableRow")
+                    .filter(function (d) {
+                        return (d.id !== drill.toId);
+                    })
+                    .remove();
+            }
+
+            // Ha felfúrás történik.
+            else if (drill.direction === 1) {
+
+                // Ha nem a legalsó szinten vagyunk, akkor minden sor törlése.
+                if ((global.baseLevels[that.panelSide])[that.dimToShow].length + 2 !== that.localMeta.dimensions[that.dimToShow].levels) {
+                    that.gRowHeads.selectAll(".svgRowHead").remove();
+                    that.gTable.selectAll(".svgTableRow").remove();
+                }
             }
         }
     }
@@ -289,17 +300,17 @@ panel_table1d.prototype.preUpdate = function (drill) {
  * @returns {Array} Az új megjelenítendő adatok.
  */
 panel_table1d.prototype.prepareData = function (oldPreparedData, newDataRows, drill) {
-    var that = this;
-    var level = (global.baseLevels[that.panelSide])[that.dimToShow].length;
+    const that = this;
+    const level = (that.dimToShow < global.baseLevels[that.panelSide].length) ? (global.baseLevels[that.panelSide])[this.dimToShow].length : 0;
 
     newDataRows.sort(that.getSortingComparator());	// Elemi adatok sorbarendezése.
-    var dataArray = [];		// Az adatok tömbje, az X dimenzió mentén tárolva, azon belül pedig az Y mentén.
+    const dataArray = [];		// Az adatok tömbje, az X dimenzió mentén tárolva, azon belül pedig az Y mentén.
 
     // Alapértékek beállítása.
-    for (var i = 0; i < newDataRows.length; i++) {
-        var d = newDataRows[i];
-        var dim = d.dims[0];
-        var element = {
+    for (let i = 0; i < newDataRows.length; i++) {
+        const d = newDataRows[i];
+        const dim = d.dims[0];
+        const element = {
             index: i,
             oldRowIndex: i,
             id: dim.id,
@@ -319,15 +330,15 @@ panel_table1d.prototype.prepareData = function (oldPreparedData, newDataRows, dr
 
     // Honnan nyíljon ki az animáció?
     if (oldPreparedData && drill.dim === that.dimToShow && drill.direction === -1) { // Ha sorba való lefúrás történt.
-        var oldRowIndex = global.getFromArrayByProperty(oldPreparedData, 'id', drill.toId).index;
-        for (var r = 0, rMax = dataArray.length; r < rMax; r++) {
+        const oldRowIndex = global.getFromArrayByProperty(oldPreparedData, 'id', drill.toId).index;
+        for (let r = 0, rMax = dataArray.length; r < rMax; r++) {
             dataArray[r].oldRowIndex = oldRowIndex;
             dataArray[r].startOpacity = (1 / rMax) + 0.2;
         }
     } else if (oldPreparedData && drill.dim === that.dimToShow && drill.direction === 1) { // Ha sorból való felfúrás történt.
-        var offset = (oldPreparedData.length - 1) / 2;
-        var newRowIndex = global.getFromArrayByProperty(dataArray, 'id', drill.fromId).index;
-        for (var r = 0, rMax = dataArray.length; r < rMax; r++) {
+        const offset = (oldPreparedData.length - 1) / 2;
+        const newRowIndex = global.getFromArrayByProperty(dataArray, 'id', drill.fromId).index;
+        for (let r = 0, rMax = dataArray.length; r < rMax; r++) {
             dataArray[r].oldRowIndex = (dataArray[r].index - newRowIndex) * 5 + offset;
             dataArray[r].startOpacity = (dataArray[r].index === newRowIndex) ? 1 : 0;
         }
@@ -344,17 +355,17 @@ panel_table1d.prototype.prepareData = function (oldPreparedData, newDataRows, dr
  * @returns {undefined}
  */
 panel_table1d.prototype.update = function (data, drill) {
-    var that = this;
+    const that = this;
     that.data = data || that.data;
     drill = drill || {dim: -1, direction: 0};
 
-    var tweenDuration = (drill.duration === undefined) ? global.getAnimDuration(-1, that.panelId) : drill.duration;
-    var trans = d3.transition().duration(tweenDuration);
+    const tweenDuration = (drill.duration === undefined) ? global.getAnimDuration(-1, that.panelId) : drill.duration;
+    const trans = d3.transition().duration(tweenDuration);
 
     // Ha túl sok értéket kéne megjeleníteni, pánik
     if (that.data.rows.length > that.maxEntries) {
         that.verticalScrollbar.set(0, null, trans);
-        that.panic(true, _("<html>A panel nem képes ") + that.data.rows.length + _(" értéket megjeleníteni.<br />A maximálisan megjeleníthető értékek száma ") + that.maxEntries + _(".</html>"));
+        that.panic(true, _(that.htmlTagStarter + "A panel nem képes ") + that.data.rows.length + _(" értéket megjeleníteni.<br />A maximálisan megjeleníthető értékek száma ") + that.maxEntries + _(".</html>"));
         that.preparedData = undefined;
     } else {
         that.panic(false);
@@ -378,12 +389,12 @@ panel_table1d.prototype.update = function (data, drill) {
  * @returns {undefined}
  */
 panel_table1d.prototype.drawCells = function (preparedData, trans) {
-    var that = this;
+    const that = this;
 
     // A színek kitalálása
     that.columnColorIndex = [];
-    for (var i = 0, iMax = that.localMeta.indicators.length; i < iMax; i++) {
-        var ind = that.localMeta.indicators[i];
+    for (let i = 0, iMax = that.localMeta.indicators.length; i < iMax; i++) {
+        const ind = that.localMeta.indicators[i];
         that.columnHeadVector.push({
             hide: ((ind.value.hide) ? 1 : 0) + ((ind.fraction.hide) ? 2 : 0),
             tooltip: that.createTooltip(
@@ -400,10 +411,10 @@ panel_table1d.prototype.drawCells = function (preparedData, trans) {
     }
 
     // A sorok adathoz társítása. Kulcs: a táblázatsor dimenziója.
-    var row = that.gTable.selectAll(".svgTableRow")
-            .data(preparedData, function (d) {
-                return d.name;
-            });
+    let row = that.gTable.selectAll(".svgTableRow")
+        .data(preparedData, function (d) {
+            return d.name;
+        });
 
     // Kilépő sorok törlése.
     row.exit().remove();
@@ -427,20 +438,20 @@ panel_table1d.prototype.drawCells = function (preparedData, trans) {
             .attr("opacity", 1);
 
     // Cellákhoz való adattársítás.
-    var cell = row.selectAll(".svgTableCell")
-            .data(function (d) {
-                return d.values;
-            });
+    let cell = row.selectAll(".svgTableCell")
+        .data(function (d) {
+            return d.values;
+        });
 
     // Kilépő cellák letörlése.
     cell.exit().remove();
 
     // Új cella tartójának elkészítése.
-    var newCell = cell.enter().append("svg:g")
-            .attr("class", "svgTableCell showValue")
-            .attr("transform", function (d, i) {
-                return "translate(" + (i * that.tableSpacingHorizontal) + ",0)";
-            });
+    const newCell = cell.enter().append("svg:g")
+        .attr("class", "svgTableCell showValue")
+        .attr("transform", function (d, i) {
+            return "translate(" + (i * that.tableSpacingHorizontal) + ",0)";
+        });
 
     // Új cella háttértéglalapjának kirajzolása.
     newCell.append("svg:rect")
@@ -678,41 +689,6 @@ panel_table1d.prototype.drawRowHeaders = function (preparedData, trans) {
 //////////////////////////////////////////////////
 
 /**
- * Valamely dimenzióban történő le vagy felfúrást kezdeményező függvény.
- * 
- * @param {Object} d Lefúrás esetén a lefúrás céleleme. Ha undefined, akkor felfúrásról van szó.
- * @returns {undefined}
- */
-panel_table1d.prototype.drill = function (d) {
-    global.tooltip.kill();
-    var drill = {
-        dim: this.dimToShow,
-        direction: (d === undefined) ? 1 : -1,
-        toId: (d === undefined) ? undefined : d.id,
-        toName: (d === undefined) ? undefined : d.name
-    };
-    this.mediator.publish("drill", drill);
-};
-
-/**
- * A dimenzióváltást végrehajtó függvény.
- * 
- * @param {String} panelId A dimenzióváltást kapó panel ID-ja.
- * @param {Integer} newDimId A helyére bejövő dimenzió ID-ja.
- * @returns {undefined}
- */
-panel_table1d.prototype.doChangeDimension = function (panelId, newDimId) {
-    var that = this;
-    if (panelId === that.panelId) {
-        that.dimToShow = newDimId;
-        that.actualInit.dim = that.dimToShow;
-        that.mediator.publish("register", that, that.panelId, [that.dimToShow], that.preUpdate, that.update, that.getConfig);
-        global.tooltip.kill();
-        this.mediator.publish("drill", {dim: -1, direction: 0, toId: undefined});
-    }
-};
-
-/**
  * Nyelvváltást végrehajtó függvény.
  * 
  * @param {Number} duration A megjelenítési animáció ideje.
@@ -720,6 +696,7 @@ panel_table1d.prototype.doChangeDimension = function (panelId, newDimId) {
  * @returns {undefined}
  */
 panel_table1d.prototype.langSwitch = function (duration, isInitial) {
+    Panel.prototype.langSwitch();
     var that = this;
     var idA = [];									// Megjelenítendő értékek id-vektora a tooltiphez.
     var valueNamesVector = [];						// A megjelenítendő értékek neveinek tömbje.

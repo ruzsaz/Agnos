@@ -290,48 +290,54 @@ panel_bubble.prototype.preUpdate = function (drill) {
     const that = this;
     const oldPreparedData = that.preparedData;
 
-    if (drill.direction === -1) { // Lefúrás esetén.
-        that.gBubbles.selectAll(".bubble")
-            .filter(function (d) {
-                return (d.id !== drill.toId);
-            })
-            .on("click", null)
-            .remove();
+    // If it shows a control when clicked on, produce a blinking
+    if (drill.dim >= global.baseLevels[that.panelSide].length) {
+        if (drill.initiator === that.panelId) {
+            that.gBubbles.selectAll(".bubble").filter(function (d) {
+                return (d.id === drill.toId);
+            }).call(that.applyBlinking);
+            that.gBubbles.selectAll(".bubble_label").filter(function (d) {
+                return (d.id === drill.toId);
+            }).call(that.applyBlinking);
+        }
+    } else {
 
-        that.gBubbles.selectAll(".bubble_label")
-            .filter(function (d) {
-                return (d.id !== drill.toId);
-            })
-            .remove();
+        if (drill.direction === -1) { // Lefúrás esetén.
+            that.gBubbles.selectAll(".bubble")
+                .filter(function (d) {
+                    return (d.id !== drill.toId);
+                })
+                .on("click", null)
+                .remove();
 
-        const openFromElement = (drill.direction === -1 && oldPreparedData !== undefined) ? global.getFromArrayByProperty(oldPreparedData, 'id', drill.toId) : null;
-        that.actionCenterX = (openFromElement === null) ? undefined : that.xScale(openFromElement.x);
-        that.actionCenterY = (openFromElement === null) ? undefined : that.yScale(openFromElement.y);
-        that.actionCenterR = 0;
+            that.gBubbles.selectAll(".bubble_label")
+                .filter(function (d) {
+                    return (d.id !== drill.toId);
+                })
+                .remove();
 
-    } else if (drill.direction === 1) { // Felfúrás esetén.
-        that.gBubbles.selectAll(".bubble_label")
-            .attr("opacity", 0);
-
-        that.actionCenterX = undefined;
-        that.actionCenterY = undefined;
-        that.actionCenterR = (that.isScatter) ? 25 : 15;
-
+            const openFromElement = (drill.direction === -1 && oldPreparedData !== undefined) ? global.getFromArrayByProperty(oldPreparedData, 'id', drill.toId) : null;
+            that.actionCenterX = (openFromElement === null) ? undefined : that.xScale(openFromElement.x);
+            that.actionCenterY = (openFromElement === null) ? undefined : that.yScale(openFromElement.y);
+            that.actionCenterR = 0;
+        } else if (drill.direction === 1) { // Felfúrás esetén.
+            that.gBubbles.selectAll(".bubble_label")
+                .attr("opacity", 0);
+            that.actionCenterX = undefined;
+            that.actionCenterY = undefined;
+            that.actionCenterR = (that.isScatter) ? 25 : 15;
+        }
     }
 };
 
-panel_bubble.prototype.prepareData = function (oldPreparedData, newDataRows, drill) {
+panel_bubble.prototype.prepareData = function (oldPreparedData, newDataRows) {
     const that = this;
-    const level = (global.baseLevels[that.panelSide])[this.dimToShow].length;
+    const level = (that.dimToShow < global.baseLevels[that.panelSide].length) ? (global.baseLevels[that.panelSide])[this.dimToShow].length : 0;
 
     const comparator = that.getSortingComparator();
     newDataRows.sort(comparator);
 
     const dataArray = [];
-
-    const openFromElement = (drill.direction === -1 && oldPreparedData !== undefined) ? global.getFromArrayByProperty(oldPreparedData, 'id', drill.toId) : null;
-
-
     for (let i = 0; i < newDataRows.length; i++) {
         const d = newDataRows[i];
         const dim = d.dims[0];
@@ -536,7 +542,6 @@ panel_bubble.prototype.drawLabels = function (preparedData, trans) {
 
     for (let i = labelArray.length - 1; i >= 0; i--) {
         const li = labelArray[i];
-        let good = true;
         for (let j = labelArray.length - 1; j > i; j--) {
             const lj = labelArray[j];
             const isIntersects = that.isIntersects(li.x, li.y, li.width, li.height, lj.x, lj.y, lj.width, lj.height)
@@ -817,18 +822,6 @@ panel_bubble.prototype.drawLegend = function (trans) {
 // Control functions
 //////////////////////////////////////////////////
 
-panel_bubble.prototype.drill = function (d) {
-    const that = this;
-    global.tooltip.kill();
-    const drill = {
-        dim: that.dimToShow,
-        direction: (d === undefined) ? 1 : -1,
-        toId: (d === undefined) ? undefined : d.id,
-        toName: (d === undefined) ? undefined : d.name
-    };
-    that.mediator.publish("drill", drill);
-}
-
 panel_bubble.prototype.doChangeValue = function (panelId, value, ratio, targetId) {
     const that = this;
 
@@ -912,17 +905,6 @@ panel_bubble.prototype.checkAndCorrectFractionSettings = function() {
     }
     that.actualInit.ratio = that.valFraction;
 }
-
-panel_bubble.prototype.doChangeDimension = function (panelId, newDimId) {
-    const that = this;
-    if (panelId === that.panelId) {
-        that.dimToShow = newDimId;
-        that.actualInit.dim = that.dimToShow;
-        that.mediator.publish("register", that, that.panelId, [that.dimToShow], that.preUpdate, that.update, that.getConfig);
-        global.tooltip.kill();
-        that.mediator.publish("drill", {dim: -1, direction: 0, toId: undefined});
-    }
-};
 
 /**
  * Checks if two rectangles intersect.

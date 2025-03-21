@@ -5,7 +5,7 @@
 /**
  * Húzd-és-ejtsd réteg konstruktora.
  * 
- * @param {Integer} side A képernyő-oldal (0 vagy 1).
+ * @param {int} side A képernyő-oldal (0 vagy 1).
  * @param {Object} mediator Az oldalhoz tartozó mediátor.
  * @returns {Draglayer} A húzd-és-ejtsd réteg.
  */

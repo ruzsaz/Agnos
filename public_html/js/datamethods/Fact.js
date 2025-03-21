@@ -90,8 +90,8 @@ Fact.prototype.getLocalMeta = function() {
         this.localMeta.description = global.getFirstValidString(localLabel.description, defaultLabel.description, localLabel.caption, defaultLabel.caption);
                 
         this.localMeta.dimensions = [];
-        for (var i = 0, iMax = this.reportMeta.dimensions.length; i < iMax; i++) {
-            var d = this.reportMeta.dimensions[i];
+        for (let i = 0, iMax = this.reportMeta.dimensions.length; i < iMax; i++) {
+            const d = this.reportMeta.dimensions[i];
             const localLabel = global.getFromArrayByLang(d.multilingualization, language);
             const defaultLabel = global.getFromArrayByLang(d.multilingualization, "");
             const dimension = {
@@ -109,27 +109,41 @@ Fact.prototype.getLocalMeta = function() {
         
         this.localMeta.controls = [];
         if (this.reportMeta.controls !== undefined) {
-            for (var i = 0, iMax = this.reportMeta.controls.length; i < iMax; i++) {
+            for (let i = 0, iMax = this.reportMeta.controls.length; i < iMax; i++) {
                 const d = this.reportMeta.controls[i];
                 const localLabel = global.getFromArrayByLang(d.multilingualization, language);
                 const defaultLabel = global.getFromArrayByLang(d.multilingualization, "");
                 const controlLabelsString = global.getFirstValidString(localLabel.values, defaultLabel.values);
-
                 const control = {
                     'caption': global.getFirstValidString(localLabel.caption, defaultLabel.caption, localLabel.description, defaultLabel.description),
                     'description': global.getFirstValidString(localLabel.description, defaultLabel.description, localLabel.caption, defaultLabel.caption),
                     'type': d.type,
+                    'id': i + this.reportMeta.dimensions.length,
                     'parameters': d.parameters,
                     'labels': (controlLabelsString.length < 2) ? undefined : JSON.parse(controlLabelsString),
                     'defaultValue': d.defaultValue
                 };
                 this.localMeta.controls.push(control);
+
+                const dimension = {
+                    'caption': control.caption,
+                    'description': control.description,
+                    'dimension_unique_name': "CONTROL::" + i,
+                    'id': control.id,
+                    'is_territorial': 0,
+                    'levels': 1,
+                    'lang': "",
+                    'top_level_caption': "NOTHING"
+                };
+                this.localMeta.dimensions.push(dimension);
             }
+
+
         }
 
         this.localMeta.indicators = [];
-        for (var i = 0, iMax = this.reportMeta.indicators.length; i < iMax; i++) {            
-            var d = this.reportMeta.indicators[i];
+        for (let i = 0, iMax = this.reportMeta.indicators.length; i < iMax; i++) {
+            const d = this.reportMeta.indicators[i];
             const localLabel = global.getFromArrayByLang(d.multilingualization, language);
             const defaultLabel = global.getFromArrayByLang(d.multilingualization, "");
             const indicator = {
@@ -193,7 +207,7 @@ Fact.prototype.setControlValues = function(controlValues) {
         this.controlValues = controlValues;        
     } else if (this.reportMeta.controls !== undefined) {
         this.controlValues = [];
-        for (var i = 0, iMax = this.reportMeta.controls.length; i < iMax; i++) {
+        for (let i = 0, iMax = this.reportMeta.controls.length; i < iMax; i++) {
             this.controlValues.push(this.reportMeta.controls[i].defaultValue);
         }
     }    

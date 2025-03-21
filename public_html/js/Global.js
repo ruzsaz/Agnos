@@ -1105,7 +1105,7 @@ var global = function () {
     /**
      * Megadja egy dimenzióelem kijelzésének színét.
      * 
-     * @param {Integer} id A dimenzió azonosítója.
+     * @param {String} id A dimenzió azonosítója.
      * @returns {String} A hozzá tartozó szín, html kódolva.
      */
     var color = function (id) {
@@ -1763,7 +1763,7 @@ var global = function () {
      * @param {Function} leftButtonFunction Baloldali gomb megnyomásakor lefutó függvény.
      * @param {String} rightButtonLabel Jobboldali gomb szövege. Ha undefined, nincs jobb gomb.
      * @param {Function} rightButtonFunction Jobboldali gomb megnyomásakor lefutó függvény.
-     * @param {Integer} enterFunctionNumber Az enter melyik gombklikkelést hajtsa végre? (1: bal, 2: jobb, undefined: semmit se)
+     * @param {int} enterFunctionNumber Az enter melyik gombklikkelést hajtsa végre? (1: bal, 2: jobb, undefined: semmit se)
      * @param {String} extraButtonLabel Extra gomb szövege.
      * @param {Function} extraButtonFunction Az extra gomb megnyomásakor lefutó függvény.
      * @returns {undefined}
@@ -1875,7 +1875,7 @@ var global = function () {
             timer: null, // A megragadást késleltető timer
             scrollRepeaterTimer: null,
             draggedSide: null, // A húzott objektum származási oldala (0 v 1).
-            draggedType: null, // A húzott valami típusa: 0: dimenzió, 1: érték.
+            draggedType: null, // A húzott valami típusa: 0: dimenzió, 1: érték, 2: kontroll.
             draggedId: null, // A húzott valami ID-je.
             previousHoverObject: null,
             hoverObject: null,
@@ -2036,6 +2036,7 @@ var global = function () {
         global.panelMargin = parseInt(varsFromCSS.panelMargin); // Panelek margója.
         global.panelHeight = parseInt(varsFromCSS.panelHeight); // Panelek magassága.
         global.panelBackgroundColor = varsFromCSS.panelBackgroundColor; // Panelek háttérszíne.
+        global.writeOnPanelColor = varsFromCSS.panelWriteColor; // A panelek háttérszínén írandó szöveg színe.
         global.axisTextOpacity = varsFromCSS.axisTextOpacity; // Az oszlopdiagramok tengelyszövegének átlátszósága.
         global.fontSizeSmall = parseInt(varsFromCSS.fontSizeSmall); // A legkisebb betűméret.
         global.mainToolbarHeight = parseInt(varsFromCSS.mainToolbarHeight); // A képernyő tetején levő toolbar magassága.
@@ -2088,6 +2089,7 @@ var global = function () {
         superMeta: undefined, // SuperMeta: az összes riport adatait tartalmazó leírás.
         scrollbarWidth: scrollBarSize, // Scrollbarok szélessége.
         selfDuration: 800, // A fő animációs időhossz (ms).
+        blinkDuration: 200, // Duration of a blinkink (ms).
         legendOffsetX: 20, // A jelkulcs vízszintes pozicionálása.
         legendOffsetY: 15, // A jelkulcs függőleges pozicionálása.
         panelTitleHeight: 30, // A panelek fejlécének magassága.

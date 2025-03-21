@@ -2,7 +2,8 @@
 
 'use strict';
 
-var sankeypanel = panel_sankey;
+const sankeypanel = panel_sankey;
+
 /**
  * A tortadiagram konstruktora.
  * 
@@ -10,7 +11,7 @@ var sankeypanel = panel_sankey;
  * @returns {panel_sankey} A megkonstruált panel.
  */
 function panel_sankey(init) {
-    var that = this;
+    const that = this;
 
     this.constructorName = "panel_sankey";
 
@@ -45,7 +46,7 @@ function panel_sankey(init) {
     
     
     const modDim = global.sort_unique(that.dimsToShow);    
-    for (var i = 0, iMax = this.numberOfDims; i < iMax; i++) {        
+    for (let i = 0, iMax = this.numberOfDims; i < iMax; i++) {
         that.dims.push(modDim.indexOf(that.dimsToShow[i]));        
     }
         
@@ -65,7 +66,7 @@ function panel_sankey(init) {
     // Az oszlopok árnyékához létrehozandó kamu-gráf
     const nodes = [];
     const links = [];
-    for (var j = 0, jMax = that.numberOfDims; j < jMax; j++) {
+    for (let j = 0, jMax = that.numberOfDims; j < jMax; j++) {
         nodes.push({"uniqueId": j, "columnIndex": j});        
         if (j > 0) {
             links.push({"source": (j-1), "target": j, "value": 1});
@@ -111,7 +112,7 @@ function panel_sankey(init) {
 
 
     // Feliratkozás a mediátorokra.
-    var med;
+    let med;
     med = that.mediator.subscribe("changeValue", function (id, val, ratio) {
         that.doChangeValue(id, val, ratio);
     });
@@ -150,7 +151,7 @@ function panel_sankey(init) {
  * @returns {Number} Az értékek.
  */
 panel_sankey.prototype.valueToShow = function (d) {
-    var that = this;
+    const that = this;
     if (d !== undefined && d.vals !== undefined) {
         var val = (that.valFraction) ? that.fracMultiplier * d.vals[that.valToShow].sz / d.vals[that.valToShow].n : that.valMultiplier * d.vals[that.valToShow].sz;
         var origVal = val;
@@ -172,7 +173,7 @@ panel_sankey.prototype.valueToShow = function (d) {
  * @returns {Function} Az adatelemek sorbarendezéséhez szükséges comparator.
  */
 panel_sankey.prototype.getNodeSortingComparator = function() {
-    var that = this;            
+    const that = this;
     if (that.sortByValue) {        
         return function(a, b) {
             if (a.columnIndex !== b.columnIndex) return global.realCompare(a.columnIndex.toString(), b.columnIndex.toString());
@@ -208,8 +209,8 @@ panel_sankey.prototype.getLinkSortingComparator = function(nodeSortingComparator
  * @returns {String} A megjelenítendő tooltip.
  */
 panel_sankey.prototype.getTooltip = function (node) {
-    var that = this;
-    var unitProperty = (node.value === 1) ? "unit" : "unitPlural";
+    const that = this;
+    const unitProperty = (node.value === 1) ? "unit" : "unitPlural";
     return that.createTooltip(
             [{
                     name: that.localMeta.dimensions[that.dimsToShow[node.columnIndex]].description,
@@ -235,42 +236,50 @@ panel_sankey.prototype.getTooltip = function (node) {
  * @returns {undefined}
  */
 panel_sankey.prototype.preUpdate = function (drill) {
-    var that = this;
+    const that = this;
 
-    if (drill.direction === -1) { // Lefúrás esetén.
-        
-        // Minden, azonos oszlopbeli node törlése, kivéve, amibe fúrunk (a szövegük is törlődik)
-        that.gNodes.selectAll(".node")
-                .filter(function(d) {
+    // If it shows a control when clicked on, produce a blinking
+    if (drill.dim >= global.baseLevels[that.panelSide].length) {
+        if (drill.initiator === that.panelId) {
+            that.gNodes.selectAll(".node").filter(function (d) {
+                return (d.id === drill.toId);
+            }).call(that.applyBlinking);
+        }
+    } else {
+        if (drill.direction === -1) { // Lefúrás esetén.
+
+            // Minden, azonos oszlopbeli node törlése, kivéve, amibe fúrunk (a szövegük is törlődik)
+            that.gNodes.selectAll(".node")
+                .filter(function (d) {
                     return (that.dimsToShow[d.columnIndex] === drill.dim && d.id !== drill.toId);
                 })
                 .on("click", null)
                 .on("mouseover", null)
                 .on("mouseout", null)
                 .remove();
-        
-        // Minden nem érintett link törlése
-        that.gLinks.selectAll(".link")
-                .filter(function(d) {
+
+            // Minden nem érintett link törlése
+            that.gLinks.selectAll(".link")
+                .filter(function (d) {
                     return ((that.dimsToShow[d.source.columnIndex] === drill.dim || that.dimsToShow[d.target.columnIndex] === drill.dim)
-                            && d.source.id !== drill.toId
-                            && d.target.id !== drill.toId);
+                        && d.source.id !== drill.toId
+                        && d.target.id !== drill.toId);
                 })
                 .remove();
-                   
-    } else if (drill.direction === 1) { // Felfúrás esetén
-        
-        // Mindent a szülő színére színezünk a kifúrás oszlopában.        
-        that.gNodes.selectAll(".node")
-                .filter(function(d) {
+
+        } else if (drill.direction === 1) { // Felfúrás esetén
+
+            // Mindent a szülő színére színezünk a kifúrás oszlopában.
+            that.gNodes.selectAll(".node")
+                .filter(function (d) {
                     return (that.dimsToShow[d.columnIndex] === drill.dim);
                 })
-                .on("click", null)                
+                .on("click", null)
                 .on("mouseover", null)
                 .on("mouseout", null)
-                .attr("fill", global.color(drill.fromId));       
+                .attr("fill", global.color(drill.fromId));
+        }
     }
-    
 };
 
 /**
@@ -282,7 +291,7 @@ panel_sankey.prototype.preUpdate = function (drill) {
  * @returns {Array} Az új megjelenési tortaadatok.
  */
 panel_sankey.prototype.prepareData = function (oldData, newDataRows, drill) {
-    var that = this;
+    const that = this;
     const nodeSortingComparator = that.getNodeSortingComparator();
     const linkSortingComparator = that.getLinkSortingComparator(nodeSortingComparator);
     that.sankey.nodeSort(nodeSortingComparator).linkSort(linkSortingComparator);
@@ -302,26 +311,26 @@ panel_sankey.prototype.setStartPositions = function (oldGraph, sankeyGraph, dril
     
     const openFromElement = (drill.direction === -1 && oldGraph !== undefined) ? global.getFromArrayByProperty(oldGraph.nodes, 'id', drill.toId) : null; // Ebből a régi elemből kell kinyitni mindent.
     const openFromElementHeightRatio = (openFromElement) ? (openFromElement.y1 - openFromElement.y0) / (that.shadowGraph.nodes[0].y1 - that.shadowGraph.nodes[0].y0) : 1;
-    
-    var parentFound = [false, false, false, false, false];
-    var after = 0;
+
+    const parentFound = [false, false, false, false, false];
+    let after = 0;
     const startY0 = that.shadowGraph.nodes[0].y0;
     const startY1 = that.shadowGraph.nodes[0].y1;
     const fullHeight = startY1 - startY0;
-    var before = 0;
+    let before = 0;
     
-    for (var i = 0, iMax = sankeyGraph.nodes.length; i < iMax; i++) {
+    for (let i = 0, iMax = sankeyGraph.nodes.length; i < iMax; i++) {
         const node = sankeyGraph.nodes[i];
         if (openFromElement && that.dimsToShow[node.columnIndex] === drill.dim) { // Ha az adott dimenzióban befúrás történik            
             node.startY0 = openFromElement.y0 + node.y0 * openFromElementHeightRatio;
             node.startY1 = openFromElement.y0 + node.y1 * openFromElementHeightRatio;
             node.startOpacity = 1;
             node.startTextOpacity = 0;
-            for (var j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
+            for (let j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
                 node.sourceLinks[j].startY0 = node.startY0 + (node.sourceLinks[j].y0 - node.y0) * (node.startY1 - node.startY0) / (node.y1 - node.y0);            
             }
-            for (var j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
-                node.targetLinks[j].startY1 = node.startY0 + (node.targetLinks[j].y1 - node.y0) * (node.startY1 - node.startY0) / (node.y1 - node.y0);    ;
+            for (let j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
+                node.targetLinks[j].startY1 = node.startY0 + (node.targetLinks[j].y1 - node.y0) * (node.startY1 - node.startY0) / (node.y1 - node.y0);
             }  
         } else if (drill.direction === 1 && that.dimsToShow[node.columnIndex] === drill.dim) { // Ha az adott dimenzióban kifúrás történik
             
@@ -332,23 +341,23 @@ panel_sankey.prototype.setStartPositions = function (oldGraph, sankeyGraph, dril
                 after = 1;
                 node.startOpacity = 1;
                 node.startTextOpacity = 1;
-                for (var j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
+                for (let j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
                     node.sourceLinks[j].startY0 = (node.startY0 + node.startY1)/2;            
                 }
-                for (var j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
+                for (let j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
                     node.targetLinks[j].startY1 = (node.startY0 + node.startY1)/2;
                 }
                 
-                for (var b = 1; b < before + 1; b++) {
+                for (let b = 1; b < before + 1; b++) {
                     const node = sankeyGraph.nodes[i - b];
                     node.startY0 = -5 - startY1 * b;
                     node.startY1 = node.startY0 + fullHeight;
                     node.startOpacity = 0;
                     node.startTextOpacity = 0;
-                    for (var j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
+                    for (let j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
                         node.sourceLinks[j].startY0 = node.startY0 + (node.sourceLinks[j].y0 - node.y0) * fullHeight / (node.y1 - node.y0);            
                     }
-                    for (var j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
+                    for (let j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
                         node.targetLinks[j].startY1 = node.startY0 + (node.targetLinks[j].y1 - node.y0) * fullHeight / (node.y1 - node.y0);    ;
                     }                                        
                 }
@@ -360,10 +369,10 @@ panel_sankey.prototype.setStartPositions = function (oldGraph, sankeyGraph, dril
                 node.startY1 = node.startY0 + fullHeight; 
                 node.startOpacity = 0;
                 node.startTextOpacity = 0;
-                for (var j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
+                for (let j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
                     node.sourceLinks[j].startY0 = node.startY0 + (node.sourceLinks[j].y0 - node.y0) * fullHeight / (node.y1 - node.y0);           
                 }
-                for (var j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
+                for (let j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
                     node.targetLinks[j].startY1 = node.startY0 + (node.targetLinks[j].y1 - node.y0) * fullHeight / (node.y1 - node.y0);
                 }
                 after++;
@@ -379,25 +388,25 @@ panel_sankey.prototype.setStartPositions = function (oldGraph, sankeyGraph, dril
      
 };
 
-panel_sankey.prototype.graphFromDataRows = function (oldGraph, dataRows, drill) {
+panel_sankey.prototype.graphFromDataRows = function (oldGraph, dataRows) {
     const that = this;
-        
-    var nodes = [];
-    for (var j = 0, jMax = that.numberOfDims; j < jMax; j++) {
+
+    const nodes = [];
+    for (let j = 0, jMax = that.numberOfDims; j < jMax; j++) {
         nodes.push([]);
     }
-    var links = [];
-    for (var i = 0, iMax = dataRows.length; i < iMax; i++) {
-        var d = dataRows[i];        
-        var nodeIndexes = [];
-        for (var j = 0, jMax = that.numberOfDims; j < jMax; j++) {
+    const links = [];
+    for (let i = 0, iMax = dataRows.length; i < iMax; i++) {
+        const d = dataRows[i];
+        const nodeIndexes = [];
+        for (let j = 0, jMax = that.numberOfDims; j < jMax; j++) {
             const actualNode = d.dims[that.dims[j]];            
-            var nodeIndex = global.positionInArrayByProperty(nodes[j], "id", actualNode.id);
+            let nodeIndex = global.positionInArrayByProperty(nodes[j], "id", actualNode.id);
             
             // Dimenzióelem hozzáadása, ha még nem volt benne
             if (nodeIndex === -1) {
                 nodeIndex = nodes[j].length;
-                var nodeElement = {
+                const nodeElement = {
                     index: nodeIndex,
                     columnIndex: j,
                     id: actualNode.id,
@@ -413,8 +422,8 @@ panel_sankey.prototype.graphFromDataRows = function (oldGraph, dataRows, drill) 
             if (j > 0) {
                 const sourceUniqueId = nodes[j-1][nodeIndexes[j - 1]].uniqueId;
                 const targetUniqueId = nodes[j][nodeIndexes[j]].uniqueId;
-                var linkIndex = global.positionInArrayByProperties(links, ["source", "target"], [sourceUniqueId, targetUniqueId]);
-                
+                const linkIndex = global.positionInArrayByProperties(links, ["source", "target"], [sourceUniqueId, targetUniqueId]);
+
                 if (linkIndex === -1) {
                     const linkElement = {
                         'source': sourceUniqueId,
@@ -429,8 +438,8 @@ panel_sankey.prototype.graphFromDataRows = function (oldGraph, dataRows, drill) 
         }
     }
     
-    var unitedNodes = [];
-    for (var j = 0, jMax = that.numberOfDims; j < jMax; j++) {
+    let unitedNodes = [];
+    for (let j = 0, jMax = that.numberOfDims; j < jMax; j++) {
         unitedNodes = unitedNodes.concat(nodes[j]);
     }
     return {nodes: unitedNodes, links: links};
@@ -442,38 +451,36 @@ panel_sankey.prototype.addGapsToGraph = function (graph) {
     const contraction = (that.height - allGap) / that.height;
 
     const nodes = graph.nodes;
-    var idx = -1;
-    var lastColIdx = -1;
-    var elementsInColumn = -1;
-    var nextStart = -1;
+    let idx = -1;
+    let lastColIdx = -1;
+    let elementsInColumn = -1;
+    let nextStart = -1;
     
     
-    for (var i = 0, iMax = nodes.length; i < iMax; i++) {
+    for (let i = 0, iMax = nodes.length; i < iMax; i++) {
         const node = nodes[i];
         if (node.columnIndex !== lastColIdx) {
             idx = -1;
             lastColIdx = node.columnIndex;
             elementsInColumn = 0;            
-            for (var j = i; j < iMax && nodes[j].columnIndex === lastColIdx; j++) {
+            for (let j = i; j < iMax && nodes[j].columnIndex === lastColIdx; j++) {
                 elementsInColumn++;
             }
             nextStart = allGap / elementsInColumn / 2;
         }
         idx++;
         const newHeight = (node.y1 - node.y0) * contraction;
-        const translation = node.y0 - nextStart;
         const oldStart = node.y0;
         node.y0 = nextStart;
         node.y1 = node.y0 + newHeight;
                 
-        for (var j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
+        for (let j = 0, jMax = node.sourceLinks.length; j < jMax; j++) {
             const link = node.sourceLinks[j];
-            const height = link.y1 - link.y0;
             link.y0 = (link.y0 - oldStart) * contraction + nextStart;
             link.width = link.width * contraction;                        
         }
         
-        for (var j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
+        for (let j = 0, jMax = node.targetLinks.length; j < jMax; j++) {
             const link = node.targetLinks[j];            
             link.y1 = (link.y1 - oldStart) * contraction + nextStart;            
         }
@@ -483,8 +490,8 @@ panel_sankey.prototype.addGapsToGraph = function (graph) {
 };
 
 panel_sankey.prototype.addTooltips = function (graph) {
-    var that = this;
-    for (var i = 0, iMax = graph.nodes.length; i < iMax; i++) {
+    const that = this;
+    for (let i = 0, iMax = graph.nodes.length; i < iMax; i++) {
         const node = graph.nodes[i];
         node.tooltip = that.getTooltip(node);
     }    
@@ -499,7 +506,7 @@ panel_sankey.prototype.addTooltips = function (graph) {
  * @returns {undefined}
  */
 panel_sankey.prototype.update = function (data, drill) {
-    var that = this;
+    const that = this;
     that.data = data || that.data;
     drill = drill || {dim: -1, direction: 0};
 
@@ -511,7 +518,7 @@ panel_sankey.prototype.update = function (data, drill) {
     }
     that.valMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].value.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].value.multiplier);
     that.fracMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier);
-    var tweenDuration = (drill.duration === undefined) ? global.getAnimDuration(-1, that.panelId) : drill.duration;
+    const tweenDuration = (drill.duration === undefined) ? global.getAnimDuration(-1, that.panelId) : drill.duration;
 
     // Ha túl sok értéket kéne megjeleníteni, pánik
     if (that.data.rows.length > that.maxEntries) {
@@ -521,7 +528,7 @@ panel_sankey.prototype.update = function (data, drill) {
         that.preparedData = that.prepareData(that.preparedData, that.data.rows, drill);
         if (that.preparedData.nodes.length > 0) {
             that.panic(false);
-            var trans = d3.transition().duration(tweenDuration);
+            const trans = d3.transition().duration(tweenDuration);
             that.drawSankey(that.preparedData, trans);
             that.drawLabels(that.preparedData, trans);
             that.drawAxes(that.preparedData, trans);
@@ -714,14 +721,15 @@ panel_sankey.prototype.drawLabels = function (graph, trans) {
 /**
  * Az aktuális dimenzióban történő le vagy felfúrást kezdeményező függvény.
  * 
- * @param {Integer} dimIndex A lefúrás dimenziójának sorszáma a panel által
+ * @param {int} dimIndex A lefúrás dimenziójának sorszáma a panel által
  * megjelenített dimenziókon belül (0, 1, ...).
  * @param {Object} d Lefúrás esetén a lefúrás céleleme. Ha undefined, akkor felfúrásról van szó.
  * @returns {undefined}
  */
 panel_sankey.prototype.drill = function (dimIndex, d) {    
-    global.tooltip.kill();    
-    var drill = {
+    global.tooltip.kill();
+    const drill = {
+        initiator: this.panelId,
         dim: this.dimsToShow[dimIndex],
         direction: (d === undefined) ? 1 : -1,
         toId: (d === undefined) ? undefined : d.id,
@@ -730,49 +738,23 @@ panel_sankey.prototype.drill = function (dimIndex, d) {
     this.mediator.publish("drill", drill);
 };
 
-/**
- * A mutató- és hányadosválasztást végrehajtó függvény.
- * 
- * @param {String} panelId A váltást végrehajtó panel azonosítója. Akkor vált, ha az övé, vagy ha undefined.
- * @param {Integer} value Az érték, amire váltani kell. Ha -1 akkor a következőre vált, ha undefined, nem vált.
- * @param {boolean} ratio Hányadost mutasson-e. Ha -1 akkor a másikra ugrik, ha undefined, nem vált.
- * @returns {undefined}
- */
-panel_sankey.prototype.doChangeValue = function (panelId, value, ratio) {
-    var that = this;
-    if (panelId === undefined || panelId === that.panelId) {
-        if (value !== undefined) {
-            that.valToShow = (value === -1) ? (that.valToShow + 1) % that.localMeta.indicators.length : value;
-            while (!that.localMeta.indicators[that.valToShow].isShown) {
-                that.valToShow = (that.valToShow + 1) % that.localMeta.indicators.length;
-            }
-            that.actualInit.val = that.valToShow;
-        }
-        if (ratio !== undefined) {
-            that.valFraction = (ratio === -1) ? !that.valFraction : ratio;
-            that.actualInit.ratio = that.valFraction;
-        }
-        that.update();
-        global.getConfig2();
-    }
-};
 
 /**
  * A dimenzióváltást végrehajtó függvény.
  * 
  * @param {String} panelId A dimenzióváltást kapó panel ID-ja.
- * @param {Integer} newDimId A helyére bejövő dimenzió ID-ja.
- * @param {Integer} dimToChangeIndex A megváltoztatandó dimenzió  sorszáma a panel által
+ * @param {int} newDimId A helyére bejövő dimenzió ID-ja.
+ * @param {int} dimToChangeIndex A megváltoztatandó dimenzió  sorszáma a panel által
  * megjelenített dimenziókon belül (0, 1, ...).
  * @returns {undefined}
  */
 panel_sankey.prototype.doChangeDimension = function (panelId, newDimId, dimToChangeIndex) {
-    var that = this;
+    const that = this;
     if (panelId === that.panelId) {                        
         that.dimsToShow[dimToChangeIndex] = newDimId;        
         this.dims = [];
         const modDim = global.sort_unique(that.dimsToShow);    
-        for (var i = 0, iMax = this.numberOfDims; i < iMax; i++) {        
+        for (let i = 0, iMax = this.numberOfDims; i < iMax; i++) {
            that.dims.push(modDim.indexOf(that.dimsToShow[i]));        
         }
         that.actualInit.dim = that.dimsToShow;

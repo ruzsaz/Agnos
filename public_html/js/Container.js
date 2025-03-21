@@ -456,6 +456,17 @@ Container.prototype.newReportReady = function(side, reportMeta) {
     // Blokkoljuk a resize metódust 50 milisec-re
     that.resizeInProgress = true;
 
+    global.mediators[side].publish("killPanel", "#panel" + side + "P-1");	// Esetleges régi fejlécpanel megölése.
+    var sizePercentage = 0;
+    if ((this.panelState === 0 && side === 0) || (this.panelState === 2 && side === 1)) {
+        sizePercentage = 1;
+    } else if (this.panelState === 1) {
+        sizePercentage = 0.5;
+    }
+    const scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, reportMeta.visualizations.length);
+
+    new HeadPanel_Report({group: side}, reportMeta, scaleRatio);			// Fejlécpanel létrehozása.
+
     // Megjelenítés a meta alapján
     for (var i = 0, iMax = reportMeta.visualizations.length; i < iMax; i++) {
         // De előbb a megfelelő oldalra kell hozni...
@@ -471,16 +482,9 @@ Container.prototype.newReportReady = function(side, reportMeta) {
         eval("new " + initString);
     }
 
-    global.mediators[side].publish("killPanel", "#panel" + side + "P-1");	// Esetleges régi fejlécpanel megölése.    
-    var sizePercentage = 0;
-    if ((this.panelState === 0 && side === 0) || (this.panelState === 2 && side === 1)) {
-        sizePercentage = 1;
-    } else if (this.panelState === 1) {
-        sizePercentage = 0.5;
-    }
+
     
-    var scaleRatio = Container.prototype.getScaleRatio(side, sizePercentage, global.panelNumberOnScreen, reportMeta.visualizations.length);
-    
+
     // Ha egy card klikkelés miatt kell megnyitni, akkor belebújási animáció
     const clickedCardNode = d3.select(".card.clicked").node();
     if (clickedCardNode !== null) {
@@ -493,7 +497,7 @@ Container.prototype.newReportReady = function(side, reportMeta) {
         global.zoom(fakeEvent, d3.select("#scrollPaneP" + side).node(), transition, (1/15) / scaleRatio);
     }
     
-    new HeadPanel_Report({group: side}, reportMeta, scaleRatio);			// Fejlécpanel létrehozása.
+
     this.resizeContainer(side, 0, sizePercentage, global.panelNumberOnScreen, scaleRatio);
 
     that.counter--;        
@@ -615,7 +619,7 @@ Container.prototype.killSide = function(side) {
 /**
  * Új panel hozzáadása a felülethez.
  * 
- * @param {Integer} side A hozzáadást kérő oldal.
+ * @param {int} side A hozzáadást kérő oldal.
  * @param {String} panelType A hozzáadandó panel névkódja.
  * @returns {undefined}
  */

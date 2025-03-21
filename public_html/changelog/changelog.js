@@ -5,6 +5,7 @@ var changelog = [
     {
         "language": "hu",
         "history": [
+            {"entity": "Agnos", "date": "2025-03-20", "change": "Kontrol ábrázolható dimenzióként."},
             {"entity": "Agnos", "date": "2025-03-12", "change": "Pontszórás- és buborékdiagram."},
             {"entity": "Agnos", "date": "2025-03-08", "change": "Kontrol elemek és számított mutatók."},
             {"entity": "Agnos", "date": "2025-01-14", "change": "Mutatók opcionális szín meghatározása."},
@@ -42,6 +43,7 @@ var changelog = [
     {
         "language": "en",
         "history": [
+            {"entity": "Agnos", "date": "2025-03-20", "change": "Controls can be drawn as dimensions."},
             {"entity": "Agnos", "date": "2025-03-12", "change": "Scatter and bubble chart."},
             {"entity": "Agnos", "date": "2025-03-08", "change": "Control elements and calculated measures."},
             {"entity": "Agnos", "date": "2025-01-14", "change": "Optional color for indicators."},

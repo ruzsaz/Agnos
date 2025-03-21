@@ -2,27 +2,36 @@
 
 'use strict';
 
-var piechartpanel = panel_pie;
+const piechartpanel = panel_pie;
 
 /**
  * A tortadiagram konstruktora.
- * 
+ *
  * @param {Object} init Inicializáló objektum.
  * @returns {panel_pie} A megkonstruált panel.
  */
 function panel_pie(init) {
-    var that = this;
+    const that = this;
 
     this.constructorName = "panel_pie";
 
     // Reading the initializer object, populating it with default values.
-    this.defaultInit = {group: 0, position: undefined, dim: 0, val: 0, ratio: false, mag: 1, frommg: 1, sortbyvalue: false};
+    this.defaultInit = {
+        group: 0,
+        position: undefined,
+        dim: 0,
+        val: 0,
+        ratio: false,
+        mag: 1,
+        frommg: 1,
+        sortbyvalue: false
+    };
     this.actualInit = global.combineObjects(that.defaultInit, init);
 
     Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, false, 0, 0); // A Panel konstruktorának meghívása.
 
     this.valMultiplier = 1;						// The multiplier of the displayed value.
-    this.fracMultiplier = 1;					// The multiplier of the fraction.
+    this.fracMultiplier = 1;					// The multiplier of the fraction.ű
     this.dimToShow = that.actualInit.dim;		// A mutatott dimenzió.
     this.valToShow = that.actualInit.val;		// Az ennyiedik mutatót mutatja.
     this.valFraction = that.actualInit.ratio;	// Hányadost mutasson, vagy abszolútértéket?
@@ -36,55 +45,55 @@ function panel_pie(init) {
 
     // A tortaelmeket létrehozó függvény
     this.arc = d3.arc()
-            .startAngle(function (d) {
-                return d.startAngle;
-            })
-            .endAngle(function (d) {
-                return d.endAngle;
-            })
-            .outerRadius(that.radius)
-            .innerRadius(that.innerRadius);
+        .startAngle(function (d) {
+            return d.startAngle;
+        })
+        .endAngle(function (d) {
+            return d.endAngle;
+        })
+        .outerRadius(that.radius)
+        .innerRadius(that.innerRadius);
 
     // Alapréteg.
     that.svg.insert("svg:g", ".panelControlButton")
-            .attr("class", "background listener droptarget droptarget0")
-            .on('mouseover', function () {
-                that.hoverOn(this);
-            })
-            .on('mouseout', function () {
-                that.hoverOff();
-            })
-            .on("click", function () {
-                that.drill();
-            })
-            .append("svg:rect")
-            .attr("width", that.w)
-            .attr("height", that.h);
+        .attr("class", "background listener droptarget droptarget0")
+        .on('mouseover', function () {
+            that.hoverOn(this);
+        })
+        .on('mouseout', function () {
+            that.hoverOff();
+        })
+        .on("click", function () {
+            that.drill();
+        })
+        .append("svg:rect")
+        .attr("width", that.w)
+        .attr("height", that.h);
 
     // A tortaszeleteket tartalmazó réteg.
     this.arc_group = that.svg.insert("svg:g", ".title_group")
-            .attr("class", "arc")
-            .attr("transform", "translate(" + (that.margin.left + that.width / 2) + "," + (that.margin.top + that.height / 2) + ")");
+        .attr("class", "arc")
+        .attr("transform", "translate(" + (that.margin.left + that.width / 2) + "," + (that.margin.top + that.height / 2) + ")");
 
     // A szövegeket tartalmazó réteg.
     this.label_group = that.svg.insert("svg:g", ".title_group")
-            .attr("class", "label_group noEvents")
-            .attr("transform", "translate(" + (that.margin.left + that.width / 2) + "," + (that.margin.top + that.height / 2) + ")");
+        .attr("class", "label_group noEvents")
+        .attr("transform", "translate(" + (that.margin.left + that.width / 2) + "," + (that.margin.top + that.height / 2) + ")");
 
     // A panel dimenziójának ráírása.
     this.axisXCaption = that.svg.insert("svg:text", ".title_group")
-            .attr("class", "dimensionLabel noEvents")
-            .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");
+        .attr("class", "dimensionLabel noEvents")
+        .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");
 
     // Feliratkozás a mediátorokra.
-    var med;
+    let med;
     med = that.mediator.subscribe("changeValue", function (id, val, ratio) {
         that.doChangeValue(id, val, ratio);
     });
     that.mediatorIds.push({"channel": "changeValue", "id": med.id});
 
     // Feliratkozás a dimenzióváltó mediátorra.
-    med = that.mediator.subscribe("changeDimension", function (panelId, newDimId, dimToChange) {
+    med = that.mediator.subscribe("changeDimension", function (panelId, newDimId) {
         that.doChangeDimension(panelId, newDimId);
     });
     that.mediatorIds.push({"channel": "changeDimension", "id": med.id});
@@ -108,12 +117,12 @@ function panel_pie(init) {
 
 /**
  * Egy adatsorból meghatározza a megmutatandó értéket.
- * 
+ *
  * @param {Object} d Nyers adatsor.
- * @returns {Number} Az értékek.
+ * @returns {Object} Az értékek.
  */
 panel_pie.prototype.valueToShow = function (d) {
-    var that = this;
+    const that = this;
     if (d !== undefined && d.vals !== undefined) {
         var val = (that.valFraction) ? that.fracMultiplier * d.vals[that.valToShow].sz / d.vals[that.valToShow].n : that.valMultiplier * d.vals[that.valToShow].sz;
         var origVal = val;
@@ -131,13 +140,13 @@ panel_pie.prototype.valueToShow = function (d) {
 
 /**
  * Meghatározza a kért sorbarendezéshez szükséges comparator-függvényt.
- * 
+ *
  * @returns {Function} Az adatelemek sorbarendezéséhez szükséges comparator.
  */
-panel_pie.prototype.getSortingComparator = function() {
-    var that = this;        
+panel_pie.prototype.getSortingComparator = function () {
+    const that = this;
     if (that.sortByValue) {
-        return function(a, b) {
+        return function (a, b) {
             const aValue = that.valueToShow(a).value;
             const bValue = that.valueToShow(b).value;
             if (aValue < bValue) return 1;
@@ -150,70 +159,69 @@ panel_pie.prototype.getSortingComparator = function() {
 
 /**
  * Egy elemhez tartozó tooltipet legyártó függvény;
- * 
+ *
  * @param {Object} d Az elem.
  * @returns {String} A megjelenítendő tooltip.
  */
 panel_pie.prototype.getTooltip = function (d) {
-    var that = this;
-    var unitProperty = (d.value === 1) ? "unit" : "unitPlural";
-    return that.createTooltip(
-            [{
-                    name: that.localMeta.dimensions[that.dimToShow].description,
-                    value: (d.name) ? d.name : _("Nincs adat")
-                }],
-            [{
-                    name: that.localMeta.indicators[that.valToShow].description,
-                    value: d.originalValue,
-                    dimension: ((that.valFraction) ? that.localMeta.indicators[that.valToShow].fraction[unitProperty] : that.localMeta.indicators[that.valToShow].value[unitProperty])
-                }]
-            );
+    const that = this;
+    const unitProperty = (d.value === 1) ? "unit" : "unitPlural";
+    return that.createTooltip([{
+        name: that.localMeta.dimensions[that.dimToShow].description, value: (d.name) ? d.name : _("Nincs adat")
+    }], [{
+        name: that.localMeta.indicators[that.valToShow].description,
+        value: d.originalValue,
+        dimension: ((that.valFraction) ? that.localMeta.indicators[that.valToShow].fraction[unitProperty] : that.localMeta.indicators[that.valToShow].value[unitProperty])
+    }]);
 };
 
 /**
  * A tortaszelet animációját leíró függvényt meghatározó függvény.
- * 
+ *
  * @param {Object} d A kérdéses tortadarab.
  * @returns {Function} A tortadarab animációját leíró függvény.
  */
 panel_pie.prototype.pieTween = function (d) {
-    var that = this;
-    var int = d3.interpolate({startAngle: d.oldStartAngle - 0.0001, endAngle: d.oldEndAngle + 0.0001}, {startAngle: d.startAngle - 0.0001, endAngle: d.endAngle + 0.0001});
+    const that = this;
+    const int = d3.interpolate({
+        startAngle: d.oldStartAngle - 0.0001,
+        endAngle: d.oldEndAngle + 0.0001
+    }, {startAngle: d.startAngle - 0.0001, endAngle: d.endAngle + 0.0001});
     return function (t) {
-        var b = int(t);
+        const b = int(t);
         return that.arc(b);
     };
 };
 
 /**
  * A magyarázószöveg animációját leíró függvényt meghatározó függvény.
- * 
+ *
  * @param {Object} d A tortadarab, amihez a szöveg tartozik.
  * @returns {Function} A szöveg animációját leíró függvény.
  */
 panel_pie.prototype.textTween = function (d) {
-    var that = this;
-    var a = (d.oldStartAngle + d.oldEndAngle - Math.PI) / 2;
-    var b = (d.startAngle + d.endAngle - Math.PI) / 2;
-    var int = d3.interpolateNumber(a, b);
+    const that = this;
+    const a = (d.oldStartAngle + d.oldEndAngle - Math.PI) / 2;
+    const b = (d.startAngle + d.endAngle - Math.PI) / 2;
+    const int = d3.interpolateNumber(a, b);
     return function (t) {
-        var val = int(t);
+        const val = int(t);
         return "translate(" + (Math.cos(val) * that.textRadius) + "," + (Math.sin(val) * that.textRadius) + ")";
     };
 };
 
 /**
  * A mutató pöcök animációját leíró függvényt meghatározó függvény.
- * 
+ *
  * @param {Object} d A tortadarab, amihez a pöcök tartozik.
  * @returns {Function} A pöcök animációját leíró függvény.
  */
 panel_pie.prototype.tickTween = function (d) {
-    var a = (d.oldStartAngle + d.oldEndAngle) / 2;
-    var b = (d.startAngle + d.endAngle) / 2;
-    var int = d3.interpolateNumber(a, b);
+    const a = (d.oldStartAngle + d.oldEndAngle) / 2;
+    const b = (d.startAngle + d.endAngle) / 2;
+    const int = d3.interpolateNumber(a, b);
     return function (t) {
-        var val = int(t);
+        const val = int(t);
         return "rotate(" + val * (180 / Math.PI) + ")";
     };
 };
@@ -224,47 +232,56 @@ panel_pie.prototype.tickTween = function (d) {
 
 /**
  * A klikkeléskor azonnal végrehajtandó animáció.
- * 
+ *
  * @param {Object} drill A lefúrást leíró objektum: {dim: a fúrás dimenziója, direction: iránya [+1 fel, -1 le], fromId: az előzőleg kijelzett elem azonosítója, toId: az új elem azonosítója}
  * @returns {undefined}
  */
 panel_pie.prototype.preUpdate = function (drill) {
-    var that = this;
+    const that = this;
 
-    if (drill.direction === -1) { // Lefúrás esetén.
+    // If it shows a control when clicked on, produce a blinking
+    if (drill.dim >= global.baseLevels[that.panelSide].length) {
+        if (drill.initiator === that.panelId) {
+            that.arc_group.selectAll("path").filter(function (d) {
+                return (d.id === drill.toId);
+            }).call(that.applyBlinking);
+        }
+    } else {
+        if (drill.direction === -1) { // Lefúrás esetén.
 
-        // Mindent, kivéve amibe fúrunk, letörlünk.
-        that.arc_group.selectAll("path").filter(function (d) {
-            return (d.id !== drill.toId);
-        })
+            // Mindent, kivéve amibe fúrunk, letörlünk.
+            that.arc_group.selectAll("path").filter(function (d) {
+                return (d.id !== drill.toId);
+            })
                 .on("click", null)
                 .remove();
 
-        that.label_group.selectAll("line, .gPieTick").filter(function (d) {
-            return (d.id !== drill.toId);
-        }).remove();
+            that.label_group.selectAll("line, .gPieTick").filter(function (d) {
+                return (d.id !== drill.toId);
+            }).remove();
 
-    } else if (drill.direction === 1) { // Felfúrás esetén
+        } else if (drill.direction === 1) { // Felfúrás esetén
 
-        // Mindent letörlünk.
-        that.arc_group.selectAll("path")
+            // Mindent letörlünk.
+            that.arc_group.selectAll("path")
                 .on("click", null)
                 .remove();
 
-        that.label_group.selectAll("line, .gPieTick").remove();
+            that.label_group.selectAll("line, .gPieTick").remove();
 
-        // Kirajzolunk egy teljes kört a szülő színével.
-        that.arc_group.selectAll("path").data([1], false)
+            // Kirajzolunk egy teljes kört a szülő színével.
+            that.arc_group.selectAll("path").data([1], false)
                 .enter().append("svg:path")
                 .attr("class", "bar bordered darkenable")
                 .attr("fill", global.color(drill.fromId))
                 .attr("d", that.arc({startAngle: 0, endAngle: 2 * Math.PI}));
+        }
     }
 };
 
 /**
  * Az új adat előkészítése. Meghatározza hogy mit, honnan kinyílva kell kirajzolni.
- * 
+ *
  * @param {Array} oldPieData Az adat megkapása előtti adatok.
  * @param {Array} newDataRows Az új adatsorokat tartalmazó tömb.
  * @param {Object} drill Az épp végrehajtandó fúrás.
@@ -272,14 +289,14 @@ panel_pie.prototype.preUpdate = function (drill) {
  */
 panel_pie.prototype.prepareData = function (oldPieData, newDataRows, drill) {
     const that = this;
-    const level = (global.baseLevels[that.panelSide])[this.dimToShow].length;
-    
+    const level = (that.dimToShow < global.baseLevels[that.panelSide].length) ? (global.baseLevels[that.panelSide])[this.dimToShow].length : 0; // A szint, amire fúrunk.
+
     const comparator = that.getSortingComparator();
     const newPieData = d3.pie()
-            .sort(comparator) 	// Használjuk a sorbarendezést [null: nincs rendezés, egész kihagyása: érték szerinti]
-            .value(function (d) {
-                return that.valueToShow(d).value;
-            })(newDataRows);
+        .sort(comparator)    // Használjuk a sorbarendezést [null: nincs rendezés, egész kihagyása: érték szerinti]
+        .value(function (d) {
+            return that.valueToShow(d).value;
+        })(newDataRows);
 
     let total = 0; // A mutatott összérték meghatározása.
     for (let i = 0, iMax = newDataRows.length; i < iMax; i++) {
@@ -291,21 +308,21 @@ panel_pie.prototype.prepareData = function (oldPieData, newDataRows, drill) {
         return d.value > 0;
     });
 
-    var prevX = 0, prevY = -9999; // Az előző címke koordinátái; annak eldöntéséhez kell, hogy kifér-e az új címke.
+    let prevX = 0, prevY = -9999; // Az előző címke koordinátái; annak eldöntéséhez kell, hogy kifér-e az új címke.
 
-    var openFromElement = (drill.direction === -1 && oldPieData !== undefined) ? global.getFromArrayByProperty(oldPieData, 'id', drill.toId) : null; // Ebből a régi elemből kell kinyitni mindent.
-    var oldElementArc = (openFromElement) ? openFromElement.endAngle - openFromElement.startAngle : 0;
+    const openFromElement = (drill.direction === -1 && oldPieData !== undefined) ? global.getFromArrayByProperty(oldPieData, 'id', drill.toId) : null; // Ebből a régi elemből kell kinyitni mindent.
+    const oldElementArc = (openFromElement) ? openFromElement.endAngle - openFromElement.startAngle : 0;
 
     // Bezoomolás esetén előkészülünk a rányíló animáció kezdőszögeinek meghatározására.
-    var oldStartAngle = (openFromElement) ? openFromElement.startAngle : 0;
-    var oldEndAngle = 0;
+    let oldStartAngle = (openFromElement) ? openFromElement.startAngle : 0;
+    let oldEndAngle = 0;
 
-    var parentFound = false;
+    let parentFound = false;
 
-    for (var i = 0, iMax = newPieData.length; i < iMax; i++) {
-        var element = newPieData[i];
-        var dataRow = element.data;
-        var val = that.valueToShow(dataRow);
+    for (let i = 0, iMax = newPieData.length; i < iMax; i++) {
+        const element = newPieData[i];
+        const dataRow = element.data;
+        const val = that.valueToShow(dataRow);
         element.id = dataRow.dims[0].id;
         element.uniqueId = level + "L" + element.id;
         element.name = dataRow.dims[0].name.trim();
@@ -315,9 +332,9 @@ panel_pie.prototype.prepareData = function (oldPieData, newDataRows, drill) {
         element.tooltip = that.getTooltip(element);
 
         // Eldöntjük, hogy ki kell-e írni a címkét.
-        var b = (element.startAngle + element.endAngle - Math.PI) / 2;
-        var x = Math.cos(b) * (that.textRadius);
-        var y = Math.sin(b) * (that.textRadius);
+        const b = (element.startAngle + element.endAngle - Math.PI) / 2;
+        const x = Math.cos(b) * (that.textRadius);
+        const y = Math.sin(b) * (that.textRadius);
         if ((((prevX < 0) !== (x < 0)) || Math.abs(prevY - y) > that.requiredDifferenceForX) && element.percentage > that.labelMinValue) {
             prevX = x;
             prevY = y;
@@ -343,7 +360,7 @@ panel_pie.prototype.prepareData = function (oldPieData, newDataRows, drill) {
                 parentFound = true;
             }
         } else { // Ha azonos szintű változtatás van
-            var oldElement = (oldPieData !== undefined) ? global.getFromArrayByProperty(oldPieData, 'id', element.id) : undefined;
+            const oldElement = (oldPieData !== undefined) ? global.getFromArrayByProperty(oldPieData, 'id', element.id) : undefined;
             if (oldElement) {
                 oldStartAngle = oldElement.startAngle;
                 oldEndAngle = oldElement.endAngle;
@@ -360,13 +377,13 @@ panel_pie.prototype.prepareData = function (oldPieData, newDataRows, drill) {
 
 /**
  * Új adat megérkeztekor levezényli a panel frissítését.
- * 
+ *
  * @param {Object} data Az új adat.
  * @param {Object} drill Az épp végrehajzásra kerülő fúrás.
  * @returns {undefined}
  */
 panel_pie.prototype.update = function (data, drill) {
-    var that = this;
+    const that = this;
     that.data = data || that.data;
     drill = drill || {dim: -1, direction: 0};
 
@@ -378,21 +395,21 @@ panel_pie.prototype.update = function (data, drill) {
     }
     that.valMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].value.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].value.multiplier);
     that.fracMultiplier = (isNaN(parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier))) ? 1 : parseFloat(that.localMeta.indicators[that.valToShow].fraction.multiplier);
-    var tweenDuration = (drill.duration === undefined) ? global.getAnimDuration(-1, that.panelId) : drill.duration;
+    const tweenDuration = (drill.duration === undefined) ? global.getAnimDuration(-1, that.panelId) : drill.duration;
 
     // Ha túl sok értéket kéne megjeleníteni, pánik
     if (that.data.rows.length > that.maxEntries) {
-        that.panic(true, _("<html>A panel nem képes ") + that.data.rows.length + _(" értéket megjeleníteni.<br />A maximálisan megjeleníthető értékek száma ") + that.maxEntries + _(".</html>"));
+        that.panic(true, _(that.htmlTagStarter + "A panel nem képes ") + that.data.rows.length + _(" értéket megjeleníteni.<br />A maximálisan megjeleníthető értékek száma ") + that.maxEntries + _(".</html>"));
         that.preparedData = undefined;
     } else {
         that.preparedData = that.prepareData(that.preparedData, that.data.rows, drill);
         if (that.preparedData.length > 0 && !isNaN(that.preparedData[0].percentage)) {
             that.panic(false);
-            var trans = d3.transition().duration(tweenDuration);
+            const trans = d3.transition().duration(tweenDuration);
             that.drawPie(that.preparedData, trans);
             that.drawLabels(that.preparedData, trans);
         } else {
-            that.panic(true, _("<html>A változó értéke<br />minden dimenzióban 0.</html>"));
+            that.panic(true, _(that.htmlTagStarter + "A változó értéke<br />minden dimenzióban 0.</html>"));
             that.preparedData = [];
         }
     }
@@ -402,135 +419,135 @@ panel_pie.prototype.update = function (data, drill) {
 
 /**
  * A körcikkek kirajzolása, animálása.
- * 
+ *
  * @param {Array} preparedData A kirajzolandó körcikkekekt tartalmazó adattömb.
  * @param {Object} trans Az animáció objektum, amelyhez csatlakozni fog.
  * @returns {undefined}
  */
 panel_pie.prototype.drawPie = function (preparedData, trans) {
-    var that = this;
+    const that = this;
 
     // A körcikkek adathoz társítása. 
-    var paths = that.arc_group.selectAll("path").data(preparedData, function (d) {
+    const paths = that.arc_group.selectAll("path").data(preparedData, function (d) {
         return d.uniqueId;
     });
 
     // Kilépő körcikkek törlése.
     paths.exit()
-            .on("click", null)
-            .remove();
+        .on("click", null)
+        .remove();
 
     // Új körcikkek kirajzolása.
-    paths = paths.enter().append("svg:path")
-            .attr("class", "bar bordered darkenable listener")
-            .on("click", function (d) {
-                that.drill(d);
-            })
-            .merge(paths)
-            .attr("fill", function (d) {
-                return global.color(d.id);
-            })
-            .transition(trans)
-            .attrTween("d", that.pieTween.bind(that));
+    paths.enter().append("svg:path")
+        .attr("class", "bar bordered darkenable listener")
+        .on("click", function (d) {
+            that.drill(d);
+        })
+        .merge(paths)
+        .attr("fill", function (d) {
+            return global.color(d.id);
+        })
+        .transition(trans)
+        .attrTween("d", that.pieTween.bind(that));
 };
 
 /**
  * A vonások és feliratok kirajzolása, animálása.
- * 
+ *
  * @param {Array} preparedData A körcikkek adatait tartalmazó adattömb.
  * @param {Object} trans Az animáció objektum, amelyhez csatlakozni fog.
  * @returns {undefined}
  */
 panel_pie.prototype.drawLabels = function (preparedData, trans) {
-    var that = this;
+    const that = this;
 
     // A panel dimenziójának beállítása
     that.axisXCaption
-            .text(that.localMeta.dimensions[that.dimToShow].caption)
-            .attr("text-anchor", "end")
-            .transition(trans).attrs({
-                x: that.width,
-                y: 0 });
+        .text(that.localMeta.dimensions[that.dimToShow].caption)
+        .attr("text-anchor", "end")
+        .transition(trans).attrs({
+        x: that.width, y: 0
+    });
 
     // A vonások kirajzolása, animálása.
-    var lines = that.label_group.selectAll("line").data(preparedData, function (d) {
+    const lines = that.label_group.selectAll("line").data(preparedData, function (d) {
         return d.uniqueId;
     });
 
     lines.exit().remove();
 
     lines.enter().append("svg:line")
-            .attr("class", "pieTicks")
-            .attr("x1", 0)
-            .attr("x2", 0)
-            .attr("y1", -that.radius - 3)
-            .attr("y2", -that.radius - 8)
-            .attr("transform", function (d) {
-                return "rotate(" + (d.startAngle + d.endAngle) / 2 * (180 / Math.PI) + ")";
-            })
-            .merge(lines)
-            .transition(trans)
-            .attrTween("transform", that.tickTween)
-            .style("opacity", function (d) {
-                return (d.isTickRequired) ? 1 : 0;
-            });
+        .attr("class", "pieTicks")
+        .attr("x1", 0)
+        .attr("x2", 0)
+        .attr("y1", -that.radius - 3)
+        .attr("y2", -that.radius - 8)
+        .attr("transform", function (d) {
+            return "rotate(" + (d.startAngle + d.endAngle) / 2 * (180 / Math.PI) + ")";
+        })
+        .merge(lines)
+        .transition(trans)
+        .attrTween("transform", that.tickTween)
+        .style("opacity", function (d) {
+            return (d.isTickRequired) ? 1 : 0;
+        });
 
     // A szövegelemek tartója.
-    var gLabelHolder = that.label_group.selectAll("g").data(that.preparedData, function (d) {
+    let gLabelHolder = that.label_group.selectAll("g").data(that.preparedData, function (d) {
         return d.uniqueId;
     });
 
     // Kilépők levevése.
     gLabelHolder.exit().remove();
 
-    var newGLabelHolder = gLabelHolder.enter().append("svg:g")
-            .attr("class", "gPieTick")
-            .attr("transform", function (d) {
-                return "translate(" + Math.cos(((d.startAngle + d.endAngle - Math.PI) / 2)) * that.textRadius + "," + Math.sin((d.startAngle + d.endAngle - Math.PI) / 2) * that.textRadius + ")";
-            });
+    const newGLabelHolder = gLabelHolder.enter().append("svg:g")
+        .attr("class", "gPieTick")
+        .attr("transform", function (d) {
+            return "translate(" + Math.cos(((d.startAngle + d.endAngle - Math.PI) / 2)) * that.textRadius + "," + Math.sin((d.startAngle + d.endAngle - Math.PI) / 2) * that.textRadius + ")";
+        });
 
     // Újonnan belépő százalék-értékek.
     newGLabelHolder.append("svg:text")
-            .attr("class", "value pieTickValue");
+        .attr("class", "value pieTickValue");
 
     // Újonnan belépő dimenziócímkék.
     newGLabelHolder.append("svg:text")
-            .attr("class", "units pieTickUnit");
+        .attr("class", "units pieTickUnit");
 
     // Maradók és új elemek összeöntése.
     gLabelHolder = newGLabelHolder.merge(gLabelHolder);
 
     // Százalékok kitöltése.
     gLabelHolder.select("text.pieTickValue")
-            .attr("dy", function (d) {
-                return (global.valueInRange((d.startAngle + d.endAngle) / 2, Math.PI / 2, Math.PI * 1.5)) ? 5 : -7;
-            })
-            .attr("text-anchor", function (d) {
-                return ((d.startAngle + d.endAngle) / 2.001 < Math.PI) ? "beginning" : "end";
-            })
-            .text(function (d) {
-                return d.percentage + "%";
-            });
+        .attr("dy", function (d) {
+            return (global.valueInRange((d.startAngle + d.endAngle) / 2, Math.PI / 2, Math.PI * 1.5)) ? 5 : -7;
+        })
+        .attr("text-anchor", function (d) {
+            return ((d.startAngle + d.endAngle) / 2.001 < Math.PI) ? "beginning" : "end";
+        })
+        .text(function (d) {
+            return d.percentage + "%";
+        });
 
     // Dimenziónevek kitöltése.
     gLabelHolder.select("text.pieTickUnit")
-            .attr("dy", function (d) {
-                return (global.valueInRange((d.startAngle + d.endAngle) / 2, Math.PI / 2, Math.PI * 1.5)) ? 17 : 5;
-            })
-            .attr("text-anchor", function (d) {
-                return ((d.startAngle + d.endAngle) / 2.001 < Math.PI) ? "beginning" : "end";
-            })
-            .text(function (d) {
-                return d.name;
-            });
+        .attr("dy", function (d) {
+            return (global.valueInRange((d.startAngle + d.endAngle) / 2, Math.PI / 2, Math.PI * 1.5)) ? 17 : 5;
+        })
+        .attr("text-anchor", function (d) {
+            return ((d.startAngle + d.endAngle) / 2.001 < Math.PI) ? "beginning" : "end";
+        })
+        .text(function (d) {
+            return d.name;
+        });
 
 
     // Maradók helyre animálása.
     gLabelHolder.transition(trans)
-            .attrTween("transform", that.textTween.bind(that))
-            .style("opacity", function (d) {
-                return (d.isTickRequired) ? 1 : 0;
-            });
+        .attrTween("transform", that.textTween.bind(that))
+        .style("opacity", function (d) {
+            return (d.isTickRequired) ? 1 : 0;
+        });
 
     // Max. 145 pixel hosszú lehet egy szövegdoboz.
     global.cleverCompress(that.label_group.selectAll(".pieTickUnit"), 140, 1, 1.5, false);
@@ -540,66 +557,3 @@ panel_pie.prototype.drawLabels = function (preparedData, trans) {
 //////////////////////////////////////////////////
 // Control functions
 //////////////////////////////////////////////////
-
-/**
- * Az aktuális dimenzióban történő le vagy felfúrást kezdeményező függvény.
- * 
- * @param {Object} d Lefúrás esetén a lefúrás céleleme. Ha undefined, akkor felfúrásról van szó.
- * @returns {undefined}
- */
-panel_pie.prototype.drill = function (d) {
-    var that = this;
-    global.tooltip.kill();    
-    var drill = {
-        dim: that.dimToShow,
-        direction: (d === undefined) ? 1 : -1,
-        toId: (d === undefined) ? undefined : d.id,
-        toName: (d === undefined) ? undefined : d.name
-    };
-    that.mediator.publish("drill", drill);
-};
-
-/**
- * A mutató- és hányadosválasztást végrehajtó függvény.
- * 
- * @param {String} panelId A váltást végrehajtó panel azonosítója. Akkor vált, ha az övé, vagy ha undefined.
- * @param {Number} value Az érték, amire váltani kell. Ha -1 akkor a következőre vált, ha undefined, nem vált.
- * @param {boolean} ratio Hányadost mutasson-e. Ha -1 akkor a másikra ugrik, ha undefined, nem vált.
- * @returns {undefined}
- */
-panel_pie.prototype.doChangeValue = function (panelId, value, ratio) {
-    var that = this;
-    if (panelId === undefined || panelId === that.panelId) {
-        if (value !== undefined) {
-            that.valToShow = (value === -1) ? (that.valToShow + 1) % that.localMeta.indicators.length : value;
-            while (!that.localMeta.indicators[that.valToShow].isShown) {
-                that.valToShow = (that.valToShow + 1) % that.localMeta.indicators.length;
-            }
-            that.actualInit.val = that.valToShow;
-        }
-        if (ratio !== undefined) {
-            that.valFraction = (ratio === -1) ? !that.valFraction : ratio;
-            that.actualInit.ratio = that.valFraction;
-        }
-        that.update();
-        global.getConfig2();
-    }
-};
-
-/**
- * A dimenzióváltást végrehajtó függvény.
- * 
- * @param {String} panelId A dimenzióváltást kapó panel ID-ja.
- * @param {Number} newDimId A helyére bejövő dimenzió ID-ja.
- * @returns {undefined}
- */
-panel_pie.prototype.doChangeDimension = function (panelId, newDimId) {
-    let that = this;
-    if (panelId === that.panelId) {
-        that.dimToShow = newDimId;
-        that.actualInit.dim = that.dimToShow;
-        that.mediator.publish("register", that, that.panelId, [that.dimToShow], that.preUpdate, that.update, that.getConfig);
-        global.tooltip.kill();
-        that.mediator.publish("drill", {dim: -1, direction: 0, toId: undefined});
-    }
-};

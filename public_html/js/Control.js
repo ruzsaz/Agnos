@@ -6,7 +6,15 @@
 function ControlSlider(parentElement, id, initObject, startValue, callback) {
     const that = this;
 
-    const init = JSON.parse(initObject.parameters);
+    this.id = id;
+    this.init = JSON.parse(initObject.parameters);
+    this.min = (that.init === undefined || that.init.min === undefined) ? 0 : that.init.min;
+    this.max = (that.init === undefined || that.init.max === undefined) ? 100 : that.init.max;
+    this.step = (that.init === undefined || that.init.step === undefined) ? 1 : that.init.step;
+    this.controlValues = [];
+    for (let i = this.min, iMax = this.max; i <= iMax; i += this.step) {
+        that.controlValues.push({'value' : i, 'label' : i + ''});
+    }
 
     this.className = "control slider";
 
@@ -25,11 +33,11 @@ function ControlSlider(parentElement, id, initObject, startValue, callback) {
 
     this.container.append("html:input")
         .attr("class", that.className)
-        .attr("id", id)
+        .attr("id", that.id)
         .attr("type", "range")
-        .attr("min", (init === undefined || init.min === undefined) ? 0 : init.min)
-        .attr("max", (init === undefined || init.max === undefined) ? 100 : init.max)
-        .attr("step", (init === undefined || init.step === undefined) ? 0 : init.step)
+        .attr("min", that.min)
+        .attr("max", that.max)
+        .attr("step", that.step)
         .attr("value", startValue)
         .on("input", function () {
             const value = d3.select(this).property("value");
@@ -56,17 +64,30 @@ ControlSlider.prototype.updateLabels = function (parentElement, newLabels, trans
     valueContainer.transition(trans).style("opacity", 1);
 };
 
+ControlSlider.prototype.setValue = function (newValue) {
+    const controlElement = document.getElementById(this.id);
+    controlElement.value = newValue;
+    controlElement.dispatchEvent(new Event('change'));
+}
+
+ControlSlider.prototype.getPossibleControlValuesAsArray = function () {
+    return this.controlValues;
+}
+
+
+
 
 function ControlRadio(parentElement, id, initObject, startValue, callback) {
     const that = this;
 
-    const init = JSON.parse(initObject.parameters);
+    this.init = JSON.parse(initObject.parameters);
+    this.id = id;
 
-    const data = [];
-    for (let i = 0, iMax = init.values.length; i < iMax; i++) {
-        data.push({
-            "value": init.values[i],
-            "label": (initObject.labels === undefined || initObject.labels.length <= i) ? init.values[i] : initObject.labels[i]
+    this.controlValues = [];
+    for (let i = 0, iMax = that.init.values.length; i < iMax; i++) {
+        that.controlValues.push({
+            "value": that.init.values[i],
+            "label": (initObject.labels === undefined || initObject.labels.length <= i) ? that.init.values[i] : initObject.labels[i]
         });
     }
 
@@ -77,7 +98,7 @@ function ControlRadio(parentElement, id, initObject, startValue, callback) {
         .attr("class", "radioContainer");
 
     const valueContainer = that.container.append("html:form")
-        .attr("id", id)
+        .attr("id", that.id)
         .attr("class", that.className)
         .on("change", function () {
             const value = valueContainer.select('input:checked').node().value;
@@ -89,7 +110,7 @@ function ControlRadio(parentElement, id, initObject, startValue, callback) {
         .transition(d3.transition().duration(global.selfDuration))
         .style("opacity", 1);
 
-    const newRadioOption = valueContainer.selectAll("input").data(data)
+    const newRadioOption = valueContainer.selectAll("input").data(that.controlValues)
         .enter().append("html:p");
 
     newRadioOption.append("html:input")
@@ -121,6 +142,16 @@ ControlRadio.prototype.updateLabels = function (parentElement, newLabels, trans)
         .style("opacity", 1);
 
 };
+
+ControlRadio.prototype.setValue = function (newValue) {
+    const controlElement = document.getElementById(this.id);
+    d3.select(controlElement).select("input[value='" + newValue + "']").node().checked = true;
+    controlElement.dispatchEvent(new Event('change'));
+}
+
+ControlRadio.prototype.getPossibleControlValuesAsArray = function () {
+    return this.controlValues;
+}
 
 
 /* *****************************************

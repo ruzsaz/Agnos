@@ -2,7 +2,8 @@
 
 'use strict';
 
-var horizontalbarpanel = panel_horizontalbar;
+const horizontalbarpanel = panel_horizontalbar;
+
 /**
  * Vízszintes oszlopdiagram konstruktora.
  * 
@@ -10,7 +11,7 @@ var horizontalbarpanel = panel_horizontalbar;
  * @returns {panel_horizontalbar}
  */
 function panel_horizontalbar(init) {
-    var that = this;
+    const that = this;
 
     this.constructorName = "panel_horizontalbar";
 
@@ -28,12 +29,12 @@ function panel_horizontalbar(init) {
     this.fracMultipliers = [];							// Ennyiszeresét kell mutatni az értékeknek.
     this.valFraction = that.actualInit.ratio;			// Hányadost mutasson?
     this.isAlwaysCentered = that.actualInit.centered;	// Mindig középen legyen az y tengely?
-    this.preparedData;									// A megjelenítendő feldolgozott adat.
+    this.preparedData = undefined;  					// A megjelenítendő feldolgozott adat.
     this.maxEntries = global.maxEntriesIn1D;            // A panel által maximálisan megjeleníthető adatok száma.    
-    this.shadowTimeout;									// A háttértéglalapokat létrehozó időzítés.
+    this.shadowTimeout = undefined;						// A háttértéglalapokat létrehozó időzítés.
 
     // Az y tengely szövegszínének meghatározása.	
-    this.yAxisColor = global.readableColor(global.colorValue(that.valBarsToShow[0], that.panelSide));
+    this.yAxisColor = global.readableColor(global.colorValue(0, that.panelSide));
 
     // Vízszintes skála.
     this.xScale = d3.scaleLinear()
@@ -125,7 +126,7 @@ function panel_horizontalbar(init) {
             .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");
    
     // Feliratkozás az értékváltás mediátorra.
-    var med;
+    let med;
     med = that.mediator.subscribe("changeValue", function(id, val, ratio, valToChange) {
         that.doChangeValue(id, val, ratio, valToChange);
     });
@@ -162,9 +163,9 @@ function panel_horizontalbar(init) {
  * @returns {Array} Az értékek tömbje.
  */
 panel_horizontalbar.prototype.barValuesToShow = function(d) {
-    var pos = this.valuesToShow(d, true);
-    var neg = this.valuesToShow(d, false);
-    for (var i = 0; i < neg.length; i++) {
+    const pos = this.valuesToShow(d, true);
+    const neg = this.valuesToShow(d, false);
+    for (let i = 0; i < neg.length; i++) {
         neg[i].accumulation = -neg[i].accumulation - neg[i].value;
     }
     return neg.concat(pos);
@@ -288,83 +289,97 @@ panel_horizontalbar.prototype.setXScale = function(scale) {
  * @returns {undefined}
  */
 panel_horizontalbar.prototype.preUpdate = function(drill) {
-    var that = this;
-    var oldPreparedData = that.preparedData;
+    const that = this;
+    const oldPreparedData = that.preparedData;
 
-    // Lefúrás esetén: mindent, kivéve amibe fúrunk, letörlünk.
-    if (drill.direction === -1) {
+    // If it shows a control when clciked on, produce a blinking
+    if (drill.dim >= global.baseLevels[that.panelSide].length) {
+        if (drill.initiator === that.panelId) {
+            const transition = d3.transition().duration(global.blinkDuration);
+            that.gBars.selectAll(".bar").filter(function(d) {
+                return (d.id === drill.toId);
+            }).selectAll("rect").call(that.applyBlinking, transition);
+            that.gAxisY.selectAll("text").filter(function(d) {
+                return (d.id === drill.toId);
+            }).call(that.applyBlinking, transition);
+        }
+    } else {
 
-        // Tengelyfeliratok: nem kellőek törlése.
-        that.gAxisY.selectAll("text")
-                .filter(function(d) {
+        // Lefúrás esetén: mindent, kivéve amibe fúrunk, letörlünk.
+        if (drill.direction === -1) {
+
+            // Tengelyfeliratok: nem kellőek törlése.
+            that.gAxisY.selectAll("text")
+                .filter(function (d) {
                     return (d.id !== drill.toId);
                 })
                 .remove();
-        that.gAxisYShadow.selectAll("rect")
+            that.gAxisYShadow.selectAll("rect")
                 .on("click", null)
                 .remove();
 
-        // Oszlopok: nem kellőek letörlése.
-        that.gBars.selectAll(".bar")
-                .filter(function(d) {
+            // Oszlopok: nem kellőek letörlése.
+            that.gBars.selectAll(".bar")
+                .filter(function (d) {
                     return (d.id !== drill.toId);
                 })
                 .on("click", null)
                 .remove();
 
-        // Felfúrás esetén.
-    } else if (drill.direction === 1 && oldPreparedData) {
+            // Felfúrás esetén.
+        } else if (drill.direction === 1 && oldPreparedData) {
 
-        // Tengelyfeliratok: minden törlése.
-        that.gAxisY.selectAll("text")
-                .filter(function(d) {
+            // Tengelyfeliratok: minden törlése.
+            that.gAxisY.selectAll("text")
+                .filter(function (d) {
                     return (d.id !== drill.fromId);
                 })
                 .remove();
-        that.gAxisYShadow.selectAll("rect")
+            that.gAxisYShadow.selectAll("rect")
                 .on("click", null)
                 .remove();
 
-        // Az oszlopok átlagértékének meghatározása.
-        var avgValues = [];
-        for (var j = 0, jMax = that.valBarNumber; j < jMax; j++) {
-            var avgWidth = d3.mean(oldPreparedData.dataArray, function(d) {
-                return d.values[j].width;
-            });
-            var avgX = d3.mean(oldPreparedData.dataArray, function(d) {
-                return d.values[j].x;
-            });
-            avgValues.push({width: avgWidth, x: avgX});
-        }
+            // Az oszlopok átlagértékének meghatározása.
+            const avgValues = [];
+            for (let j = 0, jMax = that.valBarNumber; j < jMax; j++) {
+                const avgWidth = d3.mean(oldPreparedData.dataArray, function (d) {
+                    return d.values[j].width;
+                });
+                const avgX = d3.mean(oldPreparedData.dataArray, function (d) {
+                    return d.values[j].x;
+                });
+                avgValues.push({width: avgWidth, x: avgX});
+            }
 
-        // Minden oszlopelem eltörlése.
-        that.gBars.selectAll(".bar")
+            // Minden oszlopelem eltörlése.
+            that.gBars.selectAll(".bar")
                 .on("click", null)
                 .remove();
 
-        // Átlaghoz tartozó oszlopelem kirajzolása.
-        var level = (global.baseLevels[that.panelSide])[this.dimToShow].length;
-        that.gBars.selectAll(".bar").data([{id: drill.fromId, uniqueId: level + "L" + drill.fromId}])
+            // Átlaghoz tartozó oszlopelem kirajzolása.
+            var level = (global.baseLevels[that.panelSide])[this.dimToShow].length;
+            that.gBars.selectAll(".bar").data([{id: drill.fromId, uniqueId: level + "L" + drill.fromId}])
                 .enter().append("svg:g")
                 .attr("class", "bar bordered darkenable")
                 .attr("transform", "translate(0," + (that.yScale.range()[1] * (that.barPadding / 2)) + ")")
                 .attr("opacity", 1)
                 .selectAll("rect").data(avgValues)
                 .enter().append("svg:rect")
-                .attr("class", function(d2, i2) {
+                .attr("class", function (d2, i2) {
                     return "controlled controlled" + that.valBarsToShow[i2];
                 })
                 .attr("y", 0)
                 .attr("height", that.yScale.range()[1] * (1 - that.barPadding))
-                .attr("x", function(d2) {
+                .attr("x", function (d2) {
                     return d2.x;
                 })
-                .attr("width", function(d2) {
+                .attr("width", function (d2) {
                     return d2.width;
                 })
-                .attr("fill", function(d2, i2) {
+                .attr("fill", function (d2, i2) {
                     return global.colorValue(that.valBarsToShow[i2], that.panelSide);
                 });
+        }
     }
 };
 
@@ -377,22 +392,22 @@ panel_horizontalbar.prototype.preUpdate = function(drill) {
  * @returns {Object} Az új megjelenítendő adatok.
  */
 panel_horizontalbar.prototype.prepareData = function(oldPreparedData, newDataRows, drill) {
-    var that = this;
-    var level = (global.baseLevels[that.panelSide])[this.dimToShow].length;
+    const that = this;
+    const level = (that.dimToShow < global.baseLevels[that.panelSide].length) ? (global.baseLevels[that.panelSide])[this.dimToShow].length : 0;
 
-    var dataArray = [];			// A fő adattörzs, ez fogja a téglalapok megjelenítését tartalmazni.
+    const dataArray = [];			// A fő adattörzs, ez fogja a téglalapok megjelenítését tartalmazni.
     newDataRows.sort(that.getSortingComparator()); // Adatok névsorba rendezése.
 
     // Vízszintes skála beállítása.
     that.yScale.domain([0, newDataRows.length]);
 
     // Lefúrás esetén: ebből a régi elemből kell kinyitni mindent.
-    var openFromElement = (drill.direction === -1 && oldPreparedData) ? global.getFromArrayByProperty(oldPreparedData.dataArray, 'id', drill.toId) : null;
+    const openFromElement = (drill.direction === -1 && oldPreparedData) ? global.getFromArrayByProperty(oldPreparedData.dataArray, 'id', drill.toId) : null;
 
     // Felfúrás esetén: annak az elemnek az indexe az új adatokban, amit előzőleg kibontva mutattunk.
-    var openToElementIndex;
+    let openToElementIndex;
     if (drill.direction === 1) {
-        for (var i = 0, iMax = newDataRows.length; i < iMax; i++) {
+        for (let i = 0, iMax = newDataRows.length; i < iMax; i++) {
             if (newDataRows[i].dims[0].id === drill.fromId) {
                 openToElementIndex = i;
                 break;
@@ -403,8 +418,8 @@ panel_horizontalbar.prototype.prepareData = function(oldPreparedData, newDataRow
     // Első végigfutás: alapértékek beállítása, és a maximumok meghatározása.
     var maxBarValue = 0;
     var minBarValue = 0;
-    for (var i = 0, iMax = newDataRows.length; i < iMax; i++) {
-        var dataRow = newDataRows[i];
+    for (let i = 0, iMax = newDataRows.length; i < iMax; i++) {
+        const dataRow = newDataRows[i];
         var element = {};
         element.index = i;
         element.id = dataRow.dims[0].id;
@@ -735,7 +750,7 @@ panel_horizontalbar.prototype.drawLegend = function() {
 panel_horizontalbar.prototype.drawAxes = function(preparedData, trans) {
     var that = this;
 
-    that.yAxisColor = global.readableColor(global.colorValue(that.valBarsToShow[0], that.panelSide));
+    that.yAxisColor = global.readableColor(global.colorValue(0, that.panelSide));
     var shadowSize = global.axisTextSize(that.yScale(1));	// A függőleges tengely betűje mögötti klikk-téglalap mérete.
     var axisTextSize = (shadowSize < 6) ? 0 : shadowSize;	// A függőleges tengely betűmérete.
 
@@ -932,24 +947,6 @@ panel_horizontalbar.prototype.createLegendArray = function() {
 };
 
 /**
- * Az aktuális dimenzióban történő le vagy felfúrást kezdeményező függvény.
- * 
- * @param {Object} d Lefúrás esetén a lefúrás céleleme. Ha undefined, akkor felfúrásról van szó.
- * @returns {undefined}
- */
-panel_horizontalbar.prototype.drill = function(d) {
-    global.tooltip.kill();
-    var drill = {
-        dim: this.dimToShow,
-        direction: (d === undefined) ? 1 : -1,
-        toId: (d === undefined) ? undefined : d.id,
-        toName: (d === undefined) ? undefined : d.name
-    };
-
-    this.mediator.publish("drill", drill);
-};
-
-/**
  * A mutató- és hányadosválasztást végrehajtó függvény.
  * 
  * @param {String} panelId A váltást végrehajtó panel azonosítója. Akkor vált, ha az övé, vagy ha undefined.
@@ -1047,23 +1044,6 @@ panel_horizontalbar.prototype.doChangeValue = function(panelId, value, ratio, ta
     }
 };
 
-/**
- * A dimenzióváltást végrehajtó függvény.
- * 
- * @param {String} panelId A dimenzióváltást kapó panel ID-ja.
- * @param {Integer} newDimId A helyére bejövő dimenzió ID-ja.
- * @returns {undefined}
- */
-panel_horizontalbar.prototype.doChangeDimension = function(panelId, newDimId) {
-    var that = this;
-    if (panelId === that.panelId) {
-        that.dimToShow = newDimId;
-        that.actualInit.dim = that.dimToShow;
-        that.mediator.publish("register", that, that.panelId, [that.dimToShow], that.preUpdate, that.update, that.getConfig);
-        global.tooltip.kill();
-        this.mediator.publish("drill", {dim: -1, direction: 0, toId: undefined});
-    }
-};
 
 /**
  * Átkonfigurálja a panelt többérték/egyérték között.
@@ -1101,6 +1081,7 @@ panel_horizontalbar.prototype.changeConfiguration = function(isLegendRequired, l
  * @returns {undefined}
  */
 panel_horizontalbar.prototype.langSwitch = function() {
+    Panel.prototype.langSwitch();
     // Jelkulcs letörlése, és újrarajzolása.
     if (this.isLegendRequired) {
         this.gLegend.selectAll(".legend").remove();

@@ -100,9 +100,6 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
             .attr("height", that.h)
             .attr("rx", global.rectRounding);
 
-    
-
-
     this.gLegend = that.svg;
 
     // Feliratkozás a panelt megölő mediátorra.
@@ -114,7 +111,7 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     // Feliratkozás a nyelvváltó mediátorra.
     med = this.mediator.subscribe("langSwitch", function() {
         that.localMeta = global.facts[that.panelSide].getLocalMeta();
-        Panel.prototype.defaultPanicText = _("<html>Nincs megjeleníthető adat.<html>");
+        Panel.prototype.defaultPanicText = _(that.htmlTagStarter + "Nincs megjeleníthető adat.</html>");
         that.langSwitch(global.selfDuration);
     });
     that.mediatorIds.push({"channel": "langSwitch", "id": med.id});
@@ -156,8 +153,7 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
         duplicator.append("svg:g")
             .html('<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#magnify_panel_button"></use>');
     }
-    
-    
+
     // A becsukó gomb fül
     if (!global.isEmbedded) {
         var closeButton = that.svg.append("svg:g")
@@ -215,11 +211,11 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
 
     /**
      * Megnézi, hogy húzáskor eleget mozgott-e az egér, ha igen, indítja a mozgatást, átpozícionálást.
-     * 
+     *
      * @returns {undefined}
      */
-    var dragging = function() {
-        var coords = d3.mouse(that.container.nodes()[0]);
+    const dragging = function() {
+        const coords = d3.mouse(that.container.nodes()[0]);
         if (!that.dragging && (coords[0] - that.dragStartX) * (coords[0] - that.dragStartX) + (coords[1] - that.dragStartY) * (coords[1] - that.dragStartY) > that.dragTreshold * that.dragTreshold) {
             that.dragging = true;
         }
@@ -318,7 +314,7 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     Panel.prototype.h = global.panelHeight;
     Panel.prototype.legendOffsetX = global.legendOffsetX;
     Panel.prototype.dragTreshold = 25;      // A paneláthúzáshoz szükséges minimális pixelnyi elhúzás.    
-    Panel.prototype.defaultPanicText = _("<html>Nincs megjeleníthető adat.<html>");
+    Panel.prototype.defaultPanicText = _("<html>Nincs megjeleníthető adat.</html>");
     Panel.prototype.doubleMultiplier = 2 + 2 * (global.panelMargin / global.panelWidth); // Nagyítás esetén ennyiszeresére kell nagyítania.
     Panel.prototype.doubleHeightModifier = (2 + 2 * (global.panelMargin / global.panelHeight)) / Panel.prototype.doubleMultiplier; // A függőleges irányú multiplikatív korrekció nagyításkor.
 }
@@ -580,12 +576,67 @@ Panel.prototype.sortSwitch = function() {
 };
 
 /**
- * Lefúrást kezdeményező függvény; az alosztályok majd felülírják maguknak.
- * 
+ * Az aktuális dimenzióban történő le vagy felfúrást kezdeményező függvény.
+ * It can be overwritten by the subclasses.
+ *
+ * @param {Object} d Lefúrás esetén a lefúrás céleleme. Ha undefined, akkor felfúrásról van szó.
  * @returns {undefined}
  */
-Panel.prototype.drill = function() {
-    return;
+Panel.prototype.drill = function (d = undefined) {
+    global.tooltip.kill();
+    const drill = {
+        initiator: this.panelId,
+        dim: this.dimToShow,
+        direction: (d === undefined) ? 1 : -1,
+        toId: (d === undefined) ? undefined : d.id,
+        toName: (d === undefined) ? undefined : d.name
+    };
+    this.mediator.publish("drill", drill);
+};
+
+/**
+ * A dimenzióváltást végrehajtó függvény.
+ *
+ * @param {String} panelId A dimenzióváltást kapó panel ID-ja.
+ * @param {int} newDimId A helyére bejövő dimenzió ID-ja.
+ * @returns {undefined}
+ */
+Panel.prototype.doChangeDimension = function (panelId, newDimId) {
+    const that = this;
+    if (panelId === that.panelId) {
+        that.dimToShow = newDimId;
+        that.actualInit.dim = that.dimToShow;
+        that.mediator.publish("register", that, that.panelId, [that.dimToShow], that.preUpdate, that.update, that.getConfig);
+        global.tooltip.kill();
+        that.mediator.publish("drill", {dim: -1, direction: 0, toId: undefined});
+    }
+};
+
+/**
+ * A mutató- és hányadosválasztást végrehajtó függvény.
+ *
+ * @param {String} panelId A váltást végrehajtó panel azonosítója. Akkor vált, ha az övé, vagy ha undefined.
+ * @param {int} value Az érték, amire váltani kell. Ha -1 akkor a következőre vált, ha undefined, nem vált.
+ * @param {boolean} ratio Hányadost mutasson-e. Ha -1 akkor a másikra ugrik, ha undefined, nem vált.
+ * @returns {undefined}
+ */
+Panel.prototype.doChangeValue = function (panelId, value, ratio) {
+    const that = this;
+    if (panelId === undefined || panelId === that.panelId) {
+        if (value !== undefined) {
+            that.valToShow = (value === -1) ? (that.valToShow + 1) % that.localMeta.indicators.length : value;
+            while (!that.localMeta.indicators[that.valToShow].isShown) {
+                that.valToShow = (that.valToShow + 1) % that.localMeta.indicators.length;
+            }
+            that.actualInit.val = that.valToShow;
+        }
+        if (ratio !== undefined) {
+            that.valFraction = (ratio === -1) ? !that.valFraction : ratio;
+            that.actualInit.ratio = that.valFraction;
+        }
+        that.update();
+        global.getConfig2();
+    }
 };
 
 /**
@@ -594,8 +645,7 @@ Panel.prototype.drill = function() {
  * @returns {undefined}
  */
 Panel.prototype.langSwitch = function() {
-    this.htmlTagStarter = "<html lang=" + String.locale + ">";
-    return;
+    this.htmlTagStarter = "<html>";
 };
 
 /**
@@ -609,9 +659,9 @@ Panel.prototype.langSwitch = function() {
  */
 Panel.prototype.hoverOn = function(gHovered, targetId = undefined) {
     if (global.dragDropManager.draggedId !== null) {
-        var rectObj = d3.select(gHovered).select("rect"); // A g-ben levő ELSŐ téglalap kiválasztása.
-        var transform = (rectObj.attr("transform") !== null) ? rectObj.attr("transform") : d3.select(gHovered).attr("transform");
-        var that = this;
+        const rectObj = d3.select(gHovered).select("rect"); // A g-ben levő ELSŐ téglalap kiválasztása.
+        const transform = (rectObj.attr("transform") !== null) ? rectObj.attr("transform") : d3.select(gHovered).attr("transform");
+        const that = this;
         global.dragDropManager.targetObject = gHovered;
         global.dragDropManager.targetPanelId = that.panelId;
         global.dragDropManager.targetId = targetId;
@@ -672,4 +722,13 @@ Panel.prototype.getConfig = function() {
     }
     panelConfigString = panelConfigString + "})";
     return panelConfigString;
+};
+
+Panel.prototype.applyBlinking = function(selection, transition = d3.transition().duration(global.blinkDuration)) {
+    selection
+        .style("fill", global.writeOnPanelColor)
+        .style("opacity", 1)
+        .transition(transition)
+        .style("fill", null)
+        .style("opacity", null);
 };

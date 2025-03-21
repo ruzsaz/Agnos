@@ -34,8 +34,8 @@ function panel_barline(init) {
 
     if (init.sortbyvalue !== false && this.actualInit.top10) {
         this.sortByValue = true;
-    }    
-    
+    }
+
     this.dimToShow = that.actualInit.dim;				// Ennyiedik dimenzió a panel dimenziója.
     this.valFraction = that.actualInit.ratio;			// Hányadost mutasson?
     this.valBarMultipliers = [];// Ennyiszeresét kell mutatni az értékeknek.
@@ -503,133 +503,147 @@ panel_barline.prototype.setYScale = function(scale) {
  * @returns {undefined}
  */
 panel_barline.prototype.preUpdate = function(drill) {
-    var that = this;
-    var oldPreparedData = that.processedData;
+    const that = this;
+    const oldPreparedData = that.processedData;
 
-    // Lefúrás esetén: mindent, kivéve amibe fúrunk, letörlünk.
-    if (drill.direction === -1) {
+    // If it shows a control when clciked on, produce a blinking
+    if (drill.dim >= global.baseLevels[that.panelSide].length) {
+        if (drill.initiator === that.panelId) {
+            const transition = d3.transition().duration(global.blinkDuration);
+            that.gBars.selectAll(".bar").filter(function(d) {
+                return (d.id === drill.toId);
+            }).selectAll("rect").call(that.applyBlinking, transition);
+            that.gAxisX.selectAll("text").filter(function(d) {
+                return (d.id === drill.toId);
+            }).call(that.applyBlinking, transition);
+        }
+    } else {
 
-        // Tengelyfeliratok: nem kellőek törlése.
-        that.gAxisX.selectAll("text")
-                .filter(function(d) {
+        // Lefúrás esetén: mindent, kivéve amibe fúrunk, letörlünk.
+        if (drill.direction === -1) {
+
+            // Tengelyfeliratok: nem kellőek törlése.
+            that.gAxisX.selectAll("text")
+                .filter(function (d) {
                     return (d.id !== drill.toId);
                 })
                 .remove();
-        that.gAxisXShadow.selectAll("rect")
+            that.gAxisXShadow.selectAll("rect")
                 .on("click", null)
                 .remove();
 
-        // Oszlopok: nem kellőek letörlése.
-        that.gBars.selectAll(".bar")
-                .filter(function(d) {
+            // Oszlopok: nem kellőek letörlése.
+            that.gBars.selectAll(".bar")
+                .filter(function (d) {
                     return (d.id !== drill.toId);
                 })
                 .on("click", null)
                 .remove();
 
-        // Átlagvonalak: a megmaradó oszlopelem méretűre nyisszantás.
-        that.gBars.selectAll(".bar")
-                .each(function(d) {
+            // Átlagvonalak: a megmaradó oszlopelem méretűre nyisszantás.
+            that.gBars.selectAll(".bar")
+                .each(function (d) {
                     var avgX0 = d.x - that.barPadding * d.width / 2;
                     var avgX1 = d.x + d.width + that.barPadding * d.width / 2;
                     that.gAvgLines.selectAll("path")
-                            .attr("d", function(d2) {
-                                return that.horizontalLine(avgX0, avgX1, d2.y);
-                            });
+                        .attr("d", function (d2) {
+                            return that.horizontalLine(avgX0, avgX1, d2.y);
+                        });
                 });
 
-        // Átlagfelirat: törlés.
-        that.gAvgLines.selectAll("text")
+            // Átlagfelirat: törlés.
+            that.gAvgLines.selectAll("text")
                 .remove();
 
-        // Vonalak: csökkentett méretűvel való pótlás.
-        that.gLines.selectAll(".lineChart")
-                .attr("d", function(d) {
+            // Vonalak: csökkentett méretűvel való pótlás.
+            that.gLines.selectAll(".lineChart")
+                .attr("d", function (d) {
                     return that.veeLine(d, drill.toId);
                 });
 
-        // Szimbólumok: törlés.
-        that.gLines.selectAll(".lineSymbolHolder")
+            // Szimbólumok: törlés.
+            that.gLines.selectAll(".lineSymbolHolder")
                 .on("click", null)
                 .remove();
 
-        // Felfúrás esetén.
-    } else if (drill.direction === 1 && oldPreparedData) {
+            // Felfúrás esetén.
+        } else if (drill.direction === 1 && oldPreparedData) {
 
-        // Tengelyfeliratok: minden törlése.
-        that.gAxisX.selectAll("text")
-                .filter(function(d) {
+            // Tengelyfeliratok: minden törlése.
+            that.gAxisX.selectAll("text")
+                .filter(function (d) {
                     return (d.id !== drill.fromId);
                 })
                 .remove();
-        that.gAxisXShadow.selectAll("rect")
+            that.gAxisXShadow.selectAll("rect")
                 .on("click", null)
                 .remove();
 
-        // Az oszlopok átlagértékének meghatározása.
-        var avgValues = [];
-        for (var j = 0, jMax = that.valBarNumber; j < jMax; j++) {
-            var avgHeight = d3.mean(oldPreparedData.dataArray, function(d) {
-                return d.barValues[j].height;
-            });
-            var avgY = d3.mean(oldPreparedData.dataArray, function(d) {
-                return d.barValues[j].y;
-            });
-            avgValues.push({height: avgHeight, y: avgY});
-        }
+            // Az oszlopok átlagértékének meghatározása.
+            var avgValues = [];
+            for (var j = 0, jMax = that.valBarNumber; j < jMax; j++) {
+                var avgHeight = d3.mean(oldPreparedData.dataArray, function (d) {
+                    return d.barValues[j].height;
+                });
+                var avgY = d3.mean(oldPreparedData.dataArray, function (d) {
+                    return d.barValues[j].y;
+                });
+                avgValues.push({height: avgHeight, y: avgY});
+            }
 
-        // Minden oszlopelem eltörlése.
-        that.gBars.selectAll(".bar")
+            // Minden oszlopelem eltörlése.
+            that.gBars.selectAll(".bar")
                 .on("click", null)
                 .remove();
 
-        // Átlaghoz tartozó oszlopelem kirajzolása.
-        var level = (global.baseLevels[that.panelSide])[that.dimToShow].length;
-        that.gBars.selectAll(".bar").data([{id: drill.fromId, uniqueId: level + "L" + drill.fromId}])
+            // Átlaghoz tartozó oszlopelem kirajzolása.
+            var level = (global.baseLevels[that.panelSide])[that.dimToShow].length;
+            that.gBars.selectAll(".bar").data([{id: drill.fromId, uniqueId: level + "L" + drill.fromId}])
                 .enter().append("svg:g")
                 .attr("class", "bar bordered darkenable")
                 .attr("transform", "translate(" + (that.xScale.range()[1] * (that.barPadding / 2)) + ", 0)")
                 .attr("opacity", 1)
                 .selectAll("rect").data(avgValues)
                 .enter().append("svg:rect")
-                .attr("class", function(d2, i2) {
+                .attr("class", function (d2, i2) {
                     return "controlled controlled" + that.valBarsToShow[i2];
                 })
                 .attr("x", 0)
                 .attr("width", that.xScale.range()[1] * (1 - that.barPadding))
-                .attr("y", function(d2) {
+                .attr("y", function (d2) {
                     return d2.y;
                 })
-                .attr("height", function(d2) {
+                .attr("height", function (d2) {
                     return d2.height;
                 })
-                .attr("fill", function(d2, i2) {
+                .attr("fill", function (d2, i2) {
                     return global.colorValue(that.valBarsToShow[i2], that.panelSide);
                 });
 
-        // Átlagvonalak: széthúzás kilógóra.
-        that.gAvgLines.selectAll("path")
-                .attr("d", function(d) {
+            // Átlagvonalak: széthúzás kilógóra.
+            that.gAvgLines.selectAll("path")
+                .attr("d", function (d) {
                     return that.horizontalLine(-that.margin.left, that.width + that.margin.right, d.y);
                 });
 
-        // Átlagfelirat: törlés.
-        that.gAvgLines.selectAll("text")
+            // Átlagfelirat: törlés.
+            that.gAvgLines.selectAll("text")
                 .remove();
 
-        // Vonalak: az átlagértékel való pótlás.
-        that.gLines.selectAll(".lineChart")
-                .attr("d", function(d) {
-                    var avgY = d3.mean(d, function(d2) {
+            // Vonalak: az átlagértékel való pótlás.
+            that.gLines.selectAll(".lineChart")
+                .attr("d", function (d) {
+                    var avgY = d3.mean(d, function (d2) {
                         return (d2.id < -10) ? undefined : d2.y;
                     });
                     return that.horizontalLine(-that.margin.left, that.width + that.margin.right, avgY);
                 });
 
-        // Szimbólumok: törlés.
-        that.gLines.selectAll(".lineSymbolHolder")
+            // Szimbólumok: törlés.
+            that.gLines.selectAll(".lineSymbolHolder")
                 .on("click", null)
                 .remove();
+        }
     }
 };
 
@@ -660,7 +674,7 @@ panel_barline.prototype.getTop10 = function(newDataRows) {
  */
 panel_barline.prototype.prepareData = function(oldPreparedData, newDataRows, drill) {
     var that = this;
-    var level = (global.baseLevels[that.panelSide])[that.dimToShow].length;
+    var level = (this.dimToShow < global.baseLevels[that.panelSide].length) ? (global.baseLevels[that.panelSide])[this.dimToShow].length : 0; // A szint, amire fúrunk.
 
     var dataArray = [];			// A fő adattörzs, ez fogja a téglalapok megjelenítését tartalmazni.
 
@@ -1697,27 +1711,11 @@ panel_barline.prototype.createLegendArray = function() {
     return legendArray;
 };
 
-/**
- * Az aktuális dimenzióban történő le vagy felfúrást kezdeményező függvény.
- * 
- * @param {Object} d Lefúrás esetén a lefúrás céleleme. Ha undefined, akkor felfúrásról van szó.
- * @returns {undefined}
- */
-panel_barline.prototype.drill = function(d) {
-    global.tooltip.kill();
-    var drill = {
-        dim: this.dimToShow,
-        direction: (d === undefined) ? 1 : -1,
-        toId: (d === undefined) ? undefined : d.id,
-        toName: (d === undefined) ? undefined : d.name
-    };
-    this.mediator.publish("drill", drill);
-};
 
 /**
  * Átlagkijelzés negálása.
  * 
- * @param {Integer} id A megváltoztatandó érték id-ja.
+ * @param {int} id A megváltoztatandó érték id-ja.
  * @returns {undefined}
  */
 panel_barline.prototype.toggleAvg = function(id) {
@@ -1882,24 +1880,6 @@ panel_barline.prototype.doChangeValue = function(panelId, value, ratio, targetId
 };
 
 /**
- * A dimenzióváltást végrehajtó függvény.
- * 
- * @param {String} panelId A dimenzióváltást kapó panel ID-ja.
- * @param {Integer} newDimId A helyére bejövő dimenzió ID-ja.
- * @returns {undefined}
- */
-panel_barline.prototype.doChangeDimension = function(panelId, newDimId) {
-    var that = this;
-    if (panelId === that.panelId) {
-        that.dimToShow = newDimId;
-        that.actualInit.dim = that.dimToShow;
-        that.mediator.publish("register", that, that.panelId, [that.dimToShow], that.preUpdate, that.update, that.getConfig);
-        global.tooltip.kill();
-        this.mediator.publish("drill", {dim: -1, direction: 0, toId: undefined});
-    }
-};
-
-/**
  * Átkonfigurálja a panelt többérték/egyérték között.
  * 
  * @param {Boolean} isLegendRequired Kell-e jelkulcs?
@@ -1951,6 +1931,7 @@ panel_barline.prototype.changeConfiguration = function(isLegendRequired, leftOff
  * @returns {undefined}
  */
 panel_barline.prototype.langSwitch = function() {
+    Panel.prototype.langSwitch();
     // "Átlag" felirat átírása.
     this.avgText = _("Átlag");
 
