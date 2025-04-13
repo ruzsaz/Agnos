@@ -24,7 +24,7 @@ function Container() {
 
     var browserLocale = (navigator.language || navigator.userLanguage || "en").replace(/[_-].*/ig, "");
     var langFromCookie = global.getCookie("language");
-    $("#mainToolbar").load("mainToolbar.html?ver=2025.33", undefined, function() {
+    $("#mainToolbar").load("mainToolbar.html?ver=2025.4.13", undefined, function() {
         if (global.i18nRequired) {
             d3.select(".languageSwitch").style("display", "block");
             browserLocale = langFromCookie || browserLocale;

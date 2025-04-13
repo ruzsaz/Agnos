@@ -26,6 +26,7 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
 
     this.panelSide = panelInitString.group || 0;
     this.isLegendRequired = isLegendRequired;
+    this.alternateSwitchEnabled = true;
     this.meta = global.facts[that.panelSide].reportMeta;
     this.localMeta = global.facts[that.panelSide].getLocalMeta();
     this.containerId = "#container" + that.panelSide;
@@ -34,11 +35,11 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
 
     this.mediator = mediator;
     this.isShortingByValueEnabled = isShortingByValueEnabled;
-    this.data;
+    this.data = undefined;	// Data for the panel
     this.dimsToShow = [];
     this.sortByValue = panelInitString.sortbyvalue || false;
     this.htmlTagStarter = "<html lang=" + String.locale + ">";
-    
+
     this.valMultiplier = 1;		// Ennyiszeresét
     this.fracMultiplier = 1;		// Ennyiszeresét
     this.valFraction = false;           // Hányadost mutasson?
@@ -47,6 +48,11 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     this.replaceFunction;
     this.magLevel = panelInitString.mag || 1;          // Nagyítottsági szint.
     this.fromMagLevel = panelInitString.frommg || 1;          // Ahonnan érkezik a nagyítás.
+    if (global.panelNumberOnScreen === 1) {
+        this.magLevel = 1;
+        this.panelInitString.mag = 1;
+        this.fromMagLevel = 1;
+    }
     this.w = that.w * that.magLevel;
     this.legendWidth = that.w - 2 * global.legendOffsetX;
     this.h = that.h * that.magLevel;
@@ -124,15 +130,30 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
 
     const scaleString = (global.hasTouchScreen) ? " scale(1.4)" : "";
 
+    // Diagram type switch
+    if (!global.isEmbedded) {
+        const alternateSwitch = that.svg.insert("svg:g")
+            .attr("class", "listener visibleInPanic panelControlButton alternateSwitch")
+            .attr("transform", "translate(0, 0)" + scaleString)
+            .attr("transform-origin", "4 4")
+            .on('click', function () {
+                that.alternateSwitch();
+            })
+            .style("display", "none");
+
+        alternateSwitch.append("svg:g")
+            .html('<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#alternate_switch_button"></use>');
+    }
+
     // Sorbarendezés váltó
-    if (that.isShortingByValueEnabled && !global.isEmbedded) {    
-        var sortSwitcher = that.svg.insert("svg:g")
-                .attr("class", "listener visibleInPanic panelControlButton")
-                .attr("transform", "translate(0, " + (that.h - 30) +")" + scaleString)
-                .attr("transform-origin", "4 24")
-                .on('click', function() {
-                    that.sortSwitch();
-                });
+    if (that.isShortingByValueEnabled && !global.isEmbedded) {
+        const sortSwitcher = that.svg.insert("svg:g")
+            .attr("class", "listener visibleInPanic panelControlButton")
+            .attr("transform", "translate(0, " + (that.h - 30) + ")" + scaleString)
+            .attr("transform-origin", "4 24")
+            .on('click', function () {
+                that.sortSwitch();
+            });
 
         sortSwitcher.append("svg:g")
                 .html('<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#sort_panel_button"></use>');
@@ -140,32 +161,31 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
 
     // A nagyító fül
     if (!global.isEmbedded) {
-        var duplicator = that.svg.append("svg:g")
-                .attr("class", "listener visibleInPanic panelControlButton magnifyPanelButton")
-                .attr("transform", "translate(" + (that.w - 30)  + ", " + (that.h - 30) +")" + scaleString)
-                .attr("transform-origin", "24 24")
-                .on('click', function() {
-                    if (global.panelNumberOnScreen !== 1) {
-                        that.mediator.publish("magnifyPanel", that.panelId);
-                    }
-                });    
-    
+        const duplicator = that.svg.append("svg:g")
+            .attr("class", "listener visibleInPanic panelControlButton magnifyPanelButton")
+            .attr("transform", "translate(" + (that.w - 30) + ", " + (that.h - 30) + ")" + scaleString)
+            .attr("transform-origin", "24 24")
+            .on('click', function () {
+                if (global.panelNumberOnScreen !== 1) {
+                    that.mediator.publish("magnifyPanel", that.panelId);
+                }
+            });
+
         duplicator.append("svg:g")
             .html('<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#magnify_panel_button"></use>');
     }
 
-    // A becsukó gomb fül
+    // CLose panel button
     if (!global.isEmbedded) {
-        var closeButton = that.svg.append("svg:g")
-                .attr("class", "listener visibleInPanic panelControlButton")
-                .attr("transform", "translate(" + (that.w - 24)  + ", 0)" + scaleString)
-                .attr("transform-origin", "16 8")
-                .on('click', function() {
-                    if (global.panelNumberOnScreen !== 0) {
-                        that.mediator.publish("killPanel", that.panelId);
-                    }
-                });
-
+        const closeButton = that.svg.append("svg:g")
+            .attr("class", "listener visibleInPanic panelControlButton")
+            .attr("transform", "translate(" + (that.w - 30) + ", 0)" + scaleString)
+            .attr("transform-origin", "24 4")
+            .on('click', function () {
+                if (global.panelNumberOnScreen !== 0) {
+                    that.mediator.publish("killPanel", that.panelId);
+                }
+            });
 
         closeButton.append("svg:g")
                 .html('<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#close_panel_button"></use>');
@@ -195,17 +215,17 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
 
     /**
      * Az egérgomb lenyomásakor elkezdi a drag-műveletet.
-     * 
+     *
      * @returns {undefined}
      */
-    var dragStarted = function() {
-        
+    const dragStarted = function () {
+
         if (!global.isEmbedded) {
-                var coords = d3.mouse(that.container.nodes()[0]);
-                that.dragStartX = coords[0];
-                that.dragStartY = coords[1];
-                that.panelDiv.classed("dragging", true)
-                        .style("z-index", 10000);
+            const coords = d3.mouse(that.container.nodes()[0]);
+            that.dragStartX = coords[0];
+            that.dragStartY = coords[1];
+            that.panelDiv.classed("dragging", true)
+                .style("z-index", 10000);
         }
     };
 
@@ -229,21 +249,21 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
 
     /**
      * Megnézi, hogy át kell-e helyezni a panelt, és ha igen, megcsinálja.
-     * 
+     *
      * @returns {undefined}
      */
-    var rearrangePanels = function() {
-        var panels = d3.selectAll("#container" + that.panelSide + " .panel.single").nodes();
-        var selfIndex = global.positionInArrayByProperty(panels, "id", that.panelId.substring(1)); // A húzott panel sorszáma a képernyőn megjelenés sorrendjében.
-        var x = $(that.panelId)[0].getBoundingClientRect().left;
-        var y = $(that.panelId)[0].getBoundingClientRect().top;
-        var flipIndex = -1; // Aminek a helyére húzzuk.
-        for (var i = 0, iMax = panels.length; i < iMax; i++) {
+    const rearrangePanels = function() {
+        const panels = d3.selectAll("#container" + that.panelSide + " .panel.single").nodes();
+        const selfIndex = global.positionInArrayByProperty(panels, "id", that.panelId.substring(1)); // A húzott panel sorszáma a képernyőn megjelenés sorrendjében.
+        const x = $(that.panelId)[0].getBoundingClientRect().left;
+        const y = $(that.panelId)[0].getBoundingClientRect().top;
+        let flipIndex = -1; // Aminek a helyére húzzuk.
+        for (let i = 0, iMax = panels.length; i < iMax; i++) {
             if (i !== selfIndex) {
-                var ix = $(panels[i])[0].getBoundingClientRect().left;
-                var iy = $(panels[i])[0].getBoundingClientRect().top;
-                var dx = Math.abs(x - ix) / global.scaleRatio;
-                var dy = Math.abs(y - iy) / global.scaleRatio;
+                const ix = $(panels[i])[0].getBoundingClientRect().left;
+                const iy = $(panels[i])[0].getBoundingClientRect().top;
+                const dx = Math.abs(x - ix) / global.scaleRatio;
+                const dy = Math.abs(y - iy) / global.scaleRatio;
                 if (dx < global.panelWidth / 2 && dy < global.panelHeight / 2) {
                     flipIndex = i;
                     break;
@@ -251,9 +271,9 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
             }
         }
 
-        var selfIndexModified = selfIndex;
-        var flipIndexModified = flipIndex;
-        var isMagnified = !d3.selectAll("#container" + that.panelSide + " .panel.single.magnified").empty();
+        let selfIndexModified = selfIndex;
+        let flipIndexModified = flipIndex;
+        const isMagnified = !d3.selectAll("#container" + that.panelSide + " .panel.single.magnified").empty();
 
         // Ha nagyított a 0. panel, akkor módosítjuk az indexeket, mert a nagyított panel 4-et foglal.
         if (isMagnified) {
@@ -263,8 +283,8 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
 
         // Ha van mit cserélni, és egyik érintett se nagyított, akkor cserélünk.
         if (flipIndex > -1 && (!isMagnified || (selfIndex > 0 && flipIndex > 0))) {
-            var rowDist = Math.floor(selfIndexModified / global.panelNumberOnScreen) - Math.floor(flipIndexModified / global.panelNumberOnScreen);
-            var colDist = (selfIndexModified % global.panelNumberOnScreen) - (flipIndexModified % global.panelNumberOnScreen);
+            const rowDist = Math.floor(selfIndexModified / global.panelNumberOnScreen) - Math.floor(flipIndexModified / global.panelNumberOnScreen);
+            const colDist = (selfIndexModified % global.panelNumberOnScreen) - (flipIndexModified % global.panelNumberOnScreen);
             if (selfIndex > flipIndex) {
                 $(that.panelId).insertBefore($(panels[flipIndex]));
             } else {
@@ -272,7 +292,7 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
             }
             that.dragStartX = that.dragStartX - global.panelWidth * global.scaleRatio * colDist;
             that.dragStartY = that.dragStartY - global.panelHeight * global.scaleRatio * rowDist;
-            var coords = d3.mouse(that.container.nodes()[0]);
+            const coords = d3.mouse(that.container.nodes()[0]);
             that.panelDiv
                     .style("left", ((coords[0] - that.dragStartX) / global.scaleRatio) + "px")
                     .style("top", ((coords[1] - that.dragStartY) / global.scaleRatio) + "px");
@@ -281,14 +301,14 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
 
     /**
      * Az egérgomb felengedésekor mindent visszaállít.
-     * 
+     *
      * @returns {undefined}
      */
-    var dragEnd = function() {
+    const dragEnd = function () {
         that.panelDiv.classed("dragging", false)
-                .style("z-index", null)
-                .style("left", null)
-                .style("top", null);
+            .style("z-index", null)
+            .style("left", null)
+            .style("top", null);
         that.dragging = false;
         global.getConfig2();
     };
@@ -333,7 +353,7 @@ Panel.prototype.classedDarkenable = function() {
  * 
  * @param {Object} a Egy adatelem.
  * @param {Object} b Egy másik adatelem.
- * @returns {Boolean} Az összehasonlítás eredménye.
+ * @returns {int} Az összehasonlítás eredménye.
  */
 Panel.prototype.cmp = function(a, b) {
     return global.realCompare(a.dims[0].name, b.dims[0].name);       
@@ -347,9 +367,9 @@ Panel.prototype.cmp = function(a, b) {
  * @returns {String} A formázott html.
  */
 Panel.prototype.createTooltip = function(dims, vals) {
-    var separator = "";
-    var html = "<html><h4>";
-    for (var d = 0, dMax = dims.length; d < dMax; d++) {
+    let separator = "";
+    let html = "<html><h4>";
+    for (let d = 0, dMax = dims.length; d < dMax; d++) {
         html = html + separator + dims[d].name;
         if (dims[d].value !== undefined) {
             html += ": <em>" + dims[d].value + "</em>";
@@ -357,7 +377,7 @@ Panel.prototype.createTooltip = function(dims, vals) {
         separator = "<br />";
     }
     html = html + "</h4>";
-    for (var v = 0, vMax = vals.length; v < vMax; v++) {
+    for (let v = 0, vMax = vals.length; v < vMax; v++) {
         html = html + vals[v].name + ": <em>" + global.cleverRound5(vals[v].value) + "</em> (" + vals[v].dimension + ")";
         if (vals[v].avgValue !== undefined) {
             html = html + _("<em> átlag: ") + global.cleverRound5(vals[v].avgValue) + "</em>";
@@ -391,12 +411,12 @@ Panel.prototype.killListeners = function() {
  */
 Panel.prototype.killPanel = function(panelId, duration, fromStyle, toStyle, dontResize) {
     if (panelId === undefined || panelId === this.panelId) {
-        var centerX = parseInt(this.panelDiv.style("width")) / 2;
-        var centerY = parseInt(this.panelDiv.style("height")) / 2;
+        const centerX = parseInt(this.panelDiv.style("width")) / 2;
+        const centerY = parseInt(this.panelDiv.style("height")) / 2;
         fromStyle = fromStyle || global.getStyleForScale(1, centerX, centerY);
         toStyle = toStyle || global.getStyleForScale(0, centerX, centerY);
 
-        var killDuration = (duration === undefined) ? global.selfDuration : duration;
+        const killDuration = (duration === undefined) ? global.selfDuration : duration;
 
         // A panel kivétele a regiszterből.
         this.mediator.publish("register", undefined, this.panelId);
@@ -405,7 +425,7 @@ Panel.prototype.killPanel = function(panelId, duration, fromStyle, toStyle, dont
         this.killListeners();
 
         // A panel mediátor-leiratkozásai.
-        for (var i = 0, iMax = this.mediatorIds.length; i < iMax; i++) {
+        for (let i = 0, iMax = this.mediatorIds.length; i < iMax; i++) {
             this.mediator.remove(this.mediatorIds[i].channel, this.mediatorIds[i].id);
         }
         this.mediatorIds = [];
@@ -437,7 +457,7 @@ Panel.prototype.magnifyPanel = function(panelId) {
     var that = this;
     if (panelId === that.panelId || that.magLevel !== 1) {
         // Belerakjuk a kezdő és végnagyítottságot a panel init-stringjébe.
-        var origMag = that.actualInit.mag;
+        const origMag = that.actualInit.mag;
         if (origMag === 1) {
             that.actualInit.mag = that.doubleMultiplier;
             that.actualInit.frommg = 1;
@@ -447,15 +467,15 @@ Panel.prototype.magnifyPanel = function(panelId) {
         }
 
         // Elkészítjük a nagyított panel config-sztringjét, és beleírjuk a pozíciót is.
-        var position = that.panelId.slice(-1);        
-        var config = this.getConfig();
+        const position = that.panelId.slice(-1);
+        let config = this.getConfig();
         config = config.substr(0, config.length - 2);
         if (config.slice(-1) !== "{") {
             config = config + ", ";
         }
         config = config + "position: " + position + "})";
-        
-        var newPanelId = that.panelId;
+
+        const newPanelId = that.panelId;
         that.panelId = that.panelId + "dying";
         this.panelDiv.attr("id", that.panelId.substring(1));
 
@@ -464,7 +484,7 @@ Panel.prototype.magnifyPanel = function(panelId) {
         setTimeout(function() {
             that.killPanel(that.panelId, global.selfDuration, global.getStyleForScale(that.actualInit.mag / origMag, 0, 0), global.getStyleForScale(that.actualInit.mag / origMag, 0, 0), true);
             eval("new " + config);
-            var newPanel = $(newPanelId);
+            const newPanel = $(newPanelId);
             global.mediators[that.panelSide].publish("drill", {dim: -1, direction: 0, duration: -1, onlyFor: newPanelId});
             that.panelDiv.style("position", "absolute");
             that.panelDiv.style("left", -global.panelMargin + "px");
@@ -473,11 +493,11 @@ Panel.prototype.magnifyPanel = function(panelId) {
             newPanel.prepend($(that.panelId));
 
             if (that.actualInit.mag !== 1) {
-                var panels = d3.selectAll("#container" + that.panelSide + " .panel.single").nodes();
+                const panels = d3.selectAll("#container" + that.panelSide + " .panel.single").nodes();
 
-                var startPosition = newPanel.position();
+                const startPosition = newPanel.position();
                 newPanel.insertBefore($(panels[0]));
-                var finishPosition = newPanel.position();
+                const finishPosition = newPanel.position();
                 d3.select(newPanelId)
                         .style("left", ((startPosition.left - finishPosition.left) / global.scaleRatio) + "px")
                         .style("top", ((startPosition.top - finishPosition.top) / global.scaleRatio) + "px")
@@ -514,12 +534,12 @@ Panel.prototype.panic = function(panic, reason) {
                     .remove();
 
             // Új réteg a többi fölé, de azért a címsor mögé.
-            var gPanic = that.svg.insert("svg:g", ".title_group")
-                    .attr("class", "panic listener")
-                    .style("opacity", 0)
-                    .on("click", function() {
-                        that.drill();
-                    });
+            const gPanic = that.svg.insert("svg:g", ".title_group")
+                .attr("class", "panic listener")
+                .style("opacity", 0)
+                .on("click", function () {
+                    that.drill();
+                });
 
             // Mindent kitakaró téglalap a rétegre.
             gPanic.append("svg:g")
@@ -561,13 +581,40 @@ Panel.prototype.panic = function(panic, reason) {
 
 };
 
+Panel.prototype.isAlternateSwitchEnabled = function() {
+    return this.alternateSwitchEnabled;
+}
+
+Panel.prototype.setAlternateSwitch = function (isEnable) {
+    if (isEnable === undefined) {
+        this.alternateSwitchEnabled = this.isAlternateSwitchEnabled();
+    } else {
+        this.alternateSwitchEnabled = isEnable;
+    }
+
+    this.svg.select(".alternateSwitch")
+        .style("display", (this.alternateSwitchEnabled) ? "unset" : "none");
+}
+
+/**
+ * Alternate - normal view switch function. Some panels will overwrite it.
+ */
+Panel.prototype.alternateSwitch = function() {
+    const that = this;
+    global.tooltip.kill();
+    that.alternate = !that.alternate;
+    that.update();
+    that.actualInit.alternate = that.alternate;
+    global.getConfig2();
+};
+
 /**
  * Sorbarendezés váltó függvény; az alosztályok majd felülírják maguknak.
  * 
  * @returns {undefined}
  */
 Panel.prototype.sortSwitch = function() {
-    var that = this;
+    const that = this;
     global.tooltip.kill();       
     that.sortByValue = !that.sortByValue;
     that.update();    
@@ -705,8 +752,8 @@ Panel.prototype.hoverOff = function() {
  * @returns {String} A panel init sztringje.
  */
 Panel.prototype.getConfig = function() {
-    var panelConfigString = this.constructorName + "({";
-    var prefix = "";
+    let panelConfigString = this.constructorName + "({";
+    let prefix = "";
     for (let propName in this.actualInit) {
         const propValue = this.actualInit[propName];
         const defaultValue = this.defaultInit[propName];

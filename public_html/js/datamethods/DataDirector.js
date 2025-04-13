@@ -149,10 +149,10 @@ DataDirector.prototype.getNumberOfPanels = function() {
 };
 
 /**
- * Fúrást végző függvény. Beállítja a szűrési-fúrási szűrőket, és ha a fúrás végrehajtjató,
- * meghívja a panelek preupdate függvényeit, majd elindítja az új adat begyűjtését.
- * 
- * @param {Object} drill A fúrás objektum.
+ * Drilling function. Sets the filtering-drilling filters, and if the drilling is executable,
+ * calls the pre-update functions of the panels, then starts the new data collection.
+ *
+ * @param {Object} drill The drill object.
  * @returns {undefined}
  */
 DataDirector.prototype.drill = function(drill) {
@@ -213,9 +213,9 @@ DataDirector.prototype.controlChange = function(duration) {
 };
 
 /**
- * Meghívja az összes panel preupdate-függvényét.
+ * Calls the pre-update function of all panels.
  * 
- * @param {Object} drill A fúrás objektum.
+ * @param {Object} drill The drill object.
  * @returns {undefined}
  */
 DataDirector.prototype.initiatePreUpdates = function(drill) {
@@ -225,10 +225,10 @@ DataDirector.prototype.initiatePreUpdates = function(drill) {
 };
 
 /**
- * Lefúrás után új adatot szerez be az olap kockából.
- * Az adat megérkeztekor kiosztja a panelek update-függvényének.
- * 
- * @param {Object} drill A lefúrás objektum.
+ * Requests new data from the server. The new data will be distributed to the
+ * panels' pre-update function.
+ *
+ * @param {Object} drill The drill object.
  * @returns {undefined}
  */
 DataDirector.prototype.requestNewData = function(drill) {
@@ -270,7 +270,7 @@ DataDirector.prototype.requestNewData = function(drill) {
     };
     that.cubePreparationRequired = false;
     const encodedQuery = "queries=" + window.btoa(encodeURIComponent((JSON.stringify(requestObject))));
-    // A letöltés élesben.
+    // The actual data request.
     global.get(global.url.fact, encodedQuery, function(result) {        
         that.processNewData(drill, result);
         that.drillLock = false;
@@ -288,12 +288,33 @@ DataDirector.prototype.processNewData = function(drill, newDataJson) {
     const newData = newDataJson.answer;
     for (let i = 0, iMax = newData.length; i < iMax; i++) {
         newData[i].name = newData[i].richName.replace(/(?<=:|^)[^:][^:]+(?=:|$)/g, '1');
-    }    
+    }
+    this.extractLatLonFromDimensions(newData);
     this.storeOrigValues(newData);
     this.localizeNewData(newData);    
     this.calculate(newData);
     this.currentData = newData;    
     this.notifyAllPanelsOnChange(newData, drill);
+};
+
+DataDirector.prototype.extractLatLonFromDimensions = function(newData) {
+    const separator = "@@@"; // TODO: adaptívan meghatározni
+    for (let i = 0, iMax = newData.length; i < iMax; i++) {
+        const panelData = newData[i].response;
+        for (let r = 0, rMax = panelData.rows.length; r < rMax; r++) {
+            const row = panelData.rows[r];
+            const dims = row.dims;
+            for (let d = 0, dMax = dims.length; d < dMax; d++) {
+                const dim = dims[d];
+                if (dim.name.indexOf(separator) !== -1) {
+                    const splitDim = dim.name.split(separator);
+                    dim.name = splitDim[0];
+                    dim.lat = splitDim[1];
+                    dim.lon = splitDim[2];
+                }
+            }
+        }
+    }
 };
 
 /**
@@ -372,7 +393,7 @@ DataDirector.prototype.enrichDataWithControlDimensions = function(data, dimsToSh
                     }
                 }
                 newRow.controls[controlsAsIndex[c]] = controlValue.value;
-                newRow.dims.push({'id': controlValue.value + '', 'name': controlValue.label + ''}); // TODO: formázottan kéne sztringgé, legalább az egyiket?
+                newRow.dims.push({'id': controlValue.value + '', 'name': controlValue.label + ''});
                 newData.rows.push(newRow);
             });
         }
@@ -483,12 +504,8 @@ DataDirector.prototype.applyFunction = function(data, controlValues, func, index
  * @returns {undefined} 
  */
 DataDirector.prototype.localizeNewData = function(newData) {
-
-    
     for (let i = 0, iMax = newData.length; i < iMax; i++) {
-        
         const panelData = newData[i];
-        
         const currentLang = String.locale;
         const dimIndexKey = panelData.name.split(":");
         const dictToUse = [];
@@ -557,11 +574,11 @@ DataDirector.prototype.getConfigs = function(callback) {
     if (typeof callback === 'function') {
         const configObject = {};
         if (global.facts[this.side] && global.facts[this.side].localMeta) {
-            configObject.s = this.side; // Az oldal, amire vonatkozik (0 vagy 1).
-            configObject.c = global.facts[this.side].localMeta.cube_unique_name; // A cube neve.
-            configObject.b = global.baseLevels[this.side]; // A bázisszintek, amire épp lefúrva van.
+            configObject.s = this.side;
+            configObject.c = global.facts[this.side].localMeta.cube_unique_name; // The cube name.
+            configObject.b = global.baseLevels[this.side]; // Current base levels.
             configObject.i = global.facts[this.side].controlValues; // Actual value of the controls.
-            configObject.v = global.minifyInits(configs); // A panelek init sztringje, minifyolva.
+            configObject.v = global.minifyInits(configs); // Initialization strings for the panels, minified.
         }
         callback(configObject);
     } else {

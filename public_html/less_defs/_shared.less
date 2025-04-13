@@ -335,6 +335,10 @@ svg {
     position: relative;	
 }
 
+.panel:not(.cardPanelHolder) > svg {
+    border-radius: @rounding;
+}
+
 .baseDiv:before, .baseDiv:after {
     content: " ";
     display: table;
@@ -1368,6 +1372,14 @@ text {
 /* universal */
 .darkenable:hover{
     opacity: 0.7;
+}
+
+.hoverControl:not(.hoverBlock) .bubbleHolder:hover > .shadow {
+    opacity: 1;
+}
+
+.bubble_label {
+    white-space: nowrap;
 }
 
 

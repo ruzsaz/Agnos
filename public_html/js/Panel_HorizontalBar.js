@@ -32,6 +32,7 @@ function panel_horizontalbar(init) {
     this.preparedData = undefined;  					// A megjelenítendő feldolgozott adat.
     this.maxEntries = global.maxEntriesIn1D;            // A panel által maximálisan megjeleníthető adatok száma.    
     this.shadowTimeout = undefined;						// A háttértéglalapokat létrehozó időzítés.
+    this.setAlternateSwitch(true);
 
     // Az y tengely szövegszínének meghatározása.	
     this.yAxisColor = global.readableColor(global.colorValue(0, that.panelSide));
@@ -1087,4 +1088,12 @@ panel_horizontalbar.prototype.langSwitch = function() {
         this.gLegend.selectAll(".legend").remove();
         this.drawLegend();
     }
+};
+
+panel_horizontalbar.prototype.alternateSwitch = function () {
+    const that = this;
+    that.isAlwaysCentered = !that.isAlwaysCentered;
+    that.update();
+    that.actualInit.centered = that.isAlwaysCentered;
+    global.getConfig2();
 };

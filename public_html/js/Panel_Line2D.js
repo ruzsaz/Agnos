@@ -34,6 +34,7 @@ function panel_line2d(init) {
     this.maxEntries1D = global.maxEntriesIn1D;              // A panel által 1 dimenzióban maximálisan megjeleníthető adatok száma.
     this.shadowTimeout = undefined;                         // A háttértéglalapokat létrehozó időzítés.
     this.maskId = global.randomString(12);                  // A maszk réteg id-je. Véletlen, nehogy kettő azonos legyen.    
+    this.setAlternateSwitch(true);
 
     // Vízszintes skála.
     this.xScale = d3.scaleLinear()
@@ -1294,4 +1295,12 @@ panel_line2d.prototype.doChangeDimension = function (panelId, newDimId, dimToCha
         global.tooltip.kill();
         that.mediator.publish("drill", {dim: -1, direction: 0, toId: undefined});
     }
+};
+
+panel_line2d.prototype.alternateSwitch = function () {
+    const that = this;
+    that.isSymbolsRequired = !that.isSymbolsRequired;
+    that.update();
+    that.actualInit.symbols = that.isSymbolsRequired;
+    global.getConfig2();
 };

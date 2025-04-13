@@ -288,6 +288,9 @@ svg {
   margin: 6px;
   position: relative;
 }
+.panel:not(.cardPanelHolder) > svg {
+  border-radius: 14px;
+}
 .baseDiv:before,
 .baseDiv:after {
   content: " ";
@@ -534,7 +537,7 @@ g.sankey_nodes_shadow .nodeShadow {
   font-size: 12px;
 }
 .valLegend {
-  font-size: 11px !important;
+  font-size: 12px !important;
 }
 .titleText {
   font-size: 26px;
@@ -1186,6 +1189,12 @@ text {
 /* universal */
 .darkenable:hover {
   opacity: 0.7;
+}
+.hoverControl:not(.hoverBlock) .bubbleHolder:hover > .shadow {
+  opacity: 1;
+}
+.bubble_label {
+  white-space: nowrap;
 }
 /* Panel_BarLine, Bar2Panel, HoritzontalBarPanel, SankeyPanel */
 .legendControl0.triggered ~ * .controlled:not(.controlled0) {

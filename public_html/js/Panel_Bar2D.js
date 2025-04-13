@@ -34,6 +34,7 @@ function panel_bar2d(init) {
     this.maxEntries1D = global.maxEntriesIn1D;              // A panel által 1 dimenzióban maximálisan megjeleníthető adatok száma.
     this.shadowTimeout = undefined;							// A háttértéglalapokat létrehozó időzítés.
     this.sortByYDimIndex = 0;
+    this.setAlternateSwitch(true);
 
     // Vízszintes skála.
     this.xScale = d3.scaleLinear()
@@ -1123,3 +1124,12 @@ panel_bar2d.prototype.doChangeDimension = function (panelId, newDimId, dimToChan
         that.mediator.publish("drill", {dim: -1, direction: 0, toId: undefined});
     }
 };
+
+panel_bar2d.prototype.alternateSwitch = function () {
+    const that = this;
+    that.isStretched = !that.isStretched;
+    that.update();
+    that.actualInit.streched = that.isStretched;
+    global.getConfig2();
+};
+

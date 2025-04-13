@@ -2,6 +2,155 @@
 
 'use strict';
 
+(function () {
+    d3.labeler = function () {
+
+        let index = 666;
+        function rnd() {
+            index++;
+            index = index * 16807 % 2147483647;
+            return index / 2147483647.0;
+        }
+
+        var labeler = {}, w, h, lab = [], anc = [];
+
+        var max_move = 5.0,
+            max_angle = .5,
+            acc = 0,
+            rej = 0;
+
+        //weight
+        var weight_label = 30.0,
+            weight_label_anc = 1.0,
+            weight_len = .1;
+
+        const energy = function (index) {
+            var m = lab.length,
+                ener = 0,
+                dx = (lab[index].x - anc[index].x), //x dist between point and label
+                dy = (anc[index].y - lab[index].y), //y dist between point and label
+                dist = (dx * dx  + dy * dy);
+
+            // penalty for length of leader line
+            if (dist > 0) ener += dist * weight_len;
+
+            var x21 = lab[index].x - lab[index].width / 2,
+                y21 = lab[index].y - lab[index].height / 2,
+                x22 = lab[index].x + lab[index].width / 2,
+                y22 = lab[index].y + lab[index].height / 2;
+            var x11, x12, y11, y12, x_overlap, y_overlap, overlap_area;
+            for (var i = 0; i < m; i++) {
+                if (i != index) {
+                    //label-label overlap
+                    //positions of 4 corners of rect bounding the text
+                    x11 = lab[i].x - lab[i].width / 2;
+                    y11 = lab[i].y - lab[i].height / 2;
+                    x12 = lab[i].x + lab[i].width / 2;
+                    y12 = lab[i].y + lab[i].height / 2;
+                    x_overlap = Math.max(0, Math.min(x12, x22) - Math.max(x11, x21));
+                    y_overlap = Math.max(0, Math.min(y12, y22) - Math.max(y11, y21));
+                    overlap_area = x_overlap * y_overlap;
+                    ener += (overlap_area * weight_label);
+
+                    //label point overlap
+                    x11 = anc[i].x - anc[i].r; //x start point
+                    y11 = anc[i].y - anc[i].r; //y start point
+                    x12 = anc[i].x + anc[i].r; //x end point
+                    y12 = anc[i].y + anc[i].r; //y end point
+                    x_overlap = Math.max(0, Math.min(x12, x22) - Math.max(x11, x21));
+                    y_overlap = Math.max(0, Math.min(y12, y22) - Math.max(y11, y21));
+                    overlap_area = x_overlap * y_overlap;
+                    ener += (overlap_area * weight_label_anc);
+                }
+            }
+            return ener;
+        };
+
+        const mcmove = function (currTemp) {
+            var i = Math.floor(rnd() * lab.length);
+
+            //save old location of label
+            var x_old = lab[i].x;
+            var y_old = lab[i].y;
+
+            //old energy
+            var old_energy = energy(i);
+
+            //move to a new position
+            lab[i].x += (rnd() - 0.5) * max_move;
+            lab[i].y += (rnd() - 0.5) * max_move;
+
+            if (w > 0) {
+                if (lab[i].x > w) {
+                    lab[i].x = x_old;
+                }
+                if (lab[i].x < 0) {
+                    lab[i].x = x_old;
+                }
+            }
+            if (h > 0) {
+                if (lab[i].y > h) {
+                    lab[i].y = y_old;
+                }
+                if (lab[i].y < 0) {
+                    lab[i].y = y_old;
+                }
+            }
+
+            //new energy
+            var new_energy = energy(i);
+            //change in energy
+            var delta_energy = new_energy - old_energy;
+
+            if (rnd() < Math.exp(-delta_energy / currTemp)) {
+                // do nothing, label already at new pos
+            } else {
+                //go back to the old pos
+                lab[i].x = x_old;
+                lab[i].y = y_old;
+                rej += 1;
+            }
+        }
+
+        const coolingTemp = function (currTemp, initialTemp, nsweeps) {
+            return (currTemp - (initialTemp / nsweeps));
+        }
+        labeler.start = function (nsweeps) {
+            //starts simulated annealing
+            var m = lab.length,
+                currTemp = 1.0,
+                initialTemp = 1.0;
+            for (var i = 0; i < nsweeps; i++) {
+                for (var j = 0; j < m; j++) {
+                    mcmove(currTemp);
+                }
+                currTemp = coolingTemp(currTemp, initialTemp, nsweeps);
+            }
+        };
+        labeler.move = function (x) {
+            max_move = x;
+            return labeler;
+        };
+        labeler.width = function (x) {
+            w = x;
+            return labeler;
+        };
+        labeler.height = function (x) {
+            h = x;
+            return labeler;
+        };
+        labeler.label = function (x) {
+            lab = x;
+            return labeler;
+        };
+        labeler.anchor = function (x) {
+            anc = x;
+            return labeler;
+        };
+        return labeler;
+    };
+})();
+
 
 /**
  * Kiterjeszti a d3.selectiont egy .moveToFront() függvénnyel, ami az adott
@@ -205,19 +354,42 @@ var global = function () {
     };
 
     /**
+     * Checks if two rectangles intersect.
+     *
+     * @param {number} ax - The x-coordinate of the center of the first rectangle.
+     * @param {number} ay - The y-coordinate of the center of the first rectangle.
+     * @param {number} aw - The width of the first rectangle.
+     * @param {number} ah - The height of the first rectangle.
+     * @param {number} bx - The x-coordinate of the center of the second rectangle.
+     * @param {number} by - The y-coordinate of the center corner of the second rectangle.
+     * @param {number} bw - The width of the second rectangle.
+     * @param {number} bh - The height of the second rectangle.
+     * @returns {boolean} - Returns true if the rectangles intersect, false otherwise.
+     */
+    var isRectanglesIntersect = function(ax, ay, aw, ah, bx, by, bw, bh) {
+        if (ax + aw/2 < bx - bw/2) {return false;}
+        if (bx + bw/2 < ax - aw/2) {return false;}
+        if (ay + ah/2 < by - bh/2) {return false;}
+        if (by + bh/2 < ay - ah/2) {return false;}
+        return true;
+    };
+
+    /**
      * Egyetlen, már kiírt  szövegelemet összenyom a megadott pixelméretre.
      * Ha kell levág belőle, ha kell összenyomja a szöveget.
-     * 
+     *
      * @param {Object} renderedText A kiírt szöveg, mint html objektum.
      * @param {Number} maxSize Maximális méret pixelben.
      * @param {Number} maxRatio Maximum ennyiszeresére nyomható össze a szöveg.
      * @param {Boolean} isVerical True: függőleges a szöveg, false: vízszintes.
      * @param {Boolean} isCenter True: centrálni is kell a szöveget, false: nem.
      * @param {Number} sizeToCenterIn Ha centrálni kell, ekkora területen belül.
+     * @param {Boolean} setOrigin True: set the transform origin into the transform matrix, false: it is set elsewhere.
      * @returns {undefined}
      */
-    var _cleverCompress = function (renderedText, maxSize, maxRatio, isVerical, isCenter, sizeToCenterIn) {
+    var _cleverCompress = function (renderedText, maxSize, maxRatio, isVerical, isCenter, sizeToCenterIn, setOrigin) {
         maxRatio = maxRatio || 1.7;
+
         if (maxSize < 10) { // 10px alatt üres szöveget csinálunk.
             renderedText.text("");
         } else {
@@ -232,7 +404,7 @@ var global = function () {
                 var tosplit = text.substring(cutPositionMin, cutPositionMax);
                 var offset = Math.max(tosplit.lastIndexOf("-"), tosplit.lastIndexOf(" "), tosplit.lastIndexOf("/"));
                 var cutPosition = Math.round((offset > -1) ? cutPositionMin + offset : (cutPositionMin + cutPositionMax) / 2);
-                var newText = text.substring(0, cutPosition) + "..";              
+                var newText = text.substring(0, cutPosition) + "..";
                 renderedText.text(newText);
                 textWidth = renderedText.nodes()[0].getBBox().width; // A szöveg pillanatnyi mérete.
             }
@@ -246,11 +418,11 @@ var global = function () {
 
             // Ha össze kellett nyomni, vagy centrálni kell, akkor beállítjuk a transform-mátrixot.
             if (ratio !== 1 || isCenter) {
-                var transOrigo = renderedText.attr("x") * (1 - ratio);
+                let transOrigo = (setOrigin) ? renderedText.attr("x") * (1 - ratio) : 0;
                 if (isCenter) {
                     transOrigo = transOrigo + (sizeToCenterIn - textWidth) / 2;
                 }
-                var oldTRansform = ((renderedText.attr("transform") || "") + " ").replace(/matrix.*/g, '');
+                const oldTRansform = ((renderedText.attr("transform") || "") + " ").replace(/matrix.*/g, '');
                 renderedText.attr("transform", oldTRansform + "matrix(" + ratio + ",0,0,1," + transOrigo + ",0)");
             }
         }
@@ -475,7 +647,7 @@ var global = function () {
      * @param {Boolean} onlyForDisplay True: csak a konzolra írja ki, false: elvégzi a beállítást.
      * @returns {undefined}
      */
-    var getConfigToHash = function(onlyForDisplay) {
+    var getConfigToHash = function(onlyForDisplay = false) {
         var startObject = {}; // A bookmarkban tárolandó objektum.
         startObject.e = global.isEmbedded;  // Embedded mód érvényessége.
         startObject.l = String.locale;
@@ -751,16 +923,17 @@ var global = function () {
      * Betömörít kiírt feliratokat a megadott helyre.
      * Ha kell levág belőle, ha kell, összenyomja a szöveget.
      * 
-     * @param {d3.Selection} renderedTexts Már kirajzolt szövegek összessége, mint d3 selection.
+     * @param {Selection} renderedTexts Már kirajzolt szövegek összessége, mint d3 selection.
      * @param {Object|Number} renderedParent A kirajzolt szövegdoboz, vagy a mérete pixelben.
      * @param {Number} multiplier A szövegdoboz ennyiszeresét töltse ki maximum a szöveg.
      * @param {Number} maxRatio Maximum ennyiszeresére nyomható össze a szöveg.
      * @param {Boolean} isVertical True: függőleges a szöveg; false: vízszintes.
      * @param {Boolean} isCenter True: centrálni is kell a szöveget, false: nem.
-     * @param {Number} sizeToCenterIn Ha centrálni kell, ekkora területen belül. 
+     * @param {Number} sizeToCenterIn Ha centrálni kell, ekkora területen belül.
+     * @param {Boolean} setOrigin True: set the transform origin into the transform matrix, false: it is set elsewhere.
      * @returns {undefined}
      */
-    var cleverCompress = function (renderedTexts, renderedParent, multiplier, maxRatio, isVertical, isCenter, sizeToCenterIn) {
+    var cleverCompress = function (renderedTexts, renderedParent, multiplier, maxRatio, isVertical, isCenter, sizeToCenterIn, setOrigin = true) {
         var maxTextWidth;
         // Meghatározzuk a szöveg maximális méretét pixelben.
         if (typeof renderedParent === "number") {
@@ -771,7 +944,7 @@ var global = function () {
 
         // Egyesével elvégezzük a tömörítést.
         renderedTexts.each(function () {
-            _cleverCompress(d3.select(this), maxTextWidth, maxRatio, isVertical, isCenter, sizeToCenterIn);
+            _cleverCompress(d3.select(this), maxTextWidth, maxRatio, isVertical, isCenter, sizeToCenterIn, setOrigin);
         });
     };
 
@@ -1357,18 +1530,18 @@ var global = function () {
     /**
      * Olvasható színt választ egy adott háttérszínhez.
      * Ha nincs megadva színkínálat, akkor a a writeOnDimColor/writeOnValColor -ból választ.
-     * 
+     *
      * @param {String} background Háttér színe.
      * @param {String} primaryColor Elsődleges szín.
      * @param {String} secondaryColor Másodlagos szín.
      * @returns {String} A legjobban olvasható írásszín.
      */
-    var readableColor = function (background, primaryColor, secondaryColor) {
-        var back = d3.lab(background);
-        var primary = (primaryColor) ? d3.lab(primaryColor) : d3.lab(writeOnValColor);
-        var secondary = (secondaryColor) ? d3.lab(secondaryColor) : d3.lab(writeOnValColor2);
-        var dP = Math.pow((back.l - primary.l), 2) + Math.pow((back.a - primary.a), 2) + Math.pow((back.b - primary.b), 2);
-        var dS = Math.pow((back.l - secondary.l), 2) + Math.pow((back.a - secondary.a), 2) + Math.pow((back.b - secondary.b), 2);
+    const readableColor = function (background, primaryColor, secondaryColor = undefined) {
+        const back = d3.lab(background);
+        const primary = (primaryColor) ? d3.lab(primaryColor) : d3.lab(writeOnValColor);
+        const secondary = (secondaryColor) ? d3.lab(secondaryColor) : d3.lab(writeOnValColor2);
+        const dP = Math.pow((back.l - primary.l), 2) + Math.pow((back.a - primary.a), 2) + Math.pow((back.b - primary.b), 2);
+        const dS = Math.pow((back.l - secondary.l), 2) + Math.pow((back.a - secondary.a), 2) + Math.pow((back.b - secondary.b), 2);
         return (dP > dS) ? primary.rgb() : secondary.rgb();
     };
 
@@ -1400,7 +1573,7 @@ var global = function () {
      * @param {Boolean} isBack Ha true, akkor visszaállít.
      * @returns {String} Az átalakított sztring.
      */
-    var minifyInits = function (initString, isBack) {
+    var minifyInits = function (initString, isBack = false) {
         // Az oda-visszaalakító szótár. Vigyázni kell, nehogy valamelyik oldalon
         // valami más részhalmazát adjunk meg, mert a csere elbaszódik!
         var dictionary = [
@@ -1435,11 +1608,10 @@ var global = function () {
             ['symbols:', 'T:'],
             ['top10:', 'U:'],
             ['range:', 'V:'],
-            ['poi:', 'W:'],
             ['mag:', 'X:'],
             ['frommg:', 'Y:'],
             ['shortbyvalue:', 'Sv:'],
-            ['visiblePoi', 'Z:'],
+            ['alternate:', 'Al:'],
             ['false', 'Ff'],
             ['true', 'Tt'],
             ['undefined', 'Uu']
@@ -2088,9 +2260,10 @@ var global = function () {
         baseLevels: [[], []], // A két oldal aktuális lefúrási szintjeit tartalmazó tömb.
         superMeta: undefined, // SuperMeta: az összes riport adatait tartalmazó leírás.
         scrollbarWidth: scrollBarSize, // Scrollbarok szélessége.
+        isRectanglesIntersect: isRectanglesIntersect, // Determines if two rectangles intersect.
         selfDuration: 800, // A fő animációs időhossz (ms).
         blinkDuration: 200, // Duration of a blinkink (ms).
-        legendOffsetX: 20, // A jelkulcs vízszintes pozicionálása.
+        legendOffsetX: 22, // A jelkulcs vízszintes pozicionálása.
         legendOffsetY: 15, // A jelkulcs függőleges pozicionálása.
         panelTitleHeight: 30, // A panelek fejlécének magassága.
         numberOffset: 35, // Ha a panel bal oldalán számkijelzés van a tengelyen, ennyi pixelt foglal.

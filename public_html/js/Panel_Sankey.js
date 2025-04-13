@@ -20,36 +20,27 @@ function panel_sankey(init) {
     this.actualInit = global.combineObjects(that.defaultInit, init);
     this.rzscale = 1.5;
 
-
-    
     if (this.actualInit.dim.length <= 3) {
         Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, false, global.legendOffsetX, global.legendOffsetX); // A Panel konstruktorának meghívása.
+        this.setAlternateSwitch(true);
     } else {        
         Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, false, 4, 4); // A Panel konstruktorának meghívása.
         this.nodeWidthInPixels = 60;
         this.rzscale = 3;
+        this.setAlternateSwitch(false);
     }
 
-    
     this.nodeWidth = this.nodeWidthInPixels * this.rzscale;
     this.rzdescale = "scale(" + (1 / this.rzscale) + " , 1)";
     
     this.valMultiplier = 1;			// A mutatott érték szorzója.
     this.fracMultiplier = 1;			// A mutatott érték szorzója.
     this.dimsToShow = that.actualInit.dim;	// A mutatott dimenziók tömbje.
-    this.numberOfDims = that.dimsToShow.length; // A mutatott dimenziók száma.
     this.valToShow = that.actualInit.val;	// Az ennyiedik mutatót mutatja.
     this.valFraction = that.actualInit.ratio;   // Hányadost mutasson, vagy abszolútértéket?
     this.preparedData = [];			// Az ábrázolásra kerülő, feldolgozott adat.
-    this.maxEntries = (that.numberOfDims < 3) ? global.maxEntriesIn2D : global.maxEntriesIn3D;    // A panel által maximálisan megjeleníthető adatok száma.
     this.dims = [];     // Az i. helyen megjelenítendő dimenzió sorszáma (a data-n belül).
-    
-    
-    const modDim = global.sort_unique(that.dimsToShow);    
-    for (let i = 0, iMax = this.numberOfDims; i < iMax; i++) {
-        that.dims.push(modDim.indexOf(that.dimsToShow[i]));        
-    }
-        
+
     // A sankey-elemeket létrehozó függvény
     this.sankey = d3.sankey()
             .iterations(0)
@@ -62,37 +53,6 @@ function panel_sankey(init) {
                         return n.columnIndex;
                     })
             .size([that.width*this.rzscale, that.height]);
-
-    // Az oszlopok árnyékához létrehozandó kamu-gráf
-    const nodes = [];
-    const links = [];
-    for (let j = 0, jMax = that.numberOfDims; j < jMax; j++) {
-        nodes.push({"uniqueId": j, "columnIndex": j});        
-        if (j > 0) {
-            links.push({"source": (j-1), "target": j, "value": 1});
-        }
-        
-    }    
-    this.shadowGraph = that.sankey({"nodes": nodes, "links": links});
-    
-    // Alaprétegek. Annyi, ahány dimenziós a sankey.
-    for (let i = 0, iMax = this.numberOfDims; i < iMax; i++) {
-        that.svg.insert("svg:g", ".panelControlButton")
-                .attr("class", "background listener droptarget droptarget0")
-                .on('mouseover', function () {
-                    that.hoverOn(this, i);
-                })
-                .on('mouseout', function () {
-                    that.hoverOff();
-                })
-                .on("click", function () {
-                    that.drill(i);
-                })
-                .append("svg:rect")
-                .attr("width", that.w / that.numberOfDims)
-                .attr("height", that.h)
-                .attr("transform", "translate(" + (i* that.w / that.numberOfDims) + ", 0)");
-    }
 
     // A diagram rétege.
     this.gLinks = that.svg.insert("svg:g", ".title_group")
@@ -110,7 +70,6 @@ function panel_sankey(init) {
             .attr("class", "noEvents")
             .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ") ");    
 
-
     // Feliratkozás a mediátorokra.
     let med;
     med = that.mediator.subscribe("changeValue", function (id, val, ratio) {
@@ -126,9 +85,14 @@ function panel_sankey(init) {
 
     // Panel regisztrálása a nyilvántartóba.
     that.mediator.publish("register", that, that.panelId, that.dimsToShow, that.preUpdate, that.update, that.getConfig);
-    
-//    this.drawNodeShadows();
-}
+
+    this.initDimensionNumberDependentElements();
+};
+
+
+
+
+
 
 //////////////////////////////////////////////////
 // Osztály-konstansok inicializálása.
@@ -139,6 +103,56 @@ function panel_sankey(init) {
     panel_sankey.prototype.nodeWidthInPixels = 80;
     panel_sankey.prototype.linkOpacity = 0.35;
 }
+
+panel_sankey.prototype.initDimensionNumberDependentElements = function () {
+    const that = this;
+
+    this.numberOfDims = that.dimsToShow.length; // A mutatott dimenziók száma.
+    this.maxEntries = (that.numberOfDims < 3) ? global.maxEntriesIn2D : global.maxEntriesIn3D;    // A panel által maximálisan megjeleníthető adatok száma.
+
+    const modDim = global.sort_unique(that.dimsToShow);
+    this.dims = [];
+    for (let i = 0, iMax = this.numberOfDims; i < iMax; i++) {
+        that.dims.push(modDim.indexOf(that.dimsToShow[i]));
+    }
+
+    // Az oszlopok árnyékához létrehozandó kamu-gráf
+    const nodes = [];
+    const links = [];
+    for (let j = 0, jMax = that.numberOfDims; j < jMax; j++) {
+        nodes.push({"uniqueId": j, "columnIndex": j});
+        if (j > 0) {
+            links.push({"source": (j-1), "target": j, "value": 1});
+        }
+
+    }
+    this.shadowGraph = that.sankey({"nodes": nodes, "links": links});
+
+    // Alaprétegek. Annyi, ahány dimenziós a sankey.
+    that.svg.selectAll(".background")
+        .on('mouseover', null)
+        .on('mouseout', null)
+        .on('click', null)
+        .remove();
+
+    for (let i = 0, iMax = this.numberOfDims; i < iMax; i++) {
+        that.svg.insert("svg:g", ".panelControlButton")
+            .attr("class", "background listener droptarget droptarget0")
+            .on('mouseover', function () {
+                that.hoverOn(this, i);
+            })
+            .on('mouseout', function () {
+                that.hoverOff();
+            })
+            .on("click", function () {
+                that.drill(i);
+            })
+            .append("svg:rect")
+            .attr("width", that.w / that.numberOfDims)
+            .attr("height", that.h)
+            .attr("transform", "translate(" + (i* that.w / that.numberOfDims) + ", 0)");
+    }
+};
 
 //////////////////////////////////////////////////
 // Kirajzolást segítő függvények
@@ -699,19 +713,23 @@ panel_sankey.prototype.drawLabels = function (graph, trans) {
                 return global.readableColor(global.color(d.id));
             });
     
-    gLabels.transition(trans)
+    gLabels
+        .attr("targetX", d => (d.x0 + d.x1) / 2 / that.rzscale)
+        .attr("targetY", d => (d.y0 + d.y1) / 2)
+        .transition(trans)
             .attr("x", function (d) {
                 return (d.x0 + d.x1) / 2 / that.rzscale;
             })
             .attr("y", function (d) {
                 return (d.y0 + d.y1) / 2;
             })
+            .attr("transform-origin", d => (d.x0 + d.x1) / 2 / that.rzscale + "px " + 0)
             .attr("opacity", function(d) {                
                 return ((d.y1-d.y0) < global.fontSizeSmall * 0.9 ) ? 0 : 1;                
             });
 
     // A szövegek összenyomása, hogy elférjenek.  
-    global.cleverCompress(gLabels, that.sankey.nodeWidth() / that.rzscale, 0.9, undefined, false, false, 80);       
+    global.cleverCompress(gLabels, that.sankey.nodeWidth() / that.rzscale, 0.9, undefined, false, false, 80, false);
 };
 
 //////////////////////////////////////////////////
@@ -761,5 +779,19 @@ panel_sankey.prototype.doChangeDimension = function (panelId, newDimId, dimToCha
         that.mediator.publish("register", that, that.panelId, that.dimsToShow, that.preUpdate, that.update, that.getConfig);
         global.tooltip.kill();
         this.mediator.publish("drill", {dim: -1, direction: 0, toId: undefined});
+    }
+};
+
+panel_sankey.prototype.alternateSwitch = function () {
+    const that = this;
+    if (that.numberOfDims === 3) {
+        const c = that.dimsToShow.pop(); // Remove the last element from the array
+        that.initDimensionNumberDependentElements();
+        that.doChangeDimension(that.panelId, that.dimsToShow[1], 1);
+    } else if (that.numberOfDims === 2) {
+        const guessedDim3 = that.dimsToShow[1];
+        that.dimsToShow.push(guessedDim3);
+        that.initDimensionNumberDependentElements();
+        that.doChangeDimension(that.panelId, that.dimsToShow[2], 2);
     }
 };

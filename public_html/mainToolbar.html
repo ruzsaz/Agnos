@@ -31,13 +31,18 @@
                                 <use xlink:href="#icon_panel_bar" />
                                 </svg>
                             </span>
-                            <span class="tloc" tooltip="<h4>Széthúzott oszlopdiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('strechedbarpanel');">
+<!--                            <span class="tloc" tooltip="<h4>Széthúzott oszlopdiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('strechedbarpanel');">
                                 <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_bar_streched" />
-                                </svg>								
-                            </span>		
+                                </svg>
+                            </span>-->
+                            <span class="tloc" tooltip="<h4>Vonaldiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('linepanel');">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <use xlink:href="#icon_panel_line" />
+                                </svg>
+                            </span>
                         </li>
-                        <li>							
+                        <!--<li>
                             <span class="tloc" tooltip="<h4>Vonaldiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('linepanel');">
                                 <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
                                 <use xlink:href="#icon_panel_line" />
@@ -48,7 +53,7 @@
                                 <use xlink:href="#icon_panel_line_marker" />
                                 </svg>
                             </span>
-                        </li>
+                        </li>-->
                         <li>
                             <span class="tloc" tooltip="<h4>Top 10 oszlopdiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('top10Barpanel');">
                                 <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
@@ -62,6 +67,18 @@
                             </span>		
                         </li>
                         <li>
+                            <span class="tloc" tooltip="<h4>2 dimenziós oszlopdiagram</h4><ul><li>dimenziók: <em>2</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('bar2panel');">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <use xlink:href="#icon_panel_2d_bar" />
+                                </svg>
+                            </span>
+                            <span class="tloc" tooltip="<h4>2 dimenziós vonaldiagram</h4><ul><li>dimenziók: <em>2</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('line2panel');">
+                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+                                <use xlink:href="#icon_panel_2d_line" />
+                                </svg>
+                            </span>
+                        </li>
+                        <li>
                             <span class="tloc mappanelcreator" tooltip="<h4>Színezett térkép</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('mappanel');">
                                 <svg x="0px" y="0px" width="50px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 32">
                                 <use xlink:href="#icon_panel_map" />
@@ -72,37 +89,6 @@
                                 <use xlink:href="#icon_panel_pie" />	
                                 </svg>
                             </span>
-                            <!--
-                            <span class="tloc mappanelcreator" tooltip="<h4>Színezett térkép POI-val</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('poimappanel');">
-                                <svg version="1.1" x="0px" y="0px" width="50px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 32">
-                                <use xlink:href="#icon_panel_map_marker" />
-                                </svg>
-                            </span>
-                            -->
-                        </li>
-                        <li>
-                            <span class="tloc" tooltip="<h4>2 dimenziós oszlopdiagram</h4><ul><li>dimenziók: <em>2</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('bar2panel');">
-                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                                <use xlink:href="#icon_panel_2d_bar" />
-                                </svg>
-                            </span>
-                            <span class="tloc" tooltip="<h4>Széthúzott 2 dimenziós oszlopdiagram</h4><ul><li>dimenziók: <em>2</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('strechedbar2panel');">
-                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                                <use xlink:href="#icon_panel_2d_bar_streched" />
-                                </svg>
-                            </span>
-                        </li>
-                        <li>
-                            <span class="tloc" tooltip="<h4>2 dimenziós vonaldiagram</h4><ul><li>dimenziók: <em>2</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('line2panel');">
-                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                                <use xlink:href="#icon_panel_2d_line" />
-                                </svg>
-                            </span>
-                            <span class="tloc" tooltip="<h4>2 dimenziós vonaldiagram jelölővel</h4><ul><li>dimenziók: <em>2</em><li>mutatók: <em>1</em></ul>" onclick="global.mainToolbar_createNewPanel('markedline2panel');">
-                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                                <use xlink:href="#icon_panel_2d_line_marker" />
-                                </svg>
-                            </span>
                         </li>
                         <li>
                             <span class="tloc" tooltip="<h4>Vízszintes oszlopdiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('horizontalbarpanel');">
@@ -110,9 +96,9 @@
                                 <use xlink:href="#icon_panel_horizontalbar" />
                                 </svg>							
                             </span>
-                            <span class="tloc" tooltip="<h4>Centrált vízszintes oszlopdiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>n</em></ul>" onclick="global.mainToolbar_createNewPanel('fixedhorizontalbarpanel');">
+                            <span class="tloc" tooltip="<h4>Szalagdiagram</h4><ul><li>dimenziók: <em>2</em> vagy <em>3</em><li>mutatók: <em>1</em></ul>Csak a dimenziók mentén additív mutatóhoz!" onclick="global.mainToolbar_createNewPanel('sankey2panel');">
                                 <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                                <use xlink:href="#icon_panel_horizontalbar_centered" />
+                                <use xlink:href="#icon_panel_sankey_2d" />
                                 </svg>								
                             </span>
                         </li>	
@@ -128,18 +114,6 @@
                                 </svg>	
                             </span>
                         </li>	
-                        <li>
-                            <span class="tloc" tooltip="<h4>2 oszlopos szalagdiagram</h4><ul><li>dimenziók: <em>2</em><li>mutatók: <em>1</em></ul>Csak a dimenziók mentén additív mutatóhoz!" onclick="global.mainToolbar_createNewPanel('sankey2panel');">
-                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                                <use xlink:href="#icon_panel_sankey_2d" />
-                                </svg>								
-                            </span>
-                            <span class="tloc" tooltip="<h4>3 oszlopos szalagdiagram</h4><ul><li>dimenziók: <em>3</em><li>mutatók: <em>1</em></ul>Csak a dimenziók mentén additív mutatóhoz!" onclick="global.mainToolbar_createNewPanel('sankey3panel');">
-                                <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-                                <use xlink:href="#icon_panel_sankey_3d" />
-                                </svg>	
-                            </span>
-                        </li>
                         <li>
                             <span class="tloc" tooltip="<h4>Buborékdiagram</h4><ul><li>dimenziók: <em>1</em><li>mutatók: <em>3</em></ul>" onclick="global.mainToolbar_createNewPanel('bubblepanel');">
                                 <svg x="0px" y="0px" width="32px" height="32px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
