@@ -1,7 +1,7 @@
 'use strict';
 
 var getCssFile = function () {
-    const username = document.querySelector('input').value;
+    const username = (document.querySelector('input') === null) ? "" : document.querySelector('input').value;
     if (username !== undefined && username.startsWith('css/')) {
 	document.querySelector('input').value = "";
         setCookie("loginCss", username);

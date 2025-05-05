@@ -151,7 +151,7 @@ function panel_bar2d(init) {
 }
 
 //////////////////////////////////////////////////
-// Osztály-konstansok inicializálása.
+// Init the class level constants.
 //////////////////////////////////////////////////
 
 {
@@ -492,7 +492,7 @@ panel_bar2d.prototype.prepareData = function (oldPreparedData, newDataRows, dril
                 uniqueId: levelY + "L" + dimY.id,
                 name: dimY.name.trim(),
                 parentId: dimY.parentId,
-                tooltip: that.htmlTagStarter + dimY.name.trim() + "</html>"
+                tooltip: "<html>" + dimY.name.trim() + "</html>"
             };
             dimYArray.push(dimYElement);
         }
@@ -702,13 +702,13 @@ panel_bar2d.prototype.update = function (data, drill) {
 
     const tweenDuration = (drill.duration === undefined) ? global.getAnimDuration("-1", that.panelId) : drill.duration;
     if (that.data.rows.length > that.maxEntries) {
-        that.panic(true, _(that.htmlTagStarter + "A panel nem képes ") + that.data.rows.length + _(" értéket megjeleníteni.<br />A maximálisan megjeleníthető értékek száma ") + that.maxEntries + _(".</html>"));
+        that.panic(true, _("<html>A panel nem képes ") + that.data.rows.length + _(" értéket megjeleníteni.<br />A maximálisan megjeleníthető értékek száma ") + that.maxEntries + _(".</html>"));
         that.preparedData = undefined;
     } else {
         that.preparedData = that.prepareData(that.preparedData, that.data.rows, drill);
         const maxInDim = Math.max(that.preparedData.dimYArray.length, Math.ceil(that.data.rows.length / that.preparedData.dimYArray.length));
         if (maxInDim > that.maxEntries1D) {
-            that.panic(true, _(that.htmlTagStarter +"A panel nem képes ") + maxInDim + " értéket egy dimenzió mentén megjeleníteni.<br />A maximálisan megjeleníthető értékek száma " + that.maxEntries1D + ".</html>");
+            that.panic(true, _("<html>A panel nem képes ") + maxInDim + " értéket egy dimenzió mentén megjeleníteni.<br />A maximálisan megjeleníthető értékek száma " + that.maxEntries1D + ".</html>");
             that.preparedData = undefined;
         } else {
             that.panic(false);
@@ -1068,13 +1068,13 @@ panel_bar2d.prototype.sortSwitch = function() {
     }
     that.update();
     that.actualInit.sortbyvalue = that.sortByValue;
-    global.getConfig2();
+    global.writeConfigToUrl();
 };
 
 panel_bar2d.prototype.resetSort = function() {
     this.sortByValue = false;
     this.actualInit.sortbyvalue = this.sortByValue;
-    global.getConfig2();
+    global.writeConfigToUrl();
 }
 
 /**
@@ -1130,6 +1130,6 @@ panel_bar2d.prototype.alternateSwitch = function () {
     that.isStretched = !that.isStretched;
     that.update();
     that.actualInit.streched = that.isStretched;
-    global.getConfig2();
+    global.writeConfigToUrl();
 };
 

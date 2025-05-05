@@ -1,4 +1,4 @@
-/* global Panel, d3, topojson, mapOfHungary, global, projections */
+/* global Panel, d3, topojson, global, projections */
 
 'use strict';
 
@@ -15,7 +15,7 @@ function panel_map(init) {
 
     this.constructorName = "panel_map";
 
-    // Inicializáló objektum beolvasása, feltöltése default értékekkel.
+    // Set default values to the init object.
     this.defaultInit = {
         group: 0,
         position: undefined,
@@ -32,9 +32,10 @@ function panel_map(init) {
     this.actualInit = global.combineObjects(that.defaultInit, init);
     this.isColorsLocked = (that.actualInit.range !== undefined);
 
-    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], false, !that.alternate, 0, 0); // A Panel konstruktorának meghívása.
+    // Call the constructor of the parent class.
+    Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], false, !that.alternate, 0, 0);
 
-    // Ha a kért dimenzió nem ábrázolható, keresünk egy olyat, ami igen.
+    // If the requested dimension is not territorial, then we need to find the first territorial dimension.
     if (that.localMeta.dimensions[that.actualInit.dim].is_territorial !== 1) {
         for (let d = 0, dMax = that.localMeta.dimensions.length; d < dMax; d++) {
             if (that.localMeta.dimensions[d].is_territorial === 1) {
@@ -44,26 +45,26 @@ function panel_map(init) {
         }
     }
 
-    this.valMultiplier = 1;						// A mutatott érték szorzója.
-    this.fracMultiplier = 1;					// A mutatott érték szorzója.
-    this.dimToShow = that.actualInit.dim;		// A mutatott dimenzió.
-    this.valToShow = that.actualInit.val;		// Az ennyiedik mutatót mutatja.
-    this.valFraction = that.actualInit.ratio;	// Hányadost mutasson, vagy abszolútértéket?
+    this.valMultiplier = 1;						// Multiply the value with this.
+    this.fracMultiplier = 1;					// Multiply the fraction with this.
+    this.dimToShow = that.actualInit.dim;		// Index of the dimension to show.
+    this.valToShow = that.actualInit.val;		// Index of the value to show.
+    this.valFraction = that.actualInit.ratio;	// True: show the fraction, false: show the value.
     this.alternate = that.actualInit.alternate;	// Is alternate mode?
-    this.mapKey = that.meta.mapKey;
-    this.currentLevel = undefined;							// Az épp kirajzolt szint.
-    this.maxDepth = that.localMeta.dimensions[that.dimToShow].levels - 1;	// Maximális lefúrási szint. 1: megye, 2: kistérség, 3: település
+    this.mapKey = that.meta.mapKey;             // Map filename to show.
+    this.currentLevel = undefined;				// The currently drawn level.
+    this.maxDepth = that.localMeta.dimensions[that.dimToShow].levels - 1;	// Maximal drilling depth.
 
-    this.imageWidthCover = 0.9 * that.width / that.w;
-    this.imageHeightCover = that.height / that.h; // Ennyiszerese fedhető le a panelnek térképpel.
-    this.maskId = global.randomString(12);      // A maszk réteg id-je. Véletlen, nehogy kettő azonos legyen.
+    this.imageWidthCover = 0.95 * that.width / that.w;  // Cover ratio of the image, considering the width.
+    this.imageHeightCover = that.height / that.h;       // Cover ratio of the image, considering the height.
+    this.maskId = global.randomString(12);       // Id of the mask layer. Random to avoid collision.
 
-    // A színskála.
+    // Color scale used for colorizing the map.
     this.colorScale = d3.scaleLinear()
         .clamp(true);
     this.radiusScale = d3.scaleSqrt().range([that.minBubbleSize, that.maxBubbleSize]);
 
-    // A színskála alacsony, magas, és opcionálisan középső elemét tartalmazó tömb.
+    // The color range of the map: minimal and maximal values, and optionally the middle value.
     this.colorRange = undefined;
     if (!that.isColorsLocked) {
         that.colorRange = [that.defaultColorMin, global.colorValue(that.valToShow, that.panelSide), that.defaultColorMax];
@@ -76,18 +77,18 @@ function panel_map(init) {
         }
     }
 
-    // Térképdefiníció és projekció beolvasása
+    // Read the map and the projection
     const mapToUse = global.mapStore.get(that.mapKey);
     this.projection = eval(mapToUse.projection)()
         .translate([that.w / 2, that.height / 2 + that.margin.top]);
     this.topology = mapToUse.map;
     this.topology.levelsInMap = that.levelsInMap();
 
-    // Görbegenerátor a térképrajzoláshoz.
+    // Path generator for the map.
     this.path = d3.geoPath()
         .projection(that.projection);
 
-    // Alapréteg.
+    // Base layer.
     that.svg.insert("svg:g", ".panelControlButton")
         .attr("class", "background listener droptarget droptarget0")
         .on('click', function () {
@@ -103,58 +104,56 @@ function panel_map(init) {
         .attr("width", that.w)
         .attr("height", that.h);
 
-    // Színezett térkép rétege.
+    // The map polygon layer.
     this.gMapHolder = that.svg.insert("svg:g", ".title_group")
         .attr("class", "mapHolder");
 
-    // Vízrajz rétege.
+    // Water bodies layer.
     this.gWater = that.svg.insert("svg:g", ".title_group")
         .attr("class", "mapHolder water noEvents");
 
-    // Körök rétege.
+    // Bubble layer.
     this.gBubbles = that.svg.insert("svg:g", ".title_group")
         .attr("class", "mapHolder bubble_group hoverControl");
 
-    // Címkék rétege.
+    // Label layer.
     this.gLabelHolder = that.svg.insert("svg:g", ".title_group")
         .attr("class", "mapHolder labels noEvents");
 
-    // Jelkulcs rétege.
+    // Legend layer.
     this.gLegend = that.svg.insert("svg:g", ".title_group")
         .attr("class", "legend noEvents");
 
-    // A dimenzió felírása.
+    // Label for the shown dimension.
     this.axisXCaption = that.svg.insert("svg:text", ".title_group")
         .attr("class", "dimensionLabel noEvents")
         .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");
 
-    // A zoomolásnál nem kellő elmeket kitakaró maszk.
+    // Mask used in zooming.
     this.mask = that.svg.append("svg:mask")
         .attr("id", "maskurl" + that.maskId);
 
-    // Feliratkozás a mediátorokra.
-    var med;
-    med = that.mediator.subscribe("changeValue", function (id, val, ratio) {
+    // Subscribe for the mediators.
+    const med0 = that.mediator.subscribe("changeValue", function (id, val, ratio) {
         that.doChangeValue(id, val, ratio);
     });
-    that.mediatorIds.push({"channel": "changeValue", "id": med.id});
+    that.mediatorIds.push({"channel": "changeValue", "id": med0.id});
 
-    // Feliratkozás a dimenzióváltó mediátorra.
-    med = that.mediator.subscribe("changeDimension", function (panelId, newDimId) {
+    const med1 = that.mediator.subscribe("changeDimension", function (panelId, newDimId) {
         that.doChangeDimension(panelId, newDimId);
     });
-    that.mediatorIds.push({"channel": "changeDimension", "id": med.id});
+    that.mediatorIds.push({"channel": "changeDimension", "id": med1.id});
 
-    // Panel regisztrálása a nyilvántartóba.
+    // Register the panel to the panel roster.
     that.mediator.publish("register", that, that.panelId, [that.dimToShow], that.preUpdate, that.update, that.getConfig);
 
-    // Kezdeti magyarország kirajzolása.
+    // Initial draw: level 0 polygon.
     const box = that.path.bounds((topojson.feature(that.topology, that.topoLevel(that.topology.objects.level0)).features)[0]);
-    const scalemeasure = Math.min(that.imageWidthCover / ((box[1][0] - box[0][0]) / that.w), that.imageHeightCover / ((box[1][1] - box[0][1]) / that.h));
+    const scale = Math.min(that.imageWidthCover / ((box[1][0] - box[0][0]) / that.w), that.imageHeightCover / ((box[1][1] - box[0][1]) / that.h));
     that.svg.selectAll(".mapHolder")
-        .attr("transform", "translate(" + that.projection.translate() + ")" + "scale(" + scalemeasure + ")" + "translate(" + -(box[1][0] + box[0][0]) / 2 + "," + -(box[1][1] + box[0][1]) / 2 + ")");
+        .attr("transform", "translate(" + that.projection.translate() + ")" + "scale(" + scale + ")" + "translate(" + -(box[1][0] + box[0][0]) / 2 + "," + -(box[1][1] + box[0][1]) / 2 + ")");
 
-    // Vízréteg kirajzolása.
+    // Initial draw: water bodies.
     that.gWater.selectAll("path").data(topojson.feature(that.topology, that.topology.objects.viz).features)
         .enter().append("svg:path")
         .attr("class", function (d) {
@@ -163,30 +162,31 @@ function panel_map(init) {
         .attr("d", that.path)
         .attr("mask", "url(#maskurl" + that.maskId + ")");
 
-    this.svg.selectAll(".panelControlButton").each(function() {
+    // Bring to front the control surfaces.
+    this.svg.selectAll(".panelControlButton").each(function () {
         this.parentNode.appendChild(this);
     })
 
 }
 
 //////////////////////////////////////////////////
-// Osztály-konstansok inicializálása.
+// Init the class level constants.
 //////////////////////////////////////////////////
 
 {
-    panel_map.prototype = global.subclassOf(Panel);	// A Panel metódusainak átvétele.
-    panel_map.prototype.mapLabelSize = 10;			// a térképre helyezendő feliratok betűmérete.
-    panel_map.prototype.mapLabelOpacity = 0.8;		// A térképre helyezendő feliratok átlátszósága.
-    panel_map.prototype.legendTicks = 7;			// A jelkulcs kívánatos elemszáma. Kb. ennyi is lesz.
-    panel_map.prototype.defaultColorMin = 'white';	// Az alapértelmezett skála minimumszíne.
-    panel_map.prototype.defaultColorMax = 'black';	// Az alapértelmezett skála maximumszíne.
-    panel_map.prototype.minBubbleSize = 0;          // Smallest circle size.
-    panel_map.prototype.maxBubbleSize = 30;         // Largest circle size.
-    panel_map.prototype.alternateBorderSize = 1.5;  // Border size in alternate mode.
+    panel_map.prototype = global.subclassOf(Panel);	// inherit the methods of the Panel class
+    panel_map.prototype.mapLabelSize = 10;			// label font size
+    panel_map.prototype.mapLabelOpacity = 0.8;		// label opacity
+    panel_map.prototype.legendTicks = 7;			// preferred number of elements in the legend
+    panel_map.prototype.defaultColorMin = 'white';	// default color of the minimal value
+    panel_map.prototype.defaultColorMax = 'black';	// default color of the maximal value
+    panel_map.prototype.minBubbleSize = 0;          // smallest bubble radius
+    panel_map.prototype.maxBubbleSize = 30;         // largest bubble radius
+    panel_map.prototype.alternateBorderSize = 1.5;  // default border size in bubble mode
 }
 
 //////////////////////////////////////////////////
-// Kirajzolást segítő függvények
+// Drawing functions.
 //////////////////////////////////////////////////
 
 /**
@@ -582,7 +582,7 @@ panel_map.prototype.prepareData = function (newDataRows) {
  * @returns {undefined}
  */
 panel_map.prototype.update = function (data = undefined, drill = undefined) {
-    var that = this;
+    const that = this;
     that.data = data || that.data;
     drill = drill || {dim: -1, direction: 0};
 
@@ -645,7 +645,7 @@ panel_map.prototype.update = function (data = undefined, drill = undefined) {
         that.panic(true, _("<html>Az adat térképen nem megjeleníthető.</html>"));
     }
 
-    // Fejléc felfrissítése.
+    // Update the header.
     const titleMeta = that.localMeta.indicators[that.valToShow];
     that.titleBox.update(that.valToShow, titleMeta.caption, titleMeta.value.unitPlural, titleMeta.fraction.unitPlural, that.valFraction, tweenDuration);
 };
@@ -759,7 +759,7 @@ panel_map.prototype.drawMapLabels = function (labelData, trans) {
         .anchor(anchorArray)
         .width(0)
         .height(0)
-        .start(500);
+        .start(100);
 
     labelArray.sort((a, b) => a.value - b.value);
 
@@ -1051,7 +1051,7 @@ panel_map.prototype.doChangeValue = function (panelId, value, ratio) {
             that.colorRange = [that.defaultColorMin, global.colorValue(that.valToShow, that.panelSide), that.defaultColorMax];
         }
         that.update();
-        global.getConfig2();
+        global.writeConfigToUrl();
     }
 };
 
@@ -1107,6 +1107,6 @@ panel_map.prototype.alternateSwitch = function (stateToSet = undefined) {
             .style("opacity", 1)
         that.update();
         that.actualInit.alternate = that.alternate;
-        global.getConfig2();
+        global.writeConfigToUrl();
     }
 };

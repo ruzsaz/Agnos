@@ -103,7 +103,7 @@ function panel_pie(init) {
 }
 
 //////////////////////////////////////////////////
-// Osztály-konstansok inicializálása.
+// Init the class level constants.
 //////////////////////////////////////////////////
 
 {
@@ -399,7 +399,7 @@ panel_pie.prototype.update = function (data, drill) {
 
     // Ha túl sok értéket kéne megjeleníteni, pánik
     if (that.data.rows.length > that.maxEntries) {
-        that.panic(true, _(that.htmlTagStarter + "A panel nem képes ") + that.data.rows.length + _(" értéket megjeleníteni.<br />A maximálisan megjeleníthető értékek száma ") + that.maxEntries + _(".</html>"));
+        that.panic(true, _("<html>A panel nem képes ") + that.data.rows.length + _(" értéket megjeleníteni.<br />A maximálisan megjeleníthető értékek száma ") + that.maxEntries + _(".</html>"));
         that.preparedData = undefined;
     } else {
         that.preparedData = that.prepareData(that.preparedData, that.data.rows, drill);
@@ -409,7 +409,7 @@ panel_pie.prototype.update = function (data, drill) {
             that.drawPie(that.preparedData, trans);
             that.drawLabels(that.preparedData, trans);
         } else {
-            that.panic(true, _(that.htmlTagStarter + "A változó értéke<br />minden dimenzióban 0.</html>"));
+            that.panic(true, _("<html>A változó értéke<br />minden dimenzióban 0.</html>"));
             that.preparedData = [];
         }
     }

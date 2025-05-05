@@ -67,7 +67,7 @@ function Tooltip() {
         
 }
 
-// Osztályáltozók.
+// Init the class level constants.
 {
 	Tooltip.prototype.tooltipOffsetX = 16;
 	Tooltip.prototype.tooltipOffsetY = 18;

@@ -144,7 +144,7 @@ function panel_horizontalbar(init) {
 }
 
 //////////////////////////////////////////////////
-// Osztály-konstansok inicializálása.
+// Init the class level constants.
 //////////////////////////////////////////////////
 
 {
@@ -1041,7 +1041,7 @@ panel_horizontalbar.prototype.doChangeValue = function(panelId, value, ratio, ta
         that.actualInit.valneg = that.valNegToShow;
         that.actualInit.ratio = that.valFraction;
         that.update();
-        global.getConfig2();
+        global.writeConfigToUrl();
     }
 };
 
@@ -1095,5 +1095,5 @@ panel_horizontalbar.prototype.alternateSwitch = function () {
     that.isAlwaysCentered = !that.isAlwaysCentered;
     that.update();
     that.actualInit.centered = that.isAlwaysCentered;
-    global.getConfig2();
+    global.writeConfigToUrl();
 };

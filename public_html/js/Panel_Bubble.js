@@ -169,7 +169,7 @@ function panel_bubble(init) {
 }
 
 //////////////////////////////////////////////////
-// Class constants
+// Init the class level constants.
 //////////////////////////////////////////////////
 
 {
@@ -882,7 +882,7 @@ panel_bubble.prototype.doChangeValue = function (panelId, value, ratio, targetId
         this.valRToShow = that.actualInit.val[2];
 
         that.update();
-        global.getConfig2();
+        global.writeConfigToUrl();
     }
 };
 

@@ -38,7 +38,6 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     this.data = undefined;	// Data for the panel
     this.dimsToShow = [];
     this.sortByValue = panelInitString.sortbyvalue || false;
-    this.htmlTagStarter = "<html lang=" + String.locale + ">";
 
     this.valMultiplier = 1;		// Ennyiszeresét
     this.fracMultiplier = 1;		// Ennyiszeresét
@@ -109,24 +108,24 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
     this.gLegend = that.svg;
 
     // Feliratkozás a panelt megölő mediátorra.
-    var med = that.mediator.subscribe("killPanel", function(panelId) {
+    const med0 = that.mediator.subscribe("killPanel", function(panelId) {
         that.killPanel(panelId);
     });
-    that.mediatorIds.push({"channel": "killPanel", "id": med.id});
+    that.mediatorIds.push({"channel": "killPanel", "id": med0.id});
 
     // Feliratkozás a nyelvváltó mediátorra.
-    med = this.mediator.subscribe("langSwitch", function() {
+    const med1 = this.mediator.subscribe("langSwitch", function() {
         that.localMeta = global.facts[that.panelSide].getLocalMeta();
-        Panel.prototype.defaultPanicText = _(that.htmlTagStarter + "Nincs megjeleníthető adat.</html>");
+        Panel.prototype.defaultPanicText = _("<html>Nincs megjeleníthető adat.</html>");
         that.langSwitch(global.selfDuration);
     });
-    that.mediatorIds.push({"channel": "langSwitch", "id": med.id});
+    that.mediatorIds.push({"channel": "langSwitch", "id": med1.id});
 
     // Feliratkozás a nagyító mediátorra.
-    var med = that.mediator.subscribe("magnifyPanel", function(panelId) {
+    const med2 = that.mediator.subscribe("magnifyPanel", function(panelId) {
         that.magnifyPanel(panelId);
     });
-    that.mediatorIds.push({"channel": "magnifyPanel", "id": med.id});
+    that.mediatorIds.push({"channel": "magnifyPanel", "id": med2.id});
 
     const scaleString = (global.hasTouchScreen) ? " scale(1.4)" : "";
 
@@ -310,7 +309,7 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
             .style("left", null)
             .style("top", null);
         that.dragging = false;
-        global.getConfig2();
+        global.writeConfigToUrl();
     };
 
     // Az áthelyezhetőség engedélyezése.
@@ -326,7 +325,7 @@ function Panel(panelInitString, mediator, isShortingByValueEnabled, isLegendRequ
 }
 
 //////////////////////////////////////////////////
-// Osztály-konstansok inicializálása.
+// Init the class level constants.
 //////////////////////////////////////////////////
 
 {
@@ -409,7 +408,7 @@ Panel.prototype.killListeners = function() {
  * @param {Boolean} dontResize Ha true, akkor nem hívja meg a megöléskor a resize-t.
  * @returns {undefined}
  */
-Panel.prototype.killPanel = function(panelId, duration, fromStyle, toStyle, dontResize) {
+Panel.prototype.killPanel = function(panelId, duration = undefined, fromStyle = undefined, toStyle = undefined, dontResize = undefined) {
     if (panelId === undefined || panelId === this.panelId) {
         const centerX = parseInt(this.panelDiv.style("width")) / 2;
         const centerY = parseInt(this.panelDiv.style("height")) / 2;
@@ -443,7 +442,7 @@ Panel.prototype.killPanel = function(panelId, duration, fromStyle, toStyle, dont
         if (!dontResize) {
             $(window).trigger('resize');
         }
-        global.getConfig2();
+        global.writeConfigToUrl();
     }
 };
 
@@ -517,7 +516,7 @@ Panel.prototype.magnifyPanel = function(panelId) {
  * @param {String} reason Megjelenítendő tooltip.
  * @returns {undefined}
  */
-Panel.prototype.panic = function(panic, reason) {
+Panel.prototype.panic = function(panic, reason = undefined) {
     var that = this;
 
     // Csak ha megváltozott a panel pánikállapota, vagy új tooltip érkezett.
@@ -605,7 +604,7 @@ Panel.prototype.alternateSwitch = function() {
     that.alternate = !that.alternate;
     that.update();
     that.actualInit.alternate = that.alternate;
-    global.getConfig2();
+    global.writeConfigToUrl();
 };
 
 /**
@@ -619,7 +618,7 @@ Panel.prototype.sortSwitch = function() {
     that.sortByValue = !that.sortByValue;
     that.update();    
     that.actualInit.sortbyvalue = that.sortByValue;
-    global.getConfig2();
+    global.writeConfigToUrl();
 };
 
 /**
@@ -682,7 +681,7 @@ Panel.prototype.doChangeValue = function (panelId, value, ratio) {
             that.actualInit.ratio = that.valFraction;
         }
         that.update();
-        global.getConfig2();
+        global.writeConfigToUrl();
     }
 };
 
@@ -692,7 +691,6 @@ Panel.prototype.doChangeValue = function (panelId, value, ratio) {
  * @returns {undefined}
  */
 Panel.prototype.langSwitch = function() {
-    this.htmlTagStarter = "<html>";
 };
 
 /**
@@ -701,7 +699,7 @@ Panel.prototype.langSwitch = function() {
  * de csak akkor csinál bármit is, ha épp valami meg van ragadva.
  * 
  * @param {Object} gHovered Az elemet tartó g. Ennek az első téglalapjára lehet ejteni.
- * @param {String} targetId A célpont-elem osztály-azonosítója (classname).
+ * @param {String|int} targetId A célpont-elem osztály-azonosítója (classname).
  * @returns {undefined}
  */
 Panel.prototype.hoverOn = function(gHovered, targetId = undefined) {

@@ -1,4 +1,4 @@
-/* global d3, version, LZString, URL, global, changelog */
+/* global d3, version, LZString, URL, global, changelog, Mediator */
 
 'use strict';
 
@@ -512,12 +512,12 @@ Container.prototype.newReportReady = function(side, reportMeta) {
  * Az egyik, pillanatnyilag nem létező oldalt inicializálja: feliratkozik a mediátorokra,
  * regisztrálja az adatrendezőt, elindítja a report-böngészőt.
  * 
- * @param {Integer} side Az inicializálandó oldal.
+ * @param {int} side Az inicializálandó oldal.
  * @param {Number} duration A fejlécpanel letörlésének időtartama. Ha undefined, azonnali.
  * @returns {undefined}
  */
 Container.prototype.initSide = function(side, duration) {
-    var that = this;
+    const that = this;
 
     if (global.mediators === undefined || global.mediators[side] === undefined) {
         global.mediators[side] = new Mediator();
@@ -611,7 +611,7 @@ Container.prototype.killSide = function(side) {
                 global.superMeta = result.reports;
                 that.initSide(side, global.selfDuration);
                 global.mainToolbar_refreshState();
-                global.getConfig2();
+                global.writeConfigToUrl();
             });            
     }
 };

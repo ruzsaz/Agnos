@@ -188,6 +188,133 @@ var global = function () {
 //////////////////////////////////////////////////
 
     /**
+         * Aszinkron ajax adatletöltés GET-en át, újrapróbálkozással, hibakezeléssel.
+         * A keycloak tokent frissíti, ha lejáróban van.
+         *
+         * @param {String} url Az URL, ahonnan le kell tölteni.
+         * @param {String} data A felküldendő adat.
+         * @param {String} callback Sikeres letöltés után meghívandó függvény.
+         * @param {Boolean} isDeleteDialogRequired Sikeres letöltés után törölje-e a dialógusablakot?
+         * @param {int} triesLeft Ennyi próbálkozást engedünk meg.
+         * @returns {undefined}
+         */
+    const getWithRetries = function (url, data, callback, isDeleteDialogRequired, triesLeft) {
+        triesLeft--;
+        var progressDiv = d3.select("#progressDiv");
+        var progressCounter = setTimeout(function () {
+            progressDiv.style("z-index", 1000);
+        }, 200);
+
+        keycloak.updateToken(10).then(function (refreshed) {
+            if (refreshed) {
+                //console.log('Token is successfully refreshed');
+            } else {
+                //console.log('Token NOT refreshed');
+            }
+        }).catch(function () {
+            //console.log('Failed to refresh the token, or the session has expired');
+        }).finally(() => {
+            $.ajax({
+                url: url,
+                data: data,
+                timeout: 5000,
+                beforeSend: function (xhr) {
+                    if (keycloak.token !== undefined) {
+                        xhr.setRequestHeader('authorization', `Bearer ${keycloak.token}`);
+                    }
+                },
+                success: function (result, status) { // Sikeres letöltés esetén.
+                    // Esetleges hibaüzenet levétele.
+                    if (isDeleteDialogRequired === undefined || isDeleteDialogRequired) {
+                        setDialog();
+                    }
+                    callback(result, status);
+                },
+                error: function (jqXHR, textStatus, errorThrown) { // Hálózati, vagy autentikációs hiba esetén.
+                    $(':focus').blur();
+                    // Esetleges homokóra letörlése.
+                    clearTimeout(progressCounter);
+                    progressDiv.style("z-index", -1);
+                    if (jqXHR.status === 401) { // Ha a szerver 'nem vagy autentikálva' választ ad, autentikáljuk.
+                        console.log("401-es hiba");
+                        showNotAuthenticated();
+                    } else if (jqXHR.status === 403) { // Ha az autentikáció jó, de nincs olvasási jog az adathoz
+                        console.log("403 error")
+                        showNotAuthorized();
+                    } else { // Más hiba esetén...
+                        if (triesLeft > 0) {
+                            console.log("Hmmm...", jqXHR.status, textStatus, errorThrown, "no problem, ", triesLeft, " tries still left before giving up.");
+                            getWithRetries(url, data, callback, isDeleteDialogRequired, triesLeft);
+                        } else {
+                            alert('Unknown error. Not good...');
+                        }
+                    }
+                },
+                complete: function () {
+                    // Esetleges homokóra letörlése.
+                    clearTimeout(progressCounter);
+                    progressDiv.style("z-index", -1);
+                }
+
+            });
+
+        });
+
+    };
+    /**
+         * Kiegészíti a böngésző URL-jét egy hash-al, ami bookmarkolhatóan
+         * tartalmazza a panelek állapotát, a reportokat, és a lefúrási szinteket.
+         *
+         * @param {Boolean} onlyForDisplay True: csak a konzolra írja ki, false: elvégzi a beállítást.
+         * @returns {undefined}
+         */
+    const writeConfigToHash = function(onlyForDisplay = false) {
+        var startObject = {}; // A bookmarkban tárolandó objektum.
+        startObject.e = global.isEmbedded;  // Embedded mód érvényessége.
+        startObject.l = String.locale;
+        startObject.s = getCookie("css");
+        startObject.p = []; // A betöltendő oldalak inicializációs objektumai.
+        var panelsToWaitFor = 2;
+
+        // A bal és a jobb oldal konfigurációs sztringjeit feldolgozó callback-függvény.
+        var receiveConfig = function (oneSideStartObject) {
+            startObject.p.push(oneSideStartObject);
+            panelsToWaitFor = panelsToWaitFor - 1;
+
+            // Ha mindkét oldalé megérkezett...
+            if (panelsToWaitFor === 0) {
+
+                // A megjelenítési mód (bal, jobb, osztott) kinyerése.
+                var displayMode;
+                var numberOfSides = d3.selectAll(".container.activeSide[id]").nodes().length; // Hány aktív oldal van? (2 ha osztottkijelzős üzemmód, 1 ha nem.)
+                if (numberOfSides === 1) {
+                    displayMode = d3.selectAll("#container1.activeSide").nodes().length * 2; // Aktív oldal id-je, 0 vagy 2. Csak akkor ételmes, ha 1 aktív oldal van.
+                } else {
+                    displayMode = 1;
+                }
+                startObject.d = displayMode; // A megjelenítési mód: 0: bal, 2: jobb, 1: mindkettő.
+
+                // A képernyőn egy sorba kiférő panelek száma.
+                startObject.n = global.panelNumberOnScreen;
+
+                const newUrl = location.origin + location.pathname + "?q=" + LZString.compressToEncodedURIComponent(JSON.stringify(startObject));
+
+                // Tényleges URL-be írás. Ha nem kell, kikommentelendő.
+                if (global.saveToBookmarkRequired && !onlyForDisplay && !global.isEmbedded) {
+                    window.history.replaceState({id: "100"}, "Page 3", newUrl);
+                }
+
+                if (onlyForDisplay) {
+                    console.log(newUrl);
+                }
+            }
+        };
+
+        // Kérés kiküldése a két oldal dataDirector-ja számára.
+        global.mediators[0].publish("getConfig", receiveConfig);
+        global.mediators[1].publish("getConfig", receiveConfig);
+    };
+    /**
      * Betölt és alkalmaz egy css-t.
      * 
      * @param {String} cssFile Az alkalmazandó css url-je.
@@ -634,64 +761,9 @@ var global = function () {
     var getEmbeddedUrl = function() {
         if (global.isEmbedded === false) {
             global.isEmbedded = true;
-            getConfigToHash(true);
+            writeConfigToHash(true);
             global.isEmbedded = false;
         }
-    };
-
-
-    /**
-     * Kiegészíti a böngésző URL-jét egy hash-al, ami bookmarkolhatóan
-     * tartalmazza a panelek állapotát, a reportokat, és a lefúrási szinteket.
-     * 
-     * @param {Boolean} onlyForDisplay True: csak a konzolra írja ki, false: elvégzi a beállítást.
-     * @returns {undefined}
-     */
-    var getConfigToHash = function(onlyForDisplay = false) {
-        var startObject = {}; // A bookmarkban tárolandó objektum.
-        startObject.e = global.isEmbedded;  // Embedded mód érvényessége.
-        startObject.l = String.locale;
-        startObject.s = getCookie("css");
-        startObject.p = []; // A betöltendő oldalak inicializációs objektumai.
-        var panelsToWaitFor = 2;
-
-        // A bal és a jobb oldal konfigurációs sztringjeit feldolgozó callback-függvény.
-        var receiveConfig = function (oneSideStartObject) {
-            startObject.p.push(oneSideStartObject);
-            panelsToWaitFor = panelsToWaitFor - 1;
-
-            // Ha mindkét oldalé megérkezett...
-            if (panelsToWaitFor === 0) {
-
-                // A megjelenítési mód (bal, jobb, osztott) kinyerése.
-                var displayMode;
-                var numberOfSides = d3.selectAll(".container.activeSide[id]").nodes().length; // Hány aktív oldal van? (2 ha osztottkijelzős üzemmód, 1 ha nem.)
-                if (numberOfSides === 1) {
-                    displayMode = d3.selectAll("#container1.activeSide").nodes().length * 2; // Aktív oldal id-je, 0 vagy 2. Csak akkor ételmes, ha 1 aktív oldal van.
-                } else {
-                    displayMode = 1;
-                }
-                startObject.d = displayMode; // A megjelenítési mód: 0: bal, 2: jobb, 1: mindkettő.
-
-                // A képernyőn egy sorba kiférő panelek száma.
-                startObject.n = global.panelNumberOnScreen;
-
-                const newUrl = location.origin + location.pathname + "?q=" + LZString.compressToEncodedURIComponent(JSON.stringify(startObject));
-                
-                // Tényleges URL-be írás. Ha nem kell, kikommentelendő.
-                if (global.saveToBookmarkRequired && !onlyForDisplay && !global.isEmbedded) {
-                    window.history.replaceState({id: "100"}, "Page 3", newUrl);
-                }
-                
-                if (onlyForDisplay) {
-                    console.log(newUrl);
-                }
-            }
-        };
-
-        // Kérés kiküldése a két oldal dataDirector-ja számára.
-        global.mediators[0].publish("getConfig", receiveConfig);
-        global.mediators[1].publish("getConfig", receiveConfig);        
     };
 
 
@@ -782,91 +854,17 @@ var global = function () {
     /**
      * Aszinkron ajax adatletöltés GET-en át, hibakezeléssel.
      * A keycloak tokent frissíti, ha lejáróban van.
-     * 
+     *
      * @param {String} url Az URL, ahonnan le kell tölteni.
      * @param {String} data A felküldendő adat.
      * @param {String} callback Sikeres letöltés után meghívandó függvény.
      * @param {Boolean} isDeleteDialogRequired Sikeres letöltés után törölje-e a dialógusablakot?
      * @returns {undefined}
      */
-    var get = function (url, data, callback, isDeleteDialogRequired) {
+    const get = function (url, data, callback, isDeleteDialogRequired = true) {
         getWithRetries(url, data, callback, isDeleteDialogRequired, 3);
     };
 
-    /**
-     * Aszinkron ajax adatletöltés GET-en át, újrapróbálkozással, hibakezeléssel.
-     * A keycloak tokent frissíti, ha lejáróban van.
-     * 
-     * @param {String} url Az URL, ahonnan le kell tölteni.
-     * @param {String} data A felküldendő adat.
-     * @param {String} callback Sikeres letöltés után meghívandó függvény.
-     * @param {Boolean} isDeleteDialogRequired Sikeres letöltés után törölje-e a dialógusablakot?
-     * @param {Nimber} triesLeft Ennyi próbálkozást engedünk meg.
-     * @returns {undefined}
-     */
-    var getWithRetries = function (url, data, callback, isDeleteDialogRequired, triesLeft) {
-        triesLeft--;
-        var progressDiv = d3.select("#progressDiv");
-        var progressCounter = setTimeout(function () {
-            progressDiv.style("z-index", 1000);
-        }, 200);
-
-        keycloak.updateToken(10).then(function (refreshed) {
-            if (refreshed) {
-                //console.log('Token is successfully refreshed');
-            } else {
-                //console.log('Token NOT refreshed');
-            }
-        }).catch(function () {
-            //console.log('Failed to refresh the token, or the session has expired');
-        }).finally(() => {
-            $.ajax({
-                url: url,
-                data: data,
-                timeout: 5000,
-                beforeSend: function (xhr) {
-                    if (keycloak.token !== undefined) {
-                        xhr.setRequestHeader('authorization', `Bearer ${keycloak.token}`);
-                    }
-                },
-                success: function (result, status) { // Sikeres letöltés esetén.
-                    // Esetleges hibaüzenet levétele.
-                    if (isDeleteDialogRequired === undefined || isDeleteDialogRequired) {
-                        setDialog();
-                    }
-                    callback(result, status);
-                },
-                error: function (jqXHR, textStatus, errorThrown) { // Hálózati, vagy autentikációs hiba esetén.
-                    $(':focus').blur();
-                    // Esetleges homokóra letörlése.
-                    clearTimeout(progressCounter);
-                    progressDiv.style("z-index", -1);
-                    if (jqXHR.status === 401) { // Ha a szerver 'nem vagy autentikálva' választ ad, autentikáljuk.
-                        console.log("401-es hiba");
-                        showNotAuthenticated();
-                    } else if (jqXHR.status === 403) { // Ha az autentikáció jó, de nincs olvasási jog az adathoz
-                        console.log("403 error")
-                        showNotAuthorized();
-                    } else { // Más hiba esetén...    
-                        if (triesLeft > 0) {
-                            console.log("Hmmm...", jqXHR.status, textStatus, errorThrown, "no problem, ", triesLeft, " tries still left before giving up.");
-                            getWithRetries(url, data, callback, isDeleteDialogRequired, triesLeft);
-                        } else {
-                            alert('Unknown error. Not good...');
-                        }
-                    }
-                },
-                complete: function () {
-                    // Esetleges homokóra letörlése.
-                    clearTimeout(progressCounter);
-                    progressDiv.style("z-index", -1);
-                }
-
-            });
-
-        });
-
-    };
 
     /**
      * Loads an external json resource, with possibility to retry it.
@@ -1331,20 +1329,20 @@ var global = function () {
 
     /**
      * Egy tömböt sorbarendez, és miden elemből csak 1-et tart meg.
-     * 
+     *
      * @param {Array} arr A rendezendő tömb.
      * @param {Function} sortby Comparator függvény. Ha undefined, az alapértelmezett.
      * @returns {Array} A rendezett, unique tömb.
      */
-    var sort_unique = function (arr, sortby) {
-        var A1 = arr.slice();
-        A1 = (typeof sortby === 'function') ? A1.sort(sortby): A1.sort();
+    const sort_unique = function (arr, sortby = undefined) {
+        let A1 = arr.slice();
+        A1 = (typeof sortby === 'function') ? A1.sort(sortby) : A1.sort();
 
-        var last = A1.shift(), next, A2 = [last];
+        let last = A1.shift(), next, A2 = [last];
         while (A1.length) {
             next = A1.shift();
             while (next === last) next = A1.shift();
-            if (next !== undefined){
+            if (next !== undefined) {
                 A2[A2.length] = next;
                 last = next;
             }
@@ -1702,7 +1700,7 @@ var global = function () {
      */
     var mainToolbar_magnify = function (direction) {
         global.mediators[0].publish("magnify", direction);
-        global.getConfig2();
+        global.writeConfigToUrl();
     };
 
     /**
@@ -1714,7 +1712,7 @@ var global = function () {
         d3.select("#progressDiv").style("z-index", -1);
         global.mediators[0].publish("killside", 0);
         global.mediators[1].publish("killside", 1);
-        global.getConfig2();
+        global.writeConfigToUrl();
     };
 
     /**
@@ -1724,7 +1722,7 @@ var global = function () {
      */
     var mainToolbar_switchSide = function () {
         global.mediators[0].publish("changepanels");
-        global.getConfig2();
+        global.writeConfigToUrl();
     };
 
     /**
@@ -2325,7 +2323,7 @@ var global = function () {
         getConfig: getConfig, // Kiírja a pillanatnyilag meglevő panelek konfigurációját a konzolra.
         getUntranslated: getUntranslated, // Kiírja a még lefordítatlan szövegeket a konzolra.
         getEmbeddedUrl: getEmbeddedUrl, // Kiírja a konzolra az épp aktuális állapottot embedded-ként beillesztő url-t.
-        getConfig2: getConfigToHash, // A böngésző URL-jébe írja boomarkolhatóan hash-ként az állapotot.
+        writeConfigToUrl: writeConfigToHash, // A böngésző URL-jébe írja boomarkolhatóan hash-ként az állapotot.
         minifyInits: minifyInits, // Minifyol egy init-stringet, hogy az URL-kódolt verzió kisebb legyen.
         setDialog: setDialog, // Dialógusablak beállítása/levétele.
         get: get, // Aszinkron ajax adatletöltés GET-en át, hibakezeléssel.

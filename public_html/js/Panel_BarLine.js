@@ -225,7 +225,7 @@ function panel_barline(init) {
 }
 
 //////////////////////////////////////////////////
-// Osztály-konstansok inicializálása.
+// Init the class level constants.
 //////////////////////////////////////////////////
 
 {
@@ -1750,7 +1750,7 @@ panel_barline.prototype.toggleAvg = function (id) {
 
     this.update(undefined, undefined, 0);
     this.actualInit.valavglines = this.valAvgToShow;
-    global.getConfig2();
+    global.writeConfigToUrl();
 };
 
 /**
@@ -1896,7 +1896,7 @@ panel_barline.prototype.doChangeValue = function (panelId, value, ratio, targetI
         that.actualInit.valavglines = that.valAvgToShow;
         that.actualInit.ratio = that.valFraction;
         that.update();
-        global.getConfig2();
+        global.writeConfigToUrl();
     }
 };
 
@@ -1979,5 +1979,5 @@ panel_barline.prototype.alternateSwitch = function () {
     that.update();
     that.actualInit.symbols = that.isSymbolsRequired;
     that.actualInit.streched = that.isStretched;
-    global.getConfig2();
+    global.writeConfigToUrl();
 };

@@ -70,7 +70,7 @@ function TitleBox(parentSVG, panelId, mediator, magLevel) {
 
 }
 
-// Osztályáltozók.
+// Init the class level constants.
 TitleBox.prototype.titleSplitRatio = 0.6;
 
 /**
