@@ -1322,14 +1322,23 @@
 
 	                                timeLocal = (timeLocal + new Date().getTime()) / 2;
 
-	                                var tokenResponse = JSON.parse(req.responseText);
+									try {
+	                                	var tokenResponse = JSON.parse(req.responseText);
+										setToken(tokenResponse['access_token'], tokenResponse['refresh_token'], tokenResponse['id_token'], timeLocal);
 
-	                                setToken(tokenResponse['access_token'], tokenResponse['refresh_token'], tokenResponse['id_token'], timeLocal);
-
-	                                kc.onAuthRefreshSuccess && kc.onAuthRefreshSuccess();
-	                                for (var p = refreshQueue.pop(); p != null; p = refreshQueue.pop()) {
-	                                    p.setSuccess(true);
-	                                }
+										kc.onAuthRefreshSuccess && kc.onAuthRefreshSuccess();
+										for (var p = refreshQueue.pop(); p != null; p = refreshQueue.pop()) {
+											p.setSuccess(true);
+										}
+									} catch (e) {
+										logWarn('[KEYCLOAK] Failed to refresh token');
+										kc.clearToken();
+										kc.onAuthRefreshError && kc.onAuthRefreshError();
+										for (var p = refreshQueue.pop(); p != null; p = refreshQueue.pop()) {
+											p.setError(true);
+										}
+									}
+									
 	                            } else {
 	                                logWarn('[KEYCLOAK] Failed to refresh token');
 

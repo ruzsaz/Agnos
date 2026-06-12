@@ -111,7 +111,7 @@ and open the template in the editor.
   width: 12px;
 }
 #less .valColorNA {
-  color: grey;
+  color: #444;
 }
 #less .valColor20 {
   color: #0885a4;

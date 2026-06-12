@@ -56,7 +56,7 @@ function panel_map(init) {
     this.maxDepth = that.localMeta.dimensions[that.dimToShow].levels - 1;	// Maximal drilling depth.
 
     this.imageWidthCover = 0.95 * that.width / that.w;  // Cover ratio of the image, considering the width.
-    this.imageHeightCover = that.height / that.h;       // Cover ratio of the image, considering the height.
+    this.imageHeightCover = 1.05 * that.height / that.h;       // Cover ratio of the image, considering the height.
     this.maskId = global.randomString(12);       // Id of the mask layer. Random to avoid collision.
 
     // Color scale used for colorizing the map.
@@ -518,27 +518,28 @@ panel_map.prototype.prepareData = function (newDataRows) {
 
         // Különben valódit.
 
-
         // Az épp kirajzolandó területek parent-je.
         const parentShape = (that.currentLevel !== that.maxDepth + 1) ? that.getParent(newDataRows) : that.getSelf(newDataRows[0].dims[0].id);
         if (parentShape === undefined) {
             return undefined;
         } else {
-            const extent = that.path.bounds(parentShape);
-            let scaleMeasure = Math.min(that.imageWidthCover / ((extent[1][0] - extent[0][0]) / that.w), that.imageHeightCover / ((extent[1][1] - extent[0][1]) / that.h));
-
             // A kirajzolandó térképi elemek adatainak megszerzése.
             const featuresToDraw = topojson.feature(that.topology, that.topoLevel(that.currentLevel)).features.filter(function (d) {
                 return parentShape.properties.shapeid === ((that.currentLevel === that.maxDepth + 1) ? d.properties.shapeid : d.properties.parentid);
             });
 
+            var extent = [[[1e10],[1e10]], [[-1e10],[-1e10]]];
+
             const pairedData = [];
             const bounds = that.path.bounds;
             featuresToDraw.map(function (d) {
+                const b = bounds(d);
                 for (let w = 0, wMax = newDataRows.length; w < wMax; w++) {
+
+                    // TODO: ezt a két részt eggyé szervezni
                     if (newDataRows[w].dims[0].id === d.properties.shapeid) {
                         const datarow = newDataRows[w];
-                        const b = bounds(d);
+
                         const val = that.valueToShow(datarow);
                         const element = {};
                         element.geometry = d.geometry;
@@ -553,10 +554,32 @@ panel_map.prototype.prepareData = function (newDataRows) {
                         element.centerY = isNaN((b[1][1] + b[0][1]) / 2) ? 0 : (b[1][1] + b[0][1]) / 2;
                         element.tooltip = that.getTooltip(element);
                         pairedData.push(element);
+                            extent = [[Math.min(extent[0][0], b[0][0]), Math.min(extent[0][1], b[0][1])],
+                                        [Math.max(extent[1][0], b[1][0]), Math.max(extent[1][1], b[1][1])]];
                         break;
                     }
                 }
+
+                // If no matched data found, then push it is a N/A element.
+                if (pairedData.length === 0 || pairedData[pairedData.length - 1].id !== d.properties.shapeid) {
+                    const element = {};
+                    element.geometry = d.geometry;
+                    element.properties = d.properties;
+                    element.type = d.type;
+                    element.id = d.properties.shapeid;
+                    element.uniqueId = that.currentLevel + "L" + element.id;
+                    element.name = "";
+                    element.value = undefined;
+                    element.originalValue = "N/A";
+                    element.centerX = isNaN((b[1][0] + b[0][0]) / 2) ? 0 : (b[1][0] + b[0][0]) / 2;
+                    element.centerY = isNaN((b[1][1] + b[0][1]) / 2) ? 0 : (b[1][1] + b[0][1]) / 2;
+                    element.tooltip = undefined;
+                    pairedData.push(element);
+                }
+
             });
+
+            let scaleMeasure = Math.min(that.imageWidthCover / ((extent[1][0] - extent[0][0]) / that.w), that.imageHeightCover / ((extent[1][1] - extent[0][1]) / that.h));
 
             that.radiusScale.domain([0, Math.max(0, d3.max(pairedData, d => d.value))]);
             that.radiusScale.range([that.minBubbleSize, that.maxBubbleSize * Math.sqrt(that.magLevel)]);
@@ -685,17 +708,23 @@ panel_map.prototype.drawMap = function (currentFeatures, drill, trans) {
 
     // Maradó területek animálása.
     terrains.on("click", function (d) {
-        that.drill(d);
+        if (d.value !== undefined) {
+            that.drill(d);
+        }
     })
         .attr("stroke-width", global.mapBorder / currentFeatures.scale)
-        .classed("listener", true)
+        .classed("listener", function (d) {
+                return (d.value !== undefined);
+            })
         .transition(trans)
         .attr("fill", function (d) {
             return that.colorLinear(d.value);
         })
         .attr("opacity", 1)
         .on('end', function () {
-            d3.select(this).classed("darkenable", true);
+            d3.select(this).classed("darkenable", function (d) {
+                return (d.value !== undefined);
+            });
         });
 
 };
@@ -888,14 +917,14 @@ panel_map.prototype.drawBubbles = function (preparedData, drill, trans) {
         .attr("class", "bubble shadow")
         .attr("cx", d => that.actionCenterX || ((that.actionCenterR > 0) ? 20 * (d.centerX - that.width / 2) + that.width / 2 : d.centerX))
         .attr("cy", d => that.actionCenterY || ((that.actionCenterR > 0) ? 20 * (d.centerY - that.height / 2) + that.height / 2 : d.centerY))
-        .attr("r", d => that.radiusScale(d.value) / preparedData.scale)
+        .attr("r", d => (d.value === undefined) ? 0 : that.radiusScale(d.value) / preparedData.scale)
         .attr("opacity", 0)
 
     bubbleHolder_new.append("svg:circle")
         .attr("class", "bubble bordered")
         .attr("cx", d => that.actionCenterX || ((that.actionCenterR > 0) ? 20 * (d.centerX - that.width / 2) + that.width / 2 : d.centerX))
         .attr("cy", d => that.actionCenterY || ((that.actionCenterR > 0) ? 20 * (d.centerY - that.height / 2) + that.height / 2 : d.centerY))
-        .attr("r", d => that.radiusScale(d.value) / preparedData.scale)
+        .attr("r", d => (d.value === undefined) ? 0 : that.radiusScale(d.value) / preparedData.scale)
         .attr("opacity", (that.actionCenterR === 0) ? 1 : 0)
 
     bubbleHolder = bubbleHolder_new.merge(bubbleHolder);
@@ -911,7 +940,7 @@ panel_map.prototype.drawBubbles = function (preparedData, drill, trans) {
         .transition(trans)
         .attr("cx", d => d.centerX)
         .attr("cy", d => d.centerY)
-        .attr("r", d => (preparedData.isLastLevel ? 2 : 1) * that.radiusScale(d.value) / preparedData.scale)
+        .attr("r", d => (d.value === undefined) ? 0 : ((preparedData.isLastLevel ? 2 : 1) * that.radiusScale(d.value) / preparedData.scale))
         .attr("opacity", 0)
         .style("opacity", null)
 
@@ -920,7 +949,7 @@ panel_map.prototype.drawBubbles = function (preparedData, drill, trans) {
         .transition(trans)
         .attr("cx", d => d.centerX)
         .attr("cy", d => d.centerY)
-        .attr("r", d => (preparedData.isLastLevel ? 2 : 1) * that.radiusScale(d.value) / preparedData.scale)
+        .attr("r", d => (d.value === undefined) ? 0 : ((preparedData.isLastLevel ? 2 : 1) * that.radiusScale(d.value) / preparedData.scale))
         .attr("fill", d => global.color(d.id))
         .attr("opacity", 1)
         .on('end', function () {

@@ -2,6 +2,7 @@
     "fromLanguage": "en",
     "toLanguage": "hu",
     "dictionary": {
+        "Albania": "Albánia",
         "Austria": "Ausztria",
         "Belgium": "Belgium",
         "Bulgaria": "Bulgária",
@@ -16,18 +17,23 @@
         "Greece": "Görögország",
         "Hungary": "Magyarország",
         "Ireland": "Írország",
+        "Israel": "Izrael",
+        "Iceland": "Izland",
         "Italy": "Olaszország",
         "Latvia": "Lettország",
         "Lithuania": "Litvánia",
         "Luxembourg": "Luxemburg",
         "Malta": "Málta",
         "Netherlands": "Hollandia",
+        "Norway": "Norvégia",
         "Poland": "Lengyelország",
         "Portugal": "Portugália",
         "Romania": "Románia",
         "Slovakia": "Szlovákia",
         "Slovenia": "Szlovénia",
         "Spain": "Spanyolország",
-        "Sweden": "Svédország"
+        "Sweden": "Svédország",
+        "Switzerland": "Svájc",
+        "United Kingdom": "Egyesült Királyság"
     }
 }

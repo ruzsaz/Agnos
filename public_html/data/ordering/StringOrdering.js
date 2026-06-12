@@ -52,8 +52,56 @@ var stringOrdering = [
             "november",
             "december"            
         ]
+    },
+    {
+        "lang": "de",
+        "ordering": [
+            "montag",
+            "dienstag",
+            "mittwoch",
+            "donnerstag",
+            "freitag",
+            "samstag",
+            "sonntag",
+
+            "januar",
+            "februar",
+            "märz",
+            "april",
+            "mai",
+            "juni",
+            "juli",
+            "august",
+            "september",
+            "oktober",
+            "november",
+            "dezember"
+        ]
+    },
+    {
+        "lang": "fr",
+        "ordering": [
+            "lundi",
+            "mardi",
+            "mercredi",
+            "jeudi",
+            "vendredi",
+            "samedi",
+            "dimanche",
+
+            "janvier",
+            "février",
+            "mars",
+            "avril",
+            "mai",
+            "juin",
+            "juillet",
+            "août",
+            "septembre",
+            "octobre",
+            "novembre",
+            "décembre"
+        ]
     }
 
-    
-    
 ]

@@ -224,11 +224,28 @@ var global = function () {
                     }
                 },
                 success: function (result, status) { // Sikeres letöltés esetén.
-                    // Esetleges hibaüzenet levétele.
-                    if (isDeleteDialogRequired === undefined || isDeleteDialogRequired) {
-                        setDialog();
+                    if (result instanceof Object) {
+                        // Esetleges hibaüzenet levétele.
+                        if (isDeleteDialogRequired === undefined || isDeleteDialogRequired) {
+                            setDialog();
+                        }
+                        callback(result, status);
+                    } else {
+                        try {
+                            JSON.parse(result);
+                            // Esetleges hibaüzenet levétele.
+                            if (isDeleteDialogRequired === undefined || isDeleteDialogRequired) {
+                                setDialog();
+                            }
+                            callback(result, status);
+                        } catch (e) {
+                            // console.log(e);
+                            // console.log("Nem JSON-t kaptunk vissza, hanem: ", result);
+                            // showNotAuthorized();
+                            keycloak.clearToken();
+                            login();
+                        }
                     }
-                    callback(result, status);
                 },
                 error: function (jqXHR, textStatus, errorThrown) { // Hálózati, vagy autentikációs hiba esetén.
                     $(':focus').blur();
@@ -237,7 +254,8 @@ var global = function () {
                     progressDiv.style("z-index", -1);
                     if (jqXHR.status === 401) { // Ha a szerver 'nem vagy autentikálva' választ ad, autentikáljuk.
                         console.log("401-es hiba");
-                        showNotAuthenticated();
+                        //showNotAuthenticated();
+                        login();
                     } else if (jqXHR.status === 403) { // Ha az autentikáció jó, de nincs olvasási jog az adathoz
                         console.log("403 error")
                         showNotAuthorized();
@@ -1631,7 +1649,7 @@ var global = function () {
      */
     var axisTextSize = function (x) {
         var size = Math.sin(Math.pow(Math.min(x, 80), 0.92) / 40) * 40;
-        return Math.min(size, 32);
+        return Math.min(size, 24);
     };
 
     /**
@@ -2192,7 +2210,7 @@ var global = function () {
     var initValuesFromCss = function () {
 
         // Az értékek megjelenését színező színpaletta.
-        global.colorNA = varsFromCSS.valClorNA; // A "nem szám", ill "nem definiált" érték színezési színe.
+        global.colorNA = varsFromCSS.valColorNA; // A "nem szám", ill "nem definiált" érték színezési színe.
         for (var i = 0; i < 20; i++) {
             colors[i] = varsFromCSS["valColor" + (i + 1)];
             valColors[0][i] = varsFromCSS["valColor" + (i + 1)];

@@ -25,3 +25,4 @@ agnosConfig.url = {
 
 agnosConfig.i18nRequired = true;
 agnosConfig.saveToBookmarkRequired = true;
+agnosConfig.logoutAllowed = false;
