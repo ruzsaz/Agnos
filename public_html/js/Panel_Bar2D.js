@@ -15,7 +15,7 @@ function panel_bar2d(init) {
     this.constructorName = "panel_bar2d";
 
     // Inicializáló objektum beolvasása, feltöltése default értékekkel.
-    this.defaultInit = {group: 0, position: undefined, dimx: 0, dimy: 1, val: 0, multiplier: 1, ratio: false, streched: false, domain: [], domainr: [], mag: 1, frommg: 1, sortbyvalue: false};
+    this.defaultInit = {group: 0, position: undefined, dimx: 0, dimy: 1, val: 0, multiplier: 1, ratio: false, streched: false, domain: [], domainr: [], mag: 1, frommg: 1, sortbyvalue: false, sortcol: 0};
     this.actualInit = global.combineObjects(that.defaultInit, init);
 
     Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, true, global.numberOffset, 0); // A Panel konstruktorának meghívása.
@@ -33,7 +33,7 @@ function panel_bar2d(init) {
     this.maxEntries = global.maxEntriesIn2D;                // A panel által maximálisan megjeleníthető adatok száma.
     this.maxEntries1D = global.maxEntriesIn1D;              // A panel által 1 dimenzióban maximálisan megjeleníthető adatok száma.
     this.shadowTimeout = undefined;							// A háttértéglalapokat létrehozó időzítés.
-    this.sortByYDimIndex = 0;
+    this.sortByYDimIndex = that.actualInit.sortcol || 0;   // Széthúzott nézetben az ennyiedik y-dimenzióelem szerint rendez.
     this.setAlternateSwitch(true);
 
     // Vízszintes skála.
@@ -510,6 +510,12 @@ panel_bar2d.prototype.prepareData = function (oldPreparedData, newDataRows, dril
         element.sumValues = element.sumValues + val.value;
     }
     
+    // Ha a bookmarkból visszatöltött rendezési index túlcímezné a jelkulcsot, az elsőre esünk vissza.
+    if (that.sortByYDimIndex >= dimYArray.length) {
+        that.sortByYDimIndex = 0;
+        that.actualInit.sortcol = 0;
+    }
+
     if (that.sortByValue) {
         if (that.isStretched) {
             dataArray.sort(function (a, b) {
@@ -1059,8 +1065,9 @@ panel_bar2d.prototype.sortSwitch = function() {
             that.sortByYDimIndex = 0;
         } else {
             that.sortByYDimIndex = that.sortByYDimIndex + 1;
-            if (that.sortByYDimIndex === that.preparedData.dimYArray.length) {
+            if (that.sortByYDimIndex >= that.preparedData.dimYArray.length) {
                 that.sortByValue = false;
+                that.sortByYDimIndex = 0;
             }
         }
     } else {
@@ -1068,12 +1075,15 @@ panel_bar2d.prototype.sortSwitch = function() {
     }
     that.update();
     that.actualInit.sortbyvalue = that.sortByValue;
+    that.actualInit.sortcol = that.sortByYDimIndex;
     global.writeConfigToUrl();
 };
 
 panel_bar2d.prototype.resetSort = function() {
     this.sortByValue = false;
+    this.sortByYDimIndex = 0;
     this.actualInit.sortbyvalue = this.sortByValue;
+    this.actualInit.sortcol = this.sortByYDimIndex;
     global.writeConfigToUrl();
 }
 
@@ -1114,6 +1124,7 @@ panel_bar2d.prototype.doChangeDimension = function (panelId, newDimId, dimToChan
             that.dimYToShow = newDimId;
             that.actualInit.dimy = that.dimYToShow;
             that.sortByYDimIndex = 0;
+            that.actualInit.sortcol = that.sortByYDimIndex;
         }
         that.dimX = (that.dimXToShow <= that.dimYToShow) ? 0 : 1; // Az x tengelyen megjelenítendő dimenzió sorszáma (a data-n belül).
         that.dimY = (that.dimXToShow < that.dimYToShow) ? 1 : 0; // Az oszloposztásban megjelenítendő dimenzió sorszáma (a data-n belül).

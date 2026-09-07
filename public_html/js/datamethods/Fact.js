@@ -100,6 +100,8 @@ Fact.prototype.getLocalMeta = function() {
                 'dimension_unique_name': d.name,
                 'id': d.id,
                 'is_territorial': (d.type === "" || d.type === null) ? 0 : 1,
+                'isKaplanMeier': d.kaplanMeier,
+                'kaplanMeierValues': d.kaplanMeierValues,
                 'levels': d.allowedDepth + 1,
                 'lang': d.lang,
                 'top_level_caption': global.getFirstValidString(localLabel.topLevelString, defaultLabel.topLevelString)

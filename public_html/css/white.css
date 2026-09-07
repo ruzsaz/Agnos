@@ -182,7 +182,7 @@ and open the template in the editor.
   font-family: arial, sans-serif;
   background-size: cover;
   -webkit-tap-highlight-color: transparent;
-  accent-color: #ffcf90;
+  accent-color: #ff9090;
 }
 body.mobile .hideForMobile {
   display: none !important;
@@ -1079,10 +1079,10 @@ g.sankey_nodes_shadow .nodeShadow {
   -o-transition: fill 0.01s linear;
 }
 body {
-  -ms-scrollbar-face-color: #ffcf90;
+  -ms-scrollbar-face-color: #ff9090;
   -ms-scrollbar-track-color: #fff;
-  -ms-scrollbar-arrow-color: #ffcf90;
-  -ms-scrollbar-shadow-color: #ffcf90;
+  -ms-scrollbar-arrow-color: #ff9090;
+  -ms-scrollbar-shadow-color: #ff9090;
 }
 ::-webkit-scrollbar {
   width: 12px;
@@ -1098,13 +1098,13 @@ body {
 ::-webkit-scrollbar-thumb {
   -webkit-border-radius: 0px;
   border-radius: 0px;
-  background: #ffcf90;
+  background: #ff9090;
   box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5);
   -moz-box-shadow: inset 0 0 1px rgba(0, 0, 0, 0.5);
 }
 ::-webkit-scrollbar-thumb:window-inactive {
-  background: #ffcf90;
+  background: #ff9090;
 }
 p {
   margin: 20px 0 0;
@@ -2803,10 +2803,10 @@ body.embedded .titleButton1:hover ~ .titleText1 {
 }
 .control.slider {
   position: relative;
-  left: 4em;
   pointer-events: all !important;
-  width: 8em;
+  width: 50%;
   max-height: 15px;
+  float: right;
 }
 .control.radio {
   display: inline-flex;

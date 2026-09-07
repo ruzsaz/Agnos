@@ -147,9 +147,26 @@ DataDirector.prototype.guessValue = function (exceptions = []) {
  */
 DataDirector.prototype.drill = function (drill) {
     const that = this;
-
     let isSuccessful = false;
     const dim = drill.dim;
+
+    // If it is a kaplanMeier dimension, allow drilling by replacing the current drill regardless of the level.
+    // Clicking the currently displayed last period should be a no-op instead of reloading the same state.
+    const dimension = global.facts[that.side].reportMeta.dimensions[dim];
+    if (dimension !== undefined && dimension.kaplanMeier) {
+        const baseDim = (global.baseLevels[that.side])[dim];
+        const currentKaplanMeierValue = (baseDim.length > 0)
+            ? (baseDim[baseDim.length - 1]).id
+            : ((dimension.kaplanMeierValues !== undefined && dimension.kaplanMeierValues.length > 0)
+                ? dimension.kaplanMeierValues[dimension.kaplanMeierValues.length - 1].id
+                : undefined);
+
+        if (drill.direction === -1 && drill.toId === currentKaplanMeierValue) {
+            that.drillLock = false;
+            return;
+        }
+        drill.replace = true;
+    }
 
     // If the drill is a control, then set the desired controls value
     if (drill.dim > global.facts[that.side].reportMeta.dimensions.length - 1) {
@@ -164,7 +181,11 @@ DataDirector.prototype.drill = function (drill) {
     } else {
         const baseDim = (global.baseLevels[that.side])[dim];
         if (drill.direction === -1) {
-            if (drill.toId !== undefined && baseDim.length < global.facts[that.side].localMeta.dimensions[dim].levels - 1) {
+            if (drill.replace && drill.toId !== undefined && baseDim.length > 0) {
+                isSuccessful = true;
+                drill.fromId = (baseDim[baseDim.length - 1]).id;
+                baseDim[baseDim.length - 1] = {id: drill.toId, name: drill.toName};
+            } else if (drill.toId !== undefined && baseDim.length < global.facts[that.side].localMeta.dimensions[dim].levels - 1) {
                 isSuccessful = true;
                 drill.fromId = (baseDim.length === 0) ? null : (baseDim[baseDim.length - 1]).id;
                 baseDim.push({id: drill.toId, name: drill.toName});

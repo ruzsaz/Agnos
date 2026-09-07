@@ -8,13 +8,28 @@ function ControlSlider(parentElement, id, initObject, startValue, callback) {
 
     this.id = id;
     this.init = JSON.parse(initObject.parameters);
-    this.min = (that.init === undefined || that.init.min === undefined) ? 0 : that.init.min;
-    this.max = (that.init === undefined || that.init.max === undefined) ? 100 : that.init.max;
-    this.step = (that.init === undefined || that.init.step === undefined) ? 1 : that.init.step;
     this.controlValues = [];
-    for (let i = this.min, iMax = this.max; i <= iMax; i += this.step) {
-        that.controlValues.push({'value' : i, 'label' : i + ''});
+    this.isDiscrete = that.init !== undefined && that.init.values !== undefined;
+    if (that.isDiscrete) {
+        const labels = that.init.labels || initObject.labels || [];
+        for (let i = 0, iMax = that.init.values.length; i < iMax; i++) {
+            that.controlValues.push({
+                'value': that.init.values[i],
+                'label': (labels.length <= i) ? that.init.values[i] + '' : labels[i]
+            });
+        }
+        this.min = 0;
+        this.max = Math.max(0, that.controlValues.length - 1);
+        this.step = 1;
+    } else {
+        this.min = (that.init === undefined || that.init.min === undefined) ? 0 : that.init.min;
+        this.max = (that.init === undefined || that.init.max === undefined) ? 100 : that.init.max;
+        this.step = (that.init === undefined || that.init.step === undefined) ? 1 : that.init.step;
+        for (let i = this.min, iMax = this.max; i <= iMax; i += this.step) {
+            that.controlValues.push({'value' : i, 'label' : i + ''});
+        }
     }
+    const startSliderValue = this.getSliderValue(startValue);
 
     this.className = "control slider";
 
@@ -27,7 +42,7 @@ function ControlSlider(parentElement, id, initObject, startValue, callback) {
 
     valueContainer
         .style("opacity", 0)
-        .text(global.cleverRound2(startValue))
+        .text(that.getLabelForSliderValue(startSliderValue))
         .transition(d3.transition().duration(global.selfDuration))
         .style("opacity", 1);
 
@@ -38,22 +53,27 @@ function ControlSlider(parentElement, id, initObject, startValue, callback) {
         .attr("min", that.min)
         .attr("max", that.max)
         .attr("step", that.step)
-        .attr("value", startValue)
+        .attr("value", startSliderValue)
+        .on("click", function () {
+            if (d3.event) {
+                d3.event.stopPropagation();
+            }
+        })
         .on("input", function () {
             const value = d3.select(this).property("value");
             valueContainer
                 .style("opacity", 0.5)
-                .text(global.cleverRound2(value));
+                .text(that.getLabelForSliderValue(value));
         })
         .on("change", function () {
-            const value = parseFloat(d3.select(this).property("value"));
-            callback(value);
+            const sliderValue = d3.select(this).property("value");
+            callback(that.getControlValueForSliderValue(sliderValue));
         });
 }
 
 ControlSlider.prototype.updateLabels = function (parentElement, newLabels, trans) {
     const value = this.container.select("input").property("value");
-    const newValueText = global.cleverRound2(value);
+    const newValueText = this.getLabelForSliderValue(value);
     const valueContainer = this.container.select("text");
     const oldValueText = valueContainer.text();
     if (newValueText !== oldValueText) {
@@ -64,14 +84,47 @@ ControlSlider.prototype.updateLabels = function (parentElement, newLabels, trans
     valueContainer.transition(trans).style("opacity", 1);
 };
 
-ControlSlider.prototype.setValue = function (newValue) {
+ControlSlider.prototype.setValue = function (newValue, triggerChange = true) {
     const controlElement = document.getElementById(this.id);
-    controlElement.value = newValue;
-    controlElement.dispatchEvent(new Event('change'));
+    controlElement.value = this.getSliderValue(newValue);
+    this.container.select("text").text(this.getLabelForSliderValue(controlElement.value));
+    if (triggerChange) {
+        controlElement.dispatchEvent(new Event('change'));
+    }
 }
 
 ControlSlider.prototype.getPossibleControlValuesAsArray = function () {
     return this.controlValues;
+}
+
+ControlSlider.prototype.getSliderValue = function (controlValue) {
+    if (!this.isDiscrete) {
+        return controlValue;
+    }
+    const position = global.positionInArrayByProperty(this.controlValues, "value", controlValue);
+    return (position === -1) ? controlValue : position;
+}
+
+ControlSlider.prototype.getControlValueForSliderValue = function (sliderValue) {
+    if (!this.isDiscrete) {
+        return parseFloat(sliderValue);
+    }
+    const sliderIndex = parseInt(sliderValue);
+    if (!isNaN(sliderIndex) && this.controlValues[sliderIndex] !== undefined) {
+        return this.controlValues[sliderIndex].value;
+    }
+    return parseFloat(sliderValue);
+}
+
+ControlSlider.prototype.getLabelForSliderValue = function (sliderValue) {
+    if (!this.isDiscrete) {
+        return global.cleverRound2(sliderValue);
+    }
+    const sliderIndex = parseInt(sliderValue);
+    if (!isNaN(sliderIndex) && this.controlValues[sliderIndex] !== undefined) {
+        return this.controlValues[sliderIndex].label;
+    }
+    return global.cleverRound2(sliderValue);
 }
 
 
@@ -322,5 +375,3 @@ function cubicSplineInterpolate(x, xValues, yValues) {
     // If x is outside the range of xValues, return NaN
     return NaN;
 }
-
-

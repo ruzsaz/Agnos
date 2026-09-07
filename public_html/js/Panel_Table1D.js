@@ -14,7 +14,7 @@ function panel_table1d(init) {
     this.constructorName = "panel_table1d";
 
     // Inicializáló objektum beolvasása, feltöltése default értékekkel.
-    this.defaultInit = {group: 0, position: undefined, dim: 0, multiplier: 1, ratio: false, mag: 1, frommg: 1, sortbyvalue: false};
+    this.defaultInit = {group: 0, position: undefined, dim: 0, multiplier: 1, ratio: false, mag: 1, frommg: 1, sortbyvalue: false, sortcol: 0};
     this.actualInit = global.combineObjects(that.defaultInit, init);
 
     Panel.call(that, that.actualInit, global.mediators[that.actualInit.group], true, false, 0, 0); // A Panel konstruktorának meghívása.
@@ -22,6 +22,7 @@ function panel_table1d(init) {
     this.dimToShow = that.actualInit.dim;			// A mutatott dimenzió.
     this.preparedData = [];							// Az ábrázolásra kerülő, feldolgozott adat.
     this.maxEntries = global.maxEntriesIn1D;        // A panel által maximálisan megjeleníthető adatok száma.    
+    this.sortByValueIndex = that.actualInit.sortcol || 0;	// Az érték szerinti sorbarendezéskor a rendezés alapjául szolgáló oszlop sorszáma.
 
     // A mutatók elrejtésvektora, és a fejlécvektor.
     this.columnHeadVector = [];						// Mit kell elrejteni? 0: semmit, 1: az értéket, 2: a hányadost, 3: mindkettőt.	
@@ -214,16 +215,39 @@ panel_table1d.prototype.valuesToShow = function (d) {
 };
 
 /**
+ * Megmondja, hogy hány értékoszlopot mutat a táblázat. Ugyanazt a két feltételt
+ * használja, mint a valuesToShow, így a visszaadott szám a valuesToShow által
+ * adott tömb hossza.
+ * 
+ * @returns {Number} A megjelenített értékoszlopok száma.
+ */
+panel_table1d.prototype.valueColumnCount = function () {
+    var that = this;
+    var count = 0;
+    for (var i = 0, iMax = that.localMeta.indicators.length; i < iMax; i++) {
+        if (that.columnHeadVector[i] !== undefined) {
+            if (that.columnHeadVector[i].hide % 2 === 0) { // Ha az értéket meg kell mutatni.
+                count++;
+            }
+            if (that.columnHeadVector[i].hide >> 1 === 0) { // Ha a hányadost meg kell mutatni.
+                count++;
+            }
+        }
+    }
+    return count;
+};
+
+/**
  * Meghatározza a kért sorbarendezéshez szükséges comparator-függvényt.
  * 
  * @returns {Function} Az adatelemek sorbarendezéséhez szükséges comparator.
  */
 panel_table1d.prototype.getSortingComparator = function() {
     var that = this;        
-    if (that.sortByValue) {
+    if (that.sortByValue && that.sortByValueIndex < that.valueColumnCount()) {
         return function(a, b) {
-            const aValue = that.valuesToShow(a)[0].value;
-            const bValue = that.valuesToShow(b)[0].value;        
+            const aValue = that.valuesToShow(a)[that.sortByValueIndex].value;
+            const bValue = that.valuesToShow(b)[that.sortByValueIndex].value;        
             if (aValue < bValue) return 1;
             if (aValue > bValue) return -1;
             return 0;
@@ -687,6 +711,33 @@ panel_table1d.prototype.drawRowHeaders = function (preparedData, trans) {
 //////////////////////////////////////////////////
 // Irányítást végző függvények
 //////////////////////////////////////////////////
+
+/**
+ * Sorbarendezés váltó függvény. A dimenziónév szerinti rendezésből indulva
+ * minden klikkelésre a következő értékoszlop szerint rendez, az utolsó után
+ * pedig visszaáll a dimenziónév szerinti rendezésre.
+ * 
+ * @returns {undefined}
+ */
+panel_table1d.prototype.sortSwitch = function() {
+    const that = this;
+    global.tooltip.kill();
+    const valueCount = that.valueColumnCount();
+    if (that.sortByValue === false) {
+        that.sortByValue = (valueCount > 0);
+        that.sortByValueIndex = 0;
+    } else {
+        that.sortByValueIndex = that.sortByValueIndex + 1;
+        if (that.sortByValueIndex >= valueCount) {
+            that.sortByValue = false;
+            that.sortByValueIndex = 0;
+        }
+    }
+    that.update();
+    that.actualInit.sortbyvalue = that.sortByValue;
+    that.actualInit.sortcol = that.sortByValueIndex;
+    global.writeConfigToUrl();
+};
 
 /**
  * Nyelvváltást végrehajtó függvény.

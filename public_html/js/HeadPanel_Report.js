@@ -50,6 +50,7 @@ function HeadPanel_Report(init, reportMeta, startScale) {
 
     const trans = d3.transition().duration(global.selfDuration);
     this.controlElements = [];
+    this.kaplanMeierSliders = [];
 
     // Create the main container.
     that.divBase = that.panelDiv.append("html:div")
@@ -102,7 +103,8 @@ HeadPanel_Report.prototype.prepareData = function (data) {
         }
 
         dimData.push({
-            text: pathString
+            text: pathString,
+            sliderValue: that.getKaplanMeierSliderValue(i)
         });
     }
 
@@ -181,7 +183,7 @@ HeadPanel_Report.prototype.shortenDimensionPath = function (string, element) {
     const elementWidth2 = element.offsetWidth;
 
     if (elementWidth === elementWidth2) {
-        const subStrings = string.split(this.dimLevelsSeparator);
+        const subStrings = (string === undefined) ? [] : string.split(this.dimLevelsSeparator);
         let isChanged = false;
         for (let i = 0, iMax = subStrings.length - 1; i < iMax; i++) {
             if (subStrings[i] !== this.dimLevelPlaceholder) {
@@ -258,6 +260,12 @@ HeadPanel_Report.prototype.update = function (data) {
         .text(function (d) {
             return d.text;
         });
+
+    dimRow.each(function (d, i) {
+        if (that.kaplanMeierSliders[i] !== undefined) {
+            that.kaplanMeierSliders[i].setValue(d.sliderValue, false);
+        }
+    });
 
     // Kontrol értékek upgradelése
     for (let i = 0, iMax = that.controlElements.length; i < iMax; i++) {
@@ -469,9 +477,59 @@ HeadPanel_Report.prototype.initDimensions = function (trans) {
     dimDrillCell.append("html:span")
         .html("&nbsp;");
 
+    dimDrillCell.each(function (d, i) {
+        if (d.kaplanMeier && d.kaplanMeierValues !== undefined && d.kaplanMeierValues.length > 0) {
+            d3.select(this).selectAll(".tableText1:not(.spacer), span")
+                .style("display", "none");
+            that.kaplanMeierSliders[i] = new ControlSlider(
+                d3.select(this),
+                "kaplanMeierDimension_P" + that.panelSide + "_" + i,
+                that.getKaplanMeierSliderInit(d),
+                that.getKaplanMeierSliderValue(i),
+                function (v) {
+                    that.drillKaplanMeierDimension(i, v);
+                });
+        }
+    });
+
     // Background for the whole row
     newDimRow.append("html:div")
         .attr("class", "cell backgroundCell listener dragable");
+}
+
+HeadPanel_Report.prototype.getKaplanMeierSliderInit = function (dimension) {
+    return {
+        parameters: JSON.stringify({
+            values: dimension.kaplanMeierValues.map(value => value.id),
+            labels: dimension.kaplanMeierValues.map(value => value.name)
+        })
+    };
+}
+
+HeadPanel_Report.prototype.getKaplanMeierSliderValue = function (dimensionIndex) {
+    const dimension = this.meta.dimensions[dimensionIndex];
+    const baseDim = (global.baseLevels[this.panelSide])[dimensionIndex];
+    if (baseDim.length > 0) {
+        return baseDim[baseDim.length - 1].id;
+    }
+    if (dimension.kaplanMeier && dimension.kaplanMeierValues !== undefined && dimension.kaplanMeierValues.length > 0) {
+        return dimension.kaplanMeierValues[dimension.kaplanMeierValues.length - 1].id;
+    }
+    return undefined;
+}
+
+HeadPanel_Report.prototype.drillKaplanMeierDimension = function (dimensionIndex, value) {
+    const dimension = this.meta.dimensions[dimensionIndex];
+    const selectedValue = global.getFromArrayByProperty(dimension.kaplanMeierValues, "id", value);
+    if (selectedValue !== undefined) {
+        this.mediator.publish("drill", {
+            dim: dimensionIndex,
+            direction: -1,
+            toId: selectedValue.id,
+            toName: selectedValue.name,
+            replace: true
+        });
+    }
 }
 
 HeadPanel_Report.prototype.initControls = function (trans = undefined) {

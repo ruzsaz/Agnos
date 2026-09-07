@@ -1627,6 +1627,7 @@ var global = function () {
             ['mag:', 'X:'],
             ['frommg:', 'Y:'],
             ['shortbyvalue:', 'Sv:'],
+            ['sortcol:', 'Sc:'],
             ['alternate:', 'Al:'],
             ['false', 'Ff'],
             ['true', 'Tt'],
