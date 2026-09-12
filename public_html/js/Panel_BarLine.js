@@ -85,10 +85,23 @@ function panel_barline(init) {
         .range([that.height, 0])
         .domain([0, 1]);
 
+    // A vonalak másodlagos, jobb oldali függőleges skálája. Csak akkor kap az
+    // oszlopokétól eltérő értékkészletet, ha a két csoport nagyságrendje nagyon eltér.
+    this.yScaleLine = d3.scaleLinear()
+        .range([that.height, 0]);
+
+    this.isDualScale = false;	// Külön skálán van-e a vonalak és az oszlopok csoportja?
+    this.lineScaleRatio = 1;	// A vonalak skálája ennyiszerese az oszlopokénak.
+
     // Axes.
     this.xAxis = d3.axisBottom(that.xScale);
     this.yAxis = d3.axisLeft(that.yScale)
         .ticks(10);
+
+    // A vonalak másodlagos, jobb oldali függőleges tengelye.
+    this.yAxisLine = d3.axisRight(that.yScaleLine)
+        .ticks(10)
+        .tickFormat(global.cleverRound3);
 
     // Széthúzott módban a függőleges tengely %-okat kell hogy mutasson.
     that.setYAxisScale();
@@ -192,6 +205,12 @@ function panel_barline(init) {
         .attr("class", "axis axisY noEvents")
         .attr("transform", "translate(" + that.margin.left + ", " + that.margin.top + ")");
 
+    // A vonalak másodlagos, jobb oldali függőleges tengelyének rétege.
+    this.gAxisYLine = that.svg.insert("svg:g", ".title_group")
+        .attr("class", "axis axisY axisYLine noEvents")
+        .attr("transform", "translate(" + (that.margin.left + that.width) + ", " + that.margin.top + ")")
+        .style("display", "none");
+
     // A kilógó oszlopok végét elhalványító.
     this.mask = that.svg.append("svg:mask")
         .attr("id", "maskurl" + that.maskId);
@@ -235,6 +254,8 @@ function panel_barline(init) {
     panel_barline.prototype.symbolSize_background = 140;// A jelölő takaró hátterének mérete.
     panel_barline.prototype.cutLimit = 10;              // Ennyiszeres kiugó érték esetén változtatja a skálát a második legnagyobbhoz.
     panel_barline.prototype.cutConstant = 1.2;          // ... és ekkor a 2. érték ennyiszerese lesz a maximum.
+    panel_barline.prototype.dualScaleLimit = 4;         // Ennyiszeres nagyságrendi eltérés esetén kapnak a vonalak külön skálát.
+    panel_barline.prototype.dualScaleMantissas = [1, 1.25, 1.5, 2, 2.5, 3, 4, 5, 6, 8, 10]; // A két skála közötti szorzó csak ilyen, 10 hatványaival szorzott érték lehet.
 
     // Vonaldiagram path-generátora, az objektum x,y property-éből dolgozik.
     panel_barline.prototype.lineBarGenerator = d3.line()
@@ -485,6 +506,168 @@ panel_barline.prototype.interpolate = function (coord, a, b, c, i, iMax) {
         cc = aa;
     }
     return x * cc + (1 - x) * bb;
+};
+
+/**
+ * Egy felfelé kilógó értékkel felfrissíti a szélsőérték-gyűjtő objektumot:
+ * nyilvántartja a legnagyobb és a második legnagyobb értéket.
+ *
+ * @param {Object} stat A szélsőérték-gyűjtő: {max: , max2nd: , min: , min2nd: }.
+ * @param {Number} value Az új érték.
+ * @returns {undefined}
+ */
+panel_barline.prototype.collectMax = function (stat, value) {
+    if (value >= stat.max) {
+        stat.max2nd = stat.max;
+        stat.max = value;
+    } else if (value >= stat.max2nd) {
+        stat.max2nd = value;
+    }
+};
+
+/**
+ * Egy lefelé kilógó értékkel felfrissíti a szélsőérték-gyűjtő objektumot:
+ * nyilvántartja a legkisebb és a második legkisebb értéket.
+ *
+ * @param {Object} stat A szélsőérték-gyűjtő: {max: , max2nd: , min: , min2nd: }.
+ * @param {Number} value Az új érték.
+ * @returns {undefined}
+ */
+panel_barline.prototype.collectMin = function (stat, value) {
+    if (value <= stat.min) {
+        stat.min2nd = stat.min;
+        stat.min = value;
+    } else if (value <= stat.min2nd) {
+        stat.min2nd = value;
+    }
+};
+
+/**
+ * Egy szélsőérték-gyűjtőből meghatározza a hozzá tartozó skála értékkészletét.
+ * Ha egyetlen érték nagyon kilóg a többi közül, akkor a skála nem követi végig,
+ * hanem a második legnagyobbhoz igazodik.
+ *
+ * @param {Object} stat A szélsőérték-gyűjtő: {max: , max2nd: , min: , min2nd: }.
+ * @param {Number} avgMax A csoporthoz tartozó átlagvonalak maximuma.
+ * @param {Number} avgMin A csoporthoz tartozó átlagvonalak minimuma.
+ * @param {Number} rowNumber A megjelenítendő adatsorok száma.
+ * @returns {Array} 2 elemű tömb a skála alsó és felső végpontjával.
+ */
+panel_barline.prototype.cutDomain = function (stat, avgMax, avgMin, rowNumber) {
+    var that = this;
+
+    // A második legnagyobb abszolútértékű kiszedése.
+    var numbers = [Math.abs(stat.max), Math.abs(stat.min), Math.abs(stat.max2nd), Math.abs(stat.min2nd)];
+    var maxAbsNumber = Math.max.apply(null, numbers);
+    numbers.splice(numbers.indexOf(maxAbsNumber), 1);
+    var secondAbsNumber = Math.max.apply(null, numbers);
+
+    var dataMax = Math.max(stat.max, avgMax, 0);	// A skála végpontja: a legnagyobb ábrázolandó érték.
+    var dataMin = Math.min(stat.min, avgMin, 0);	// A skála alsó végpontja: a legkisebb ábrázolandó érték.
+
+    if (dataMax > that.cutLimit * secondAbsNumber && secondAbsNumber > 0 && rowNumber > 2) {
+        dataMax = stat.max2nd * that.cutConstant;
+    }
+    if (dataMin < -that.cutLimit * secondAbsNumber && secondAbsNumber > 0 && rowNumber > 2) {
+        dataMin = stat.min2nd * that.cutConstant;
+    }
+    return [dataMin, dataMax];
+};
+
+/**
+ * Eldönti, hogy a vonalaknak kell-e önálló, másodlagos skála. Akkor kell, ha
+ * egyszerre van a panelen oszlop és vonal, és a két csoport által igényelt skála
+ * legalább dualScaleLimit-szeresen eltér. Az oszlopok és a vonalak egy-egy
+ * csoportot alkotnak: a csoportokon belül mindig közös a skála.
+ *
+ * @param {Array} barDomain Az oszlopok által igényelt értékkészlet.
+ * @param {Array} lineDomain A vonalak által igényelt értékkészlet.
+ * @returns {Boolean} True, ha két skála kell, false, ha egy.
+ */
+panel_barline.prototype.isDualScaleRequired = function (barDomain, lineDomain) {
+    var that = this;
+
+    // Széthúzott módban nincsenek is vonalak, és a kettős skálához mindkét fajta elem kell.
+    if (that.isStretched || that.valBarNumber === 0 || that.valLineNumber === 0) {
+        return false;
+    }
+
+    // Ha a report fix skálát kért, azt nem bontjuk ketté.
+    var requiredDomain = (that.valFraction) ? that.actualInit.domainr : that.actualInit.domain;
+    if ((requiredDomain instanceof Array) && requiredDomain.length === 2) {
+        return false;
+    }
+
+    var barSpan = barDomain[1] - barDomain[0];
+    var lineSpan = lineDomain[1] - lineDomain[0];
+    if (!(barSpan > 0) || !(lineSpan > 0)) {
+        return false;
+    }
+
+    // A két skála nullpontja egy magasságban marad, ezért a vonalak skálája az
+    // oszlopokénak a konstansszorosa. Ez csak akkor lehetséges, ha amerre a
+    // vonalak kilógnak a nullától, arra az oszlopok is.
+    if ((lineDomain[1] > 0 && barDomain[1] <= 0) || (lineDomain[0] < 0 && barDomain[0] >= 0)) {
+        return false;
+    }
+
+    var ratio = barSpan / lineSpan;
+    return (ratio > that.dualScaleLimit || ratio < 1 / that.dualScaleLimit);
+};
+
+/**
+ * Megkeresi a legkisebb "szép" számot, ami a paraméterül kapottnál nem kisebb.
+ * Szép szám: a dualScaleMantissas egyik eleme, 10 valamelyik hatványával szorozva.
+ * Így a másodlagos tengely osztásvonalaira is kerek értékek kerülnek.
+ *
+ * @param {Number} ratio A szorzó, aminél nem kisebb szép számot keresünk.
+ * @returns {Number} A szép szorzó.
+ */
+panel_barline.prototype.niceRatio = function (ratio) {
+    var that = this;
+    if (!isFinite(ratio) || ratio <= 0) {
+        return 1;
+    }
+    var power = Math.pow(10, Math.floor(Math.log(ratio) / Math.LN10));
+    var mantissa = ratio / power;
+    for (var i = 0, iMax = that.dualScaleMantissas.length; i < iMax; i++) {
+        if (that.dualScaleMantissas[i] >= mantissa - 1e-9) {
+            return that.dualScaleMantissas[i] * power;
+        }
+    }
+    return 10 * power;
+};
+
+/**
+ * Beállítja a vonalak függőleges skáláját. Ha nincs szükség kettős skálára, akkor
+ * az oszlopokéval azonos, egyébként annak olyan konstansszorosa, amiben a vonalak
+ * elférnek. Így a két skála nullpontja és osztásvonalai egy magasságban maradnak.
+ * Csak a setYScale meghívása után szabad hívni.
+ *
+ * @param {Array} lineDomain A vonalak által igényelt értékkészlet.
+ * @returns {undefined}
+ */
+panel_barline.prototype.setYScaleLine = function (lineDomain) {
+    var that = this;
+    var barDomain = that.yScale.domain();
+
+    if (!that.isDualScale) {
+        that.lineScaleRatio = 1;
+        that.yScaleLine.domain(barDomain);
+        return;
+    }
+
+    // A legkisebb olyan szorzó, amivel a vonalak még beleférnek az oszlopok skálájába.
+    var ratio = 0;
+    if (barDomain[1] > 0) {
+        ratio = Math.max(ratio, lineDomain[1] / barDomain[1]);
+    }
+    if (barDomain[0] < 0) {
+        ratio = Math.max(ratio, lineDomain[0] / barDomain[0]);
+    }
+
+    that.lineScaleRatio = that.niceRatio(ratio);
+    that.yScaleLine.domain([barDomain[0] * that.lineScaleRatio, barDomain[1] * that.lineScaleRatio]);
 };
 
 /**
@@ -745,11 +928,31 @@ panel_barline.prototype.prepareData = function (oldPreparedData, newDataRows, dr
         return d.value;
     }) || 0;
 
+    // Az átlagvonalak szétválogatása aszerint, hogy oszlophoz vagy vonalhoz tartoznak-e,
+    // és a két csoport átlagszélsőértékeinek meghatározása.
+    var avgIsLine = [];
+    var maxAvgBarValue = 0, minAvgBarValue = 0, maxAvgLineValue = 0, minAvgLineValue = 0;
+    for (var i = 0, iMax = that.valAvgNumber; i < iMax; i++) {
+        var isLineAvg = (global.positionInArray(that.valLinesToShow, that.valAvgToShow[i]) > -1);
+        avgIsLine.push(isLineAvg);
+        if (isLineAvg) {
+            maxAvgLineValue = Math.max(maxAvgLineValue, avgValues[i].value);
+            minAvgLineValue = Math.min(minAvgLineValue, avgValues[i].value);
+        } else {
+            maxAvgBarValue = Math.max(maxAvgBarValue, avgValues[i].value);
+            minAvgBarValue = Math.min(minAvgBarValue, avgValues[i].value);
+        }
+    }
+
     // Első végigfutás: alapértékek beállítása, és a maximumok, minimumok meghatározása.
     var maxValue = 0;
     var minValue = 0;
     var max2ndValue = 0;
     var min2ndValue = 0;
+
+    // Ugyanezek külön az oszlopokra és külön a vonalakra, a kettős skála eldöntéséhez.
+    var barStat = {max: 0, min: 0, max2nd: 0, min2nd: 0};
+    var lineStat = {max: 0, min: 0, max2nd: 0, min2nd: 0};
 
     for (var i = 0, iMax = newDataRows.length; i < iMax; i++) {
         var dataRow = newDataRows[i];
@@ -766,8 +969,17 @@ panel_barline.prototype.prepareData = function (oldPreparedData, newDataRows, dr
         var mx = 0;
 
         var lineValsArray = global.getArrayFromObjectArrayByProperty(element.lineValues, 'value');
-        var currentMaxValue = Math.max((element.sumBarValues || 0), (d3.max(lineValsArray) || 0));
-        var currentMinValue = Math.min((element.sumBarValues || 0), (d3.min(lineValsArray) || 0));
+        var currentBarValue = element.sumBarValues || 0;
+        var currentMaxLineValue = d3.max(lineValsArray) || 0;
+        var currentMinLineValue = d3.min(lineValsArray) || 0;
+        var currentMaxValue = Math.max(currentBarValue, currentMaxLineValue);
+        var currentMinValue = Math.min(currentBarValue, currentMinLineValue);
+
+        // Az oszlopok és a vonalak szélsőértékeinek külön-külön gyűjtése is.
+        that.collectMax(barStat, currentBarValue);
+        that.collectMin(barStat, currentBarValue);
+        that.collectMax(lineStat, currentMaxLineValue);
+        that.collectMin(lineStat, currentMinLineValue);
 
         if (currentMaxValue >= maxValue) {
             max2ndValue = maxValue;
@@ -810,10 +1022,22 @@ panel_barline.prototype.prepareData = function (oldPreparedData, newDataRows, dr
         dataMin = min2ndValue * that.cutConstant;
     }
 
+    // Az oszlopok és a vonalak csoportja által külön-külön igényelt skála.
+    var barDomain = that.cutDomain(barStat, maxAvgBarValue, minAvgBarValue, newDataRows.length);
+    var lineDomain = that.cutDomain(lineStat, maxAvgLineValue, minAvgLineValue, newDataRows.length);
+
+    // Ha a két csoport nagyságrendje nagyon eltér, mindkettő a saját skáláját kapja.
+    that.isDualScale = that.isDualScaleRequired(barDomain, lineDomain);
+    if (that.isDualScale) {
+        dataMin = barDomain[0];
+        dataMax = barDomain[1];
+    }
+
     var oldDataMax = that.yScale.domain()[1]; // Az Y skála régi végpontja.
     var oldDataMin = that.yScale.domain()[0]; // Az Y skála régi alsó végpontja.
 
     that.setYScale([dataMin, dataMax]);	// Az új Y skála beállítása.
+    that.setYScaleLine(lineDomain);	// A vonalak skálájának beállítása.
     var yMagRatio = (that.isStretched) ? 1 : (that.yScale.domain()[1] - that.yScale.domain()[0]) / (oldDataMax - oldDataMin); // A régi és az új Y skála közötti arány.
 
     var strechScale = d3.scaleLinear() // Identikus skála; ha széthúzott üzemmódban vagyunk, akkor minden egyes elemnél átalakítjuk.
@@ -871,7 +1095,7 @@ panel_barline.prototype.prepareData = function (oldPreparedData, newDataRows, dr
     for (var j = 0, jMax = that.valAvgNumber; j < jMax; j++) {
         var avgVal = avgValues[j];
         avgVal.id = that.valAvgToShow[j];
-        avgVal.y = that.yScale(avgValues[j].value);
+        avgVal.y = (avgIsLine[j]) ? that.yScaleLine(avgValues[j].value) : that.yScale(avgValues[j].value);
         avgVal.x0 = 1;
         avgVal.x1 = that.width + that.avgTextHeight;
 
@@ -910,7 +1134,7 @@ panel_barline.prototype.prepareData = function (oldPreparedData, newDataRows, dr
             lineElement.name = dataArray[i].name.trim();
             lineElement.value = dataArray[i].lineValues[j].value;
             lineElement.x = that.xScale(i + 0.5);
-            lineElement.y = that.yScale(lineElement.value);
+            lineElement.y = that.yScaleLine(lineElement.value);
             lineElement.tooltip = dataArray[i].tooltip;
             line.push(lineElement);
         }
@@ -1551,6 +1775,34 @@ panel_barline.prototype.drawAxes = function (preparedData, trans) {
         that.gAxisY.call(that.yAxis);
     }
 
+    // A vonalak másodlagos, jobb oldali függőleges tengelyének kirajzolása, animálása.
+    if (that.isDualScale) {
+
+        // Az osztásvonalak az elsődleges tengelyéivel egy magasságba kerülnek.
+        that.yAxisLine.tickValues(that.yScale.ticks(10).map(function (d) {
+            return d * that.lineScaleRatio;
+        }));
+
+        that.gAxisYLine
+            .attr("transform", "translate(" + (that.margin.left + that.width) + ", " + that.margin.top + ")")
+            .style("display", null);
+
+        if (that.gAxisYLine.selectAll("path").nodes().length > 0) {
+            that.gAxisYLine.transition(trans).call(that.yAxisLine);
+        } else {
+            that.gAxisYLine.call(that.yAxisLine);
+        }
+
+        // Ha csak egy vonal van, a tengelyt a vonal színére színezzük, hogy látszódjon, melyikhez tartozik.
+        var axisYLineColor = (that.valLineNumber === 1) ? global.colorValue(that.valLinesToShow[0], that.panelSide) : null;
+        that.gAxisYLine.selectAll("path, line").style("stroke", axisYLineColor);
+        that.gAxisYLine.selectAll("text").style("fill", axisYLineColor);
+
+    } else {
+        that.gAxisYLine.selectAll("*").remove();
+        that.gAxisYLine.style("display", "none");
+    }
+
     // Vízszintes tengely elmozgatása (negatív értékek kijelzésekor nem alul kell lennie)
     that.gAxisX.select("line").transition(trans).attrs({
         x1: 0,
@@ -1938,6 +2190,9 @@ panel_barline.prototype.changeConfiguration = function (isLegendRequired, leftOf
 
         this.yScale.range([this.height, 0]);
         this.yScaleStreched.range([this.height, 0]);
+        this.yScaleLine.range([this.height, 0]);
+
+        this.gAxisYLine.attr("transform", "translate(" + (this.margin.left + this.width) + ", " + this.margin.top + ")");
 
         this.gAxisX.select("line").attr({
             x1: 0,
