@@ -810,10 +810,8 @@ Container.prototype.saveAsCsv = function(side, requestedDims) {
         "drillVectors": queries
     };
     
-    const encodedQuery = "queries=" + window.btoa(JSON.stringify(requestObject));
-
     // Adatok letöltése, és a belőlük származó csv-törzs összerakása.
-    global.get(global.url.fact, encodedQuery, function(resultJson) {
+    global.post(global.url.fact, JSON.stringify(requestObject), function(resultJson) {
         var result = resultJson;
 
         // Dimenziók fejlécének hozzáadása.

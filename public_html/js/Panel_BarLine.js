@@ -88,13 +88,10 @@ function panel_barline(init) {
     // Axes.
     this.xAxis = d3.axisBottom(that.xScale);
     this.yAxis = d3.axisLeft(that.yScale)
-        .ticks(10)
-        .tickFormat(global.cleverRound3);
+        .ticks(10);
 
     // Széthúzott módban a függőleges tengely %-okat kell hogy mutasson.
-    if (that.isStretched) {
-        that.yAxis.scale(this.yScaleStreched).tickFormat(d3.format(".0%"));
-    }
+    that.setYAxisScale();
 
     // Alsó dobómező.
     that.svg.insert("svg:g", ".panelControlButton")
@@ -507,6 +504,21 @@ panel_barline.prototype.setYScale = function (scale) {
     }
     if (!this.isStretched) {
         this.yScale.nice(global.niceY);
+    }
+};
+
+/**
+ * A függőleges tengely skálájának és feliratformátumának beállítása.
+ * 100%-ra széthúzott módban a tengely 0-100%-ot mutat, egyébként a tényleges
+ * értékeket. Meg kell hívni mindenhol, ahol az isStretched megváltozik.
+ *
+ * @returns {undefined}
+ */
+panel_barline.prototype.setYAxisScale = function () {
+    if (this.isStretched) {
+        this.yAxis.scale(this.yScaleStreched).tickFormat(d3.format(".0%"));
+    } else {
+        this.yAxis.scale(this.yScale).tickFormat(global.cleverRound3);
     }
 };
 
@@ -1976,6 +1988,7 @@ panel_barline.prototype.alternateSwitch = function () {
     if (that.valLineNumber === 0 && that.valBarNumber > 0) {
         that.isStretched = !that.isStretched;
     }
+    that.setYAxisScale();
     that.update();
     that.actualInit.symbols = that.isSymbolsRequired;
     that.actualInit.streched = that.isStretched;

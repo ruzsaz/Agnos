@@ -84,6 +84,26 @@ ControlSlider.prototype.updateLabels = function (parentElement, newLabels, trans
     valueContainer.transition(trans).style("opacity", 1);
 };
 
+/**
+ * A csúszka feliratainak cseréje, pl. nyelvváltáskor. A pillanatnyi értékhez
+ * tartozó feliratot azonnal újra is rajzolja.
+ *
+ * @param {Array} newLabels Az új feliratok, a values tömbbel azonos sorrendben.
+ * @returns {undefined}
+ */
+ControlSlider.prototype.setLabels = function (newLabels) {
+    if (!this.isDiscrete || newLabels === undefined) {
+        return;
+    }
+    for (let i = 0, iMax = this.controlValues.length; i < iMax; i++) {
+        if (newLabels[i] !== undefined) {
+            this.controlValues[i].label = newLabels[i];
+        }
+    }
+    const sliderValue = this.container.select("input").property("value");
+    this.container.select("text").text(this.getLabelForSliderValue(sliderValue));
+};
+
 ControlSlider.prototype.setValue = function (newValue, triggerChange = true) {
     const controlElement = document.getElementById(this.id);
     controlElement.value = this.getSliderValue(newValue);

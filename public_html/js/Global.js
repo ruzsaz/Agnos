@@ -188,17 +188,19 @@ var global = function () {
 //////////////////////////////////////////////////
 
     /**
-         * Aszinkron ajax adatletöltés GET-en át, újrapróbálkozással, hibakezeléssel.
+         * Aszinkron ajax adatkérés GET-en vagy POST-on át, újrapróbálkozással, hibakezeléssel.
          * A keycloak tokent frissíti, ha lejáróban van.
          *
+         * @param {String} method A HTTP metódus: "GET" vagy "POST".
          * @param {String} url Az URL, ahonnan le kell tölteni.
-         * @param {String} data A felküldendő adat.
+         * @param {String} data A felküldendő adat. GET-nél query-stringgé fűződik az URL-hez,
+         *                      POST-nál kész JSON-sztringként a kérés törzsébe kerül.
          * @param {String} callback Sikeres letöltés után meghívandó függvény.
          * @param {Boolean} isDeleteDialogRequired Sikeres letöltés után törölje-e a dialógusablakot?
          * @param {int} triesLeft Ennyi próbálkozást engedünk meg.
          * @returns {undefined}
          */
-    const getWithRetries = function (url, data, callback, isDeleteDialogRequired, triesLeft) {
+    const requestWithRetries = function (method, url, data, callback, isDeleteDialogRequired, triesLeft) {
         triesLeft--;
         var progressDiv = d3.select("#progressDiv");
         var progressCounter = setTimeout(function () {
@@ -214,7 +216,7 @@ var global = function () {
         }).catch(function () {
             //console.log('Failed to refresh the token, or the session has expired');
         }).finally(() => {
-            $.ajax({
+            const settings = {
                 url: url,
                 data: data,
                 timeout: 5000,
@@ -262,7 +264,7 @@ var global = function () {
                     } else { // Más hiba esetén...
                         if (triesLeft > 0) {
                             console.log("Hmmm...", jqXHR.status, textStatus, errorThrown, "no problem, ", triesLeft, " tries still left before giving up.");
-                            getWithRetries(url, data, callback, isDeleteDialogRequired, triesLeft);
+                            requestWithRetries(method, url, data, callback, isDeleteDialogRequired, triesLeft);
                         } else {
                             alert('Unknown error. Not good...');
                         }
@@ -274,7 +276,18 @@ var global = function () {
                     progressDiv.style("z-index", -1);
                 }
 
-            });
+            };
+
+            // POST esetén a data már kész JSON-sztring, ami a kérés törzsébe megy.
+            // A jQuery alapértelmezett contentType-ja form-urlencoded lenne, azzal a
+            // szerveroldali @RequestBody 415-öt adna.
+            if (method === "POST") {
+                settings.type = "POST";
+                settings.contentType = "application/json";
+                settings.processData = false;
+            }
+
+            $.ajax(settings);
 
         });
 
@@ -874,13 +887,29 @@ var global = function () {
      * A keycloak tokent frissíti, ha lejáróban van.
      *
      * @param {String} url Az URL, ahonnan le kell tölteni.
-     * @param {String} data A felküldendő adat.
+     * @param {String} data A felküldendő adat, query-stringként.
      * @param {String} callback Sikeres letöltés után meghívandó függvény.
      * @param {Boolean} isDeleteDialogRequired Sikeres letöltés után törölje-e a dialógusablakot?
      * @returns {undefined}
      */
     const get = function (url, data, callback, isDeleteDialogRequired = true) {
-        getWithRetries(url, data, callback, isDeleteDialogRequired, 3);
+        requestWithRetries("GET", url, data, callback, isDeleteDialogRequired, 3);
+    };
+
+    /**
+     * Aszinkron ajax adatkérés POST-on át, hibakezeléssel.
+     * A keycloak tokent frissíti, ha lejáróban van.
+     * Hosszú lekérdezésekhez, amik GET-en URL-be csomagolva túllépnék a
+     * szerver kérés-fejléc limitjét.
+     *
+     * @param {String} url Az URL, ahova a kérést küldjük.
+     * @param {String} data A felküldendő adat, kész JSON-sztringként.
+     * @param {String} callback Sikeres letöltés után meghívandó függvény.
+     * @param {Boolean} isDeleteDialogRequired Sikeres letöltés után törölje-e a dialógusablakot?
+     * @returns {undefined}
+     */
+    const post = function (url, data, callback, isDeleteDialogRequired = true) {
+        requestWithRetries("POST", url, data, callback, isDeleteDialogRequired, 3);
     };
 
 
@@ -2255,6 +2284,35 @@ var global = function () {
 
     };
 
+    /**
+     * Egy dimenzióérték nevét a pillanatnyi nyelvre fordítja.
+     * A lefúrási útvonalban (baseLevels) tárolt név a lefúráskori nyelven van,
+     * ezért a fordítás alapja a forrásnyelvi név, ha ismerjük. Így a fejlécpanel
+     * nyelvváltás és bookmarkból való visszatöltés után is jól jelenik meg.
+     *
+     * @param {Integer} side Melyik oldal reportjáról van szó.
+     * @param {Integer} dimIndex A dimenzió sorszáma.
+     * @param {Object} element A dimenzióérték: {id, name, sourceName}.
+     * @returns {String} A pillanatnyi nyelvre fordított név.
+     */
+    const localizeDimensionValue = function (side, dimIndex, element) {
+        if (element === undefined) {
+            return "";
+        }
+        const sourceName = (element.sourceName !== undefined) ? element.sourceName : element.name;
+        if (sourceName === undefined) {
+            return "";
+        }
+        const fact = global.facts[side];
+        if (fact === undefined || fact.reportMeta === undefined) {
+            return _(sourceName);
+        }
+        const dimension = fact.reportMeta.dimensions[dimIndex];
+        const dictionary = global.dictionaries[side].getDictionary(dimension.lang, String.locale);
+        const lookup = dictionary[sourceName];
+        return (lookup === undefined) ? _(sourceName) : lookup;
+    };
+
 //////////////////////////////////////////////////
 // A létrejövő, globálisan elérhető objektum
 //////////////////////////////////////////////////
@@ -2346,6 +2404,8 @@ var global = function () {
         minifyInits: minifyInits, // Minifyol egy init-stringet, hogy az URL-kódolt verzió kisebb legyen.
         setDialog: setDialog, // Dialógusablak beállítása/levétele.
         get: get, // Aszinkron ajax adatletöltés GET-en át, hibakezeléssel.
+        post: post, // Aszinkron ajax adatkérés POST-on át, hibakezeléssel. Hosszú lekérdezésekhez.
+        localizeDimensionValue: localizeDimensionValue, // Egy dimenzióérték nevének fordítása a pillanatnyi nyelvre.
         loadExternal: loadExternal, // Loads an external json resource, with possibility to retry it.        
         subclassOf: subclassOf, // Osztály származtatását megvalósító függvény.
         getStyleForScale: getStyleForScale, // Nagyítást/kicsinyítést végrehajtó style generálása.

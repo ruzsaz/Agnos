@@ -99,7 +99,7 @@ HeadPanel_Report.prototype.prepareData = function (data) {
         const baseDim = (global.baseLevels[that.panelSide])[i];
         let pathString = that.localMeta.dimensions[i].top_level_caption;
         for (let d = 0, dMax = baseDim.length; d < dMax; d++) {
-            pathString = pathString + that.dimLevelsSeparator + baseDim[d].name.trim();
+            pathString = pathString + that.dimLevelsSeparator + global.localizeDimensionValue(that.panelSide, i, baseDim[d]).trim();
         }
 
         dimData.push({
@@ -343,6 +343,14 @@ HeadPanel_Report.prototype.refreshPanelContent = function (trans = undefined) {
     dimRow.select(".tableText1.spacer")
         .text("&nbsp;");
 
+    // A Kaplan-Meier csúszkák feliratai csak a csúszka létrehozásakor kerülnek be,
+    // ezért nyelvváltáskor itt kell újrafordítani őket.
+    for (let i = 0, iMax = that.kaplanMeierSliders.length; i < iMax; i++) {
+        if (that.kaplanMeierSliders[i] !== undefined) {
+            that.kaplanMeierSliders[i].setLabels(that.getKaplanMeierSliderLabels(that.meta.dimensions[i], i));
+        }
+    }
+
     // Kontrol sorok
     const controlRow = that.controlTable.selectAll(".row").data(that.localMeta.controls);
 
@@ -484,7 +492,7 @@ HeadPanel_Report.prototype.initDimensions = function (trans) {
             that.kaplanMeierSliders[i] = new ControlSlider(
                 d3.select(this),
                 "kaplanMeierDimension_P" + that.panelSide + "_" + i,
-                that.getKaplanMeierSliderInit(d),
+                that.getKaplanMeierSliderInit(d, i),
                 that.getKaplanMeierSliderValue(i),
                 function (v) {
                     that.drillKaplanMeierDimension(i, v);
@@ -497,13 +505,31 @@ HeadPanel_Report.prototype.initDimensions = function (trans) {
         .attr("class", "cell backgroundCell listener dragable");
 }
 
-HeadPanel_Report.prototype.getKaplanMeierSliderInit = function (dimension) {
+HeadPanel_Report.prototype.getKaplanMeierSliderInit = function (dimension, dimensionIndex) {
     return {
         parameters: JSON.stringify({
             values: dimension.kaplanMeierValues.map(value => value.id),
-            labels: dimension.kaplanMeierValues.map(value => value.name)
+            labels: this.getKaplanMeierSliderLabels(dimension, dimensionIndex)
         })
     };
+}
+
+/**
+ * A Kaplan-Meier csúszka feliratai, a pillanatnyi nyelvre fordítva. A metában
+ * tárolt nevek a dimenzió forrásnyelvén vannak, ezért a szótáron át kell menniük.
+ *
+ * @param {Object} dimension A dimenzió, aminek a csúszkájáról szó van.
+ * @param {Integer} dimensionIndex A dimenzió sorszáma.
+ * @returns {Array} A lefordított feliratok, a values tömbbel azonos sorrendben.
+ */
+HeadPanel_Report.prototype.getKaplanMeierSliderLabels = function (dimension, dimensionIndex) {
+    const that = this;
+    if (dimension === undefined || dimension.kaplanMeierValues === undefined) {
+        return [];
+    }
+    return dimension.kaplanMeierValues.map(function (value) {
+        return global.localizeDimensionValue(that.panelSide, dimensionIndex, value);
+    });
 }
 
 HeadPanel_Report.prototype.getKaplanMeierSliderValue = function (dimensionIndex) {
@@ -527,6 +553,7 @@ HeadPanel_Report.prototype.drillKaplanMeierDimension = function (dimensionIndex,
             direction: -1,
             toId: selectedValue.id,
             toName: selectedValue.name,
+            toSourceName: selectedValue.name,
             replace: true
         });
     }

@@ -50,16 +50,14 @@ function panel_bar2d(init) {
 
     // A függőleges tengelyt generáló függvény.
     this.yAxis = d3.axisLeft(that.yScale)
-            .ticks(10)
-            .tickFormat(global.cleverRound3);
+            .ticks(10);
 
-    // Széthúzott módban a függőleges tengely %-okat kell hogy mutasson.
-    if (that.isStretched) {
-        that.yAxis.scale(d3.scaleLinear()
-                .range([that.height, 0])
-                .domain([0, 1]))
-                .tickFormat(d3.format(".0%"));
-    }
+    // Függőleges skála széthúzott módra: ilyenkor a tengely 0-100%-ot mutat.
+    this.yScaleStreched = d3.scaleLinear()
+            .range([that.height, 0])
+            .domain([0, 1]);
+
+    that.setYAxisScale();
 
     // A fő alapréteg, ami mentén az X dimenzóban való furkálás történik.
     that.svg.insert("svg:g", ".panelControlButton")
@@ -254,6 +252,21 @@ panel_bar2d.prototype.setYScale = function (scale) {
     }
     if (!this.isStretched) {
         this.yScale.nice(global.niceY);
+    }
+};
+
+/**
+ * A függőleges tengely skálájának és feliratformátumának beállítása.
+ * 100%-ra széthúzott módban a tengely 0-100%-ot mutat, egyébként a tényleges
+ * értékeket. Meg kell hívni mindenhol, ahol az isStretched megváltozik.
+ *
+ * @returns {undefined}
+ */
+panel_bar2d.prototype.setYAxisScale = function () {
+    if (this.isStretched) {
+        this.yAxis.scale(this.yScaleStreched).tickFormat(d3.format(".0%"));
+    } else {
+        this.yAxis.scale(this.yScale).tickFormat(global.cleverRound3);
     }
 };
 
@@ -1139,6 +1152,7 @@ panel_bar2d.prototype.doChangeDimension = function (panelId, newDimId, dimToChan
 panel_bar2d.prototype.alternateSwitch = function () {
     const that = this;
     that.isStretched = !that.isStretched;
+    that.setYAxisScale();
     that.update();
     that.actualInit.streched = that.isStretched;
     global.writeConfigToUrl();

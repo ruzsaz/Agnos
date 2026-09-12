@@ -16,6 +16,7 @@ function DataDirector(side, mediator) {
     this.mediator = mediator;
     this.panelRoster = [];
     this.drillLock = false; // Lock to prevent multiple drill requests.
+    this.sourceNameById = {}; // Source language names of the dimension values, by their id.
 
     // Subscribe to the panel registration, drill, control change, and config request events.
     that.mediator.subscribe("register", function (context, panelId, dimsToShow, preUpdateFunction, updateFunction, getConfigFunction) {
@@ -184,11 +185,11 @@ DataDirector.prototype.drill = function (drill) {
             if (drill.replace && drill.toId !== undefined && baseDim.length > 0) {
                 isSuccessful = true;
                 drill.fromId = (baseDim[baseDim.length - 1]).id;
-                baseDim[baseDim.length - 1] = {id: drill.toId, name: drill.toName};
+                baseDim[baseDim.length - 1] = that.createBaseLevelElement(drill);
             } else if (drill.toId !== undefined && baseDim.length < global.facts[that.side].localMeta.dimensions[dim].levels - 1) {
                 isSuccessful = true;
                 drill.fromId = (baseDim.length === 0) ? null : (baseDim[baseDim.length - 1]).id;
-                baseDim.push({id: drill.toId, name: drill.toName});
+                baseDim.push(that.createBaseLevelElement(drill));
             }
         } else if (drill.direction === 1) {
             if (baseDim.length > 0) {
@@ -280,9 +281,8 @@ DataDirector.prototype.requestNewData = function (drill) {
         "isCubePreparationRequired": that.cubePreparationRequired
     };
     that.cubePreparationRequired = false;
-    const encodedQuery = "queries=" + window.btoa(encodeURIComponent((JSON.stringify(requestObject))));
     // The actual data request.
-    global.get(global.url.fact, encodedQuery, function (result) {
+    global.post(global.url.fact, JSON.stringify(requestObject), function (result) {
         that.processNewData(drill, result);
         that.drillLock = false;
     });
@@ -554,6 +554,23 @@ DataDirector.prototype.applyFunctionToAllPanels = function (data, controlValues,
 };
 
 /**
+ * Creates an element of the drill path. Besides the displayed name it stores the
+ * source language name as well, so the head panel can translate it again after a
+ * language switch, or when the state is restored from a bookmark.
+ *
+ * @param {Object} drill The drill object.
+ * @returns {Object} The drill path element.
+ */
+DataDirector.prototype.createBaseLevelElement = function (drill) {
+    const sourceName = (drill.toSourceName !== undefined) ? drill.toSourceName : this.sourceNameById[drill.toId];
+    return {
+        id: drill.toId,
+        name: drill.toName,
+        sourceName: (sourceName === undefined) ? drill.toName : sourceName
+    };
+};
+
+/**
  * Localizes the "name" dimension attributes in the raw data.
  * There is no return value, the input data is changed.
  *
@@ -578,6 +595,9 @@ DataDirector.prototype.localizeNewData = function (newData) {
             const dims = rows[r].dims;
             for (let d = 0, dMax = dims.length; d < dMax; d++) {
                 const name = dims[d].name;
+                // The name arrives in the dimension's source language. Remember it, so a
+                // later drill can store it, and the head panel can re-translate it.
+                this.sourceNameById[dims[d].id] = name;
                 const lookup = dictToUse[d][name];
                 dims[d].name = (lookup === undefined) ? _(dims[d].name) : lookup;
             }
